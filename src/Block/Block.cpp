@@ -32,9 +32,14 @@ Block::Block(BLOCK_TYPE type, glm::vec3 pos)
 void Block::Render(GLuint shader)
 {
 	glUniform3fv(glGetUniformLocation(shader, "blockPos"), 1, glm::value_ptr(pos));
-	const char* name = getName();
-	GLuint tex = getTexture(name);
-	glBindTexture(GL_TEXTURE_2D, tex);
+
+	glm::vec3 highlightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	if (highlighted) {
+		highlightColor = glm::vec3(.5f, .5f, .5f);
+	}
+	glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(highlightColor));
+
+	glBindTexture(GL_TEXTURE_2D, getTexture(getName()));
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 }
@@ -44,11 +49,21 @@ const char* Block::getName()
 	switch (type) {
 	case BLOCK_TYPE::AIR:
 		return "air";
+
 	case BLOCK_TYPE::STONE:
 		return "stone";
+
+	case BLOCK_TYPE::GRASS:
+		return "grass";
+
 	default:
 		return "invalid";
 	}
+}
+
+glm::vec3 Block::getPos()
+{
+	return pos;
 }
 
 Block::~Block()

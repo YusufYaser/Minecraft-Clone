@@ -1,18 +1,19 @@
 #include "Camera.h"
 
-Camera::Camera(glm::vec3 pos)
+Camera::Camera(World* world, glm::vec3 pos)
 {
     Camera::pos = pos;
+    Camera::world = world;
 }
 
 void Camera::checkInputs(GLFWwindow* window, float delta) {
     glm::vec3 orientation2 = glm::vec3(orientation.x, 0.0f, orientation.z);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        pos += (speed * delta) * orientation2;
+        pos += (speed * delta) * glm::normalize(orientation2);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        pos -= (speed * delta) * orientation2;
+        pos -= (speed * delta) * glm::normalize(orientation2);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         pos -= (speed * delta) * glm::normalize(glm::cross(orientation2, up));
@@ -26,9 +27,21 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         pos -= (speed * delta) * up;
     }
-    
+
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) brokeBlock = true; // prevent block breaking when capturing mouse
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+        if (!brokeBlock) {
+            Block* target = getTargetBlock();
+
+            if (target != nullptr) {
+                world->setBlock(target->getPos(), BLOCK_TYPE::AIR);
+                brokeBlock = true;
+            }
+        }
+    } else {
+        brokeBlock = false;
     }
 
     if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_HIDDEN) {
@@ -59,4 +72,17 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
     } else {
         wasHidden = false;
     }
+}
+
+Block* Camera::getTargetBlock()
+{
+    for (int i = 0; i < 10; i++) {
+        glm::vec3 blockPos = pos + (float)i * orientation;
+        blockPos.x = ceil(blockPos.x);
+        blockPos.y = ceil(blockPos.y);
+        blockPos.z = ceil(blockPos.z);
+        Block* block = world->getBlock(blockPos);
+        if (block != nullptr) return block;
+    }
+    return nullptr;
 }

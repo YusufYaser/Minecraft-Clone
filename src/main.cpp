@@ -1,11 +1,8 @@
 #include <iostream>
 #include <glad/gl.h>
-#define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
 #include "GameWindow/GameWindow.h"
 #include "Logging.h"
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -16,6 +13,7 @@
 #include "Block/Block.h"
 #include "Shaders/Shaders.h"
 #include "Textures/Textures.h"
+#include "World/World.h"
 
 const char* vertexShaderFile = {
 #include "Shaders/DefaultShader/Shader.vert"
@@ -64,9 +62,9 @@ int main(int argc, char* argv[]) {
 	glUniform1i(glGetUniformLocation(shader.ID, "tex0"), 0);
 	print("Loaded textures");
 
-	Camera camera = Camera(glm::vec3(.0f, .0f, 2.0f));
+	World world;
 
-	Block stone = Block(BLOCK_TYPE::STONE, glm::vec3());
+	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));
 
 	glm::mat4 rotation = glm::mat4(1.0f);
 	glm::mat4 view;
@@ -75,6 +73,8 @@ int main(int argc, char* argv[]) {
 	glEnable(GL_DEPTH_TEST);
 
 	double prevTime = glfwGetTime();
+
+	Block* oldHighlightedBlock = nullptr;
 
 	while (!glfwWindowShouldClose(gameWindow.getWindow()))
 	{
@@ -99,16 +99,21 @@ int main(int argc, char* argv[]) {
 
 		camera.checkInputs(gameWindow.getWindow(), delta);
 
-		stone.Render(shader.ID);
+		world.Render(shader.ID);
+		Block* targetBlock = camera.getTargetBlock();
+
+		if (oldHighlightedBlock != nullptr) oldHighlightedBlock->highlighted = false;
+		oldHighlightedBlock = targetBlock;
+		if (targetBlock != nullptr) targetBlock->highlighted = true;
 
 		glfwSwapBuffers(gameWindow.getWindow());
 		glfwPollEvents();
 	}
 
 	print("Cleaning up");
-	gameWindow.~GameWindow();
-	stone.~Block();
+	//world.~World();
 	shader.~Shader();
+	gameWindow.~GameWindow();
 
 	print("Terminating GLFW");
 	glfwTerminate();

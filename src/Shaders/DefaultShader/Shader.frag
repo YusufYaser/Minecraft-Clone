@@ -7,9 +7,10 @@ in vec2 texCoord;
 out vec4 FragColor;
 
 uniform sampler2D tex0;
+uniform vec3 highlightColor;
 
 void main() {
-    FragColor = texture(tex0, texCoord);
+    FragColor = texture(tex0, texCoord) * vec4(highlightColor, 1.0);
 }
 
 )END"
