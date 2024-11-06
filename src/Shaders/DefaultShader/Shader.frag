@@ -1,13 +1,15 @@
 R"END(
 #version 410 core
 
-layout(location = 0) in vec3 inColor;
+in vec3 color;
+in vec2 texCoord;
 
-layout(location = 0) out vec4 color;
+out vec4 FragColor;
+
+uniform sampler2D tex0;
 
 void main() {
-    color = vec4(1, 1, 1, 1);
-    color.rgb = inColor;
+    FragColor = texture(tex0, texCoord);
 }
 
 )END"

@@ -98,6 +98,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -117,6 +118,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,6 +138,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,6 +158,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -173,13 +177,17 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\GameWindow\GameWindow.cpp" />
     <ClCompile Include="src\Shaders\Shaders.cpp" />
+    <ClCompile Include="src\stb.cpp" />
+    <ClCompile Include="src\Textures\Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Block\Block.h" />
+    <ClInclude Include="src\Block\CubeVertices.h" />
     <ClInclude Include="src\Camera\Camera.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\GameWindow\GameWindow.h" />
     <ClInclude Include="src\Shaders\Shaders.h" />
+    <ClInclude Include="src\Textures\Textures.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\DefaultShader\Shader.frag" />

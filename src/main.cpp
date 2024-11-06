@@ -5,7 +5,6 @@
 #include <GLFW/glfw3native.h>
 #include "GameWindow/GameWindow.h"
 #include "Logging.h"
-#include "Types.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -16,6 +15,7 @@
 #include "Camera/Camera.h"
 #include "Block/Block.h"
 #include "Shaders/Shaders.h"
+#include "Textures/Textures.h"
 
 const char* vertexShaderFile = {
 #include "Shaders/DefaultShader/Shader.vert"
@@ -56,6 +56,13 @@ int main(int argc, char* argv[]) {
 	}
 
 	print("Intialized shaders");
+
+	print("Loading textures");
+	initializeTextures();
+
+	glUseProgram(shader.ID);
+	glUniform1i(glGetUniformLocation(shader.ID, "tex0"), 0);
+	print("Loaded textures");
 
 	Camera camera = Camera(glm::vec3(.0f, .0f, 2.0f));
 

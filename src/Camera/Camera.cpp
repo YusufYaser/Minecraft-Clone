@@ -48,13 +48,11 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
 
         glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(-rotX), glm::normalize(glm::cross(orientation, up)));
 
-        // Decides whether or not the next vertical Orientation is legal or not
         if (abs(glm::angle(newOrientation, up) - glm::radians(90.0f)) <= glm::radians(85.0f))
         {
             orientation = newOrientation;
         }
 
-        // Rotates the Orientation left and right
         orientation = glm::rotate(orientation, glm::radians(-rotY), up);
 
         glfwSetCursorPos(window, originalPos.x, originalPos.y);

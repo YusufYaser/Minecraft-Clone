@@ -2,9 +2,11 @@
 #include <glm/vec3.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glad/gl.h>
+#include "../Textures/Textures.h"
 
 enum class BLOCK_TYPE {
-	STONE = 1
+	AIR = 0,
+	STONE
 };
 
 class Block {
@@ -13,6 +15,7 @@ public:
 	~Block();
 
 	void Render(GLuint shader);
+	const char* getName();
 
 private:
 	GLuint VAO, VBO, EBO;
