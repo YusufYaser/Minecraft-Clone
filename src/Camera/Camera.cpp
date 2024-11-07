@@ -31,6 +31,11 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
         pos -= (speed * delta) * up;
     }
 
+    static BLOCK_TYPE selectedBlock = BLOCK_TYPE::STONE;
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::STONE;
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::GRASS;
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::DIRT;
+
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) brokeBlock = true; // prevent block breaking when capturing mouse
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -59,7 +64,7 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
             getTargetBlock(&target, &face);
 
             if (target != nullptr) {
-                world->setBlock(target->getPos() + getBlockFaceDirection(face), BLOCK_TYPE::STONE, false);
+                world->setBlock(target->getPos() + getBlockFaceDirection(face), selectedBlock, false);
                 placedBlock = true;
             }
         }
