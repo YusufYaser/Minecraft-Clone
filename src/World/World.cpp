@@ -1,10 +1,14 @@
 #include "World.h"
 
-World::World() {
-    for (int x = 0; x < 20; x++) {
-        for (int y = 0; y < 5; y++) {
-            for (int z = 0; z < 20; z++) {
-                setBlock(glm::vec3(x - 10, y, z - 10), y == 4 ? BLOCK_TYPE::GRASS : y == 3 ? BLOCK_TYPE::DIRT : BLOCK_TYPE::STONE);
+World::World(siv::PerlinNoise::seed_type seed, glm::vec2 size) {
+    const siv::PerlinNoise perlin{ seed };
+
+    for (int x = 0; x < size.x; x++) {
+        for (int z = 0; z < size.y; z++) {
+            const double random = perlin.octave2D_01((x * 0.025), (z * 0.025), 4);
+            int height = random * 10;
+            for (int y = 0; y < height; y++) {
+                setBlock(glm::vec3(x - size.x/2, y, z - size.y/2), y == height - 1 ? BLOCK_TYPE::GRASS : y == height - 2 ? BLOCK_TYPE::DIRT : BLOCK_TYPE::STONE);
             }
         }
     }

@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 	print("Loaded textures");
 
 	print("Creating world");
-	World world;
+	World world(123u, glm::vec2(30, 30));
 	print("Created world");
 
 	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));
