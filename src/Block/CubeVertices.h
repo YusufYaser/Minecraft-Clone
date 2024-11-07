@@ -1,6 +1,6 @@
 #pragma once
 
-GLfloat vertices[] = {
+GLfloat blockVertices[] = {
     // positions          // texture coords
     // front face
     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,   // bottom-left
@@ -39,7 +39,7 @@ GLfloat vertices[] = {
     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f    // bottom-left
 };
 
-GLuint indices[] = {
+GLuint blockIndices[] = {
     // front face
     0, 1, 2, 0, 2, 3,
     // back face

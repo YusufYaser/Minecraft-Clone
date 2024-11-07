@@ -14,7 +14,6 @@ uniform vec3 blockPos;
 void main() {
 	gl_Position = projection * view * vec4(position + (blockPos - vec3(.5f, .5f, .5f)), 1.0f);
 
-	//color = inColor;
 	texCoord = inTexCoord;
 }
 )END"

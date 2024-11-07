@@ -174,6 +174,7 @@
     <ClCompile Include="libraries\include\glad\gl.c" />
     <ClCompile Include="src\Block\Block.cpp" />
     <ClCompile Include="src\Camera\Camera.cpp" />
+    <ClCompile Include="src\GUI\GUI.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\GameWindow\GameWindow.cpp" />
     <ClCompile Include="src\Shaders\Shaders.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="src\Block\Block.h" />
     <ClInclude Include="src\Block\CubeVertices.h" />
     <ClInclude Include="src\Camera\Camera.h" />
+    <ClInclude Include="src\GUI\GUI.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\GameWindow\GameWindow.h" />
     <ClInclude Include="src\Shaders\Shaders.h" />
@@ -194,6 +196,8 @@
   <ItemGroup>
     <None Include="src\Shaders\DefaultShader\Shader.frag" />
     <None Include="src\Shaders\DefaultShader\Shader.vert" />
+    <None Include="src\Shaders\GUI\GUI.frag" />
+    <None Include="src\Shaders\GUI\GUI.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

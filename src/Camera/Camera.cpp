@@ -39,12 +39,6 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
             Block* target = nullptr;
             BLOCK_FACE face;
             getTargetBlock(&target, &face);
-            if (face == BLOCK_FACE::TOP) std::cout << "top";
-            if (face == BLOCK_FACE::BOTTOM) std::cout << "bottom";
-            if (face == BLOCK_FACE::FRONT) std::cout << "FRONT";
-            if (face == BLOCK_FACE::LEFT) std::cout << "LEFT";
-            if (face == BLOCK_FACE::RIGHT) std::cout << "RIGHT";
-            if (face == BLOCK_FACE::BACK) std::cout << "BACK";
 
             if (target != nullptr) {
                 world->setBlock(target->getPos(), BLOCK_TYPE::AIR);
@@ -63,12 +57,6 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
             Block* target = nullptr;
             BLOCK_FACE face;
             getTargetBlock(&target, &face);
-            if (face == BLOCK_FACE::TOP) std::cout << "top";
-            if (face == BLOCK_FACE::BOTTOM) std::cout << "bottom";
-            if (face == BLOCK_FACE::FRONT) std::cout << "FRONT";
-            if (face == BLOCK_FACE::LEFT) std::cout << "LEFT";
-            if (face == BLOCK_FACE::RIGHT) std::cout << "RIGHT";
-            if (face == BLOCK_FACE::BACK) std::cout << "BACK";
 
             if (target != nullptr) {
                 world->setBlock(target->getPos() + getBlockFaceDirection(face), BLOCK_TYPE::STONE, false);

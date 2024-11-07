@@ -36,11 +36,11 @@ Block::Block(BLOCK_TYPE type, glm::vec3 pos)
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(blockVertices), blockVertices, GL_STATIC_DRAW);
 
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(blockIndices), blockIndices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -54,6 +54,7 @@ Block::Block(BLOCK_TYPE type, glm::vec3 pos)
 
 void Block::Render(GLuint shader)
 {
+	glUseProgram(shader);
 	glUniform3fv(glGetUniformLocation(shader, "blockPos"), 1, glm::value_ptr(pos));
 
 	glm::vec3 highlightColor = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -64,7 +65,7 @@ void Block::Render(GLuint shader)
 
 	glBindTexture(GL_TEXTURE_2D, getTexture(getName()));
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, sizeof(blockIndices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 }
 
 const char* Block::getName()

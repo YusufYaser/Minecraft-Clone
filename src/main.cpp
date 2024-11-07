@@ -14,6 +14,7 @@
 #include "Shaders/Shaders.h"
 #include "Textures/Textures.h"
 #include "World/World.h"
+#include "GUI/GUI.h"
 
 const char* vertexShaderFile = {
 #include "Shaders/DefaultShader/Shader.vert"
@@ -21,6 +22,14 @@ const char* vertexShaderFile = {
 
 const char* fragmentShaderFile = {
 #include "Shaders/DefaultShader/Shader.frag"
+};
+
+const char* guiVertexShaderFile = {
+#include "Shaders/GUI/GUI.vert"
+};
+
+const char* guiFragmentShaderFile = {
+#include "Shaders/GUI/GUI.frag"
 };
 
 void glfw_error_callback(int error, const char* description) {
@@ -48,7 +57,8 @@ int main(int argc, char* argv[]) {
 	print("Intializing shaders");
 
 	Shader shader = Shader(vertexShaderFile, fragmentShaderFile);
-	if (shader.ID == 0) {
+	Shader guiShader = Shader(guiVertexShaderFile, guiFragmentShaderFile);
+	if (shader.ID == 0 || guiShader.ID == 0) {
 		error("Failed to initialize shaders");
 		return 1;
 	}
@@ -67,10 +77,12 @@ int main(int argc, char* argv[]) {
 	print("Created world");
 
 	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));
+	Crosshair crosshair;
 
 	glm::mat4 rotation = glm::mat4(1.0f);
 	glm::mat4 view;
 	glm::mat4 projection;
+	glm::mat4 ortho;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -91,6 +103,17 @@ int main(int argc, char* argv[]) {
 
 		glClearColor(.3f, .3f, 1.0f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDepthRange(0, 0.01);
+		glUseProgram(guiShader.ID);
+		
+		float aspectRatio = static_cast<float>(width) / height;
+		float orthoHeight = 1.0f;
+		float orthoWidth = orthoHeight * aspectRatio;
+		ortho = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -1.0f, 1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(guiShader.ID, "viewport"), 1, GL_FALSE, glm::value_ptr(ortho));
+
+		crosshair.Render(guiShader.ID);
+		glDepthRange(0.01, 1.0);
 
 		view = glm::lookAt(camera.pos, camera.pos + camera.orientation, camera.up);
 
