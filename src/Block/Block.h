@@ -7,7 +7,8 @@
 enum class BLOCK_TYPE {
 	AIR = 0,
 	STONE,
-	GRASS
+	GRASS,
+	DIRT
 };
 
 class Block {

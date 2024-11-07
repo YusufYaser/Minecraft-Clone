@@ -4,9 +4,12 @@ Camera::Camera(World* world, glm::vec3 pos)
 {
     Camera::pos = pos;
     Camera::world = world;
+    Camera::originalPos = glm::vec3();
 }
 
 void Camera::checkInputs(GLFWwindow* window, float delta) {
+    if (glfwGetWindowAttrib(window, GLFW_FOCUSED) == GLFW_FALSE) return;
+
     glm::vec3 orientation2 = glm::vec3(orientation.x, 0.0f, orientation.z);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {

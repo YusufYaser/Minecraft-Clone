@@ -56,6 +56,9 @@ const char* Block::getName()
 	case BLOCK_TYPE::GRASS:
 		return "grass";
 
+	case BLOCK_TYPE::DIRT:
+		return "dirt";
+
 	default:
 		return "invalid";
 	}
