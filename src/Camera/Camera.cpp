@@ -35,7 +35,7 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
         if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) brokeBlock = true; // prevent block breaking when capturing mouse
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-        if (!brokeBlock) {
+        if (!brokeBlock || true) {
             Block* target = nullptr;
             BLOCK_FACE face;
             getTargetBlock(&target, &face);
@@ -100,12 +100,12 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
 
 void Camera::getTargetBlock(Block** block, BLOCK_FACE* face)
 {
-    for (int i = 0; i < 10; i++) {
-        glm::vec3 blockPosNoCeil = pos + (float)i * orientation;
-        glm::vec3 blockPos = pos + (float)i * orientation;
-        blockPos.x = ceil(blockPos.x);
-        blockPos.y = ceil(blockPos.y);
-        blockPos.z = ceil(blockPos.z);
+    for (float i = 0; i < reachDistance; i += .25) {
+        glm::vec3 blockPosNoCeil = pos + i * orientation;
+        glm::vec3 blockPos = pos + i * orientation;
+        blockPos.x = round(blockPos.x);
+        blockPos.y = round(blockPos.y);
+        blockPos.z = round(blockPos.z);
         Block* targetBlock = world->getBlock(blockPos);
         if (targetBlock != nullptr) {
             if (block != nullptr) *block = targetBlock;

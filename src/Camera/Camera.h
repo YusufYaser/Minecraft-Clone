@@ -19,6 +19,7 @@ public:
 
 	glm::vec3 pos;
 	float speed = 10.0f;
+	float reachDistance = 50.0f;
 
 	void checkInputs(GLFWwindow* window, float delta);
 

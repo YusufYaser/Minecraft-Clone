@@ -15,6 +15,7 @@
 #include "Textures/Textures.h"
 #include "World/World.h"
 #include "GUI/GUI.h"
+#include <sstream>
 
 const char* vertexShaderFile = {
 #include "Shaders/DefaultShader/Shader.vert"
@@ -87,6 +88,7 @@ int main(int argc, char* argv[]) {
 	glEnable(GL_DEPTH_TEST);
 
 	double prevTime = glfwGetTime();
+	double lastFpsUpdate = glfwGetTime();
 
 	Block* oldHighlightedBlock = nullptr;
 
@@ -100,6 +102,20 @@ int main(int argc, char* argv[]) {
 		glfwGetWindowSize(gameWindow.getWindow(), &width, &height);
 		projection = glm::perspective(glm::radians(45.0f), (float)width / height, .1f, 100.0f);
 		glViewport(0, 0, width, height);
+
+		if (currentTime - lastFpsUpdate > .25) {
+			lastFpsUpdate = currentTime;
+			std::stringstream newTitle;
+			newTitle << "Minecraft Clone";
+			newTitle << " | FPS: " << round(1 / delta);
+			newTitle << " | Position: (" << round(camera.pos.x * 100) / 100;
+			newTitle << ", " << round(camera.pos.y * 100) / 100;
+			newTitle << ", " << round(camera.pos.z * 100) / 100 << ")";
+			newTitle << " | Screen Resolution (ratio): " << width << "x" << height;
+			newTitle << " (" << round(((double)width / height) * 100) / 100 << ")";
+
+			glfwSetWindowTitle(gameWindow.getWindow(), newTitle.str().c_str());
+		}
 
 		glClearColor(.3f, .3f, 1.0f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -137,7 +153,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	print("Cleaning up");
-	world.~World();
+	//world.~World();
 	shader.~Shader();
 	gameWindow.~GameWindow();
 

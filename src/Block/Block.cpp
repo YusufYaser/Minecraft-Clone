@@ -59,7 +59,7 @@ void Block::Render(GLuint shader)
 
 	glm::vec3 highlightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	if (highlighted) {
-		highlightColor = glm::vec3(.5f, .5f, .5f);
+		highlightColor *= 1.5;
 	}
 	glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(highlightColor));
 
