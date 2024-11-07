@@ -62,7 +62,9 @@ int main(int argc, char* argv[]) {
 	glUniform1i(glGetUniformLocation(shader.ID, "tex0"), 0);
 	print("Loaded textures");
 
+	print("Creating world");
 	World world;
+	print("Created world");
 
 	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));
 
@@ -100,7 +102,8 @@ int main(int argc, char* argv[]) {
 		camera.checkInputs(gameWindow.getWindow(), delta);
 
 		world.Render(shader.ID);
-		Block* targetBlock = camera.getTargetBlock();
+		Block* targetBlock = nullptr;
+		camera.getTargetBlock(&targetBlock, nullptr);
 
 		if (oldHighlightedBlock != nullptr) oldHighlightedBlock->highlighted = false;
 		oldHighlightedBlock = targetBlock;
@@ -111,7 +114,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	print("Cleaning up");
-	//world.~World();
+	world.~World();
 	shader.~Shader();
 	gameWindow.~GameWindow();
 

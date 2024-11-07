@@ -36,15 +36,48 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
         if (!brokeBlock) {
-            Block* target = getTargetBlock();
+            Block* target = nullptr;
+            BLOCK_FACE face;
+            getTargetBlock(&target, &face);
+            if (face == BLOCK_FACE::TOP) std::cout << "top";
+            if (face == BLOCK_FACE::BOTTOM) std::cout << "bottom";
+            if (face == BLOCK_FACE::FRONT) std::cout << "FRONT";
+            if (face == BLOCK_FACE::LEFT) std::cout << "LEFT";
+            if (face == BLOCK_FACE::RIGHT) std::cout << "RIGHT";
+            if (face == BLOCK_FACE::BACK) std::cout << "BACK";
 
             if (target != nullptr) {
                 world->setBlock(target->getPos(), BLOCK_TYPE::AIR);
                 brokeBlock = true;
             }
         }
-    } else {
+    }
+    else {
         brokeBlock = false;
+    }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS &&
+        glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_HIDDEN) {
+
+        if (!placedBlock) {
+            Block* target = nullptr;
+            BLOCK_FACE face;
+            getTargetBlock(&target, &face);
+            if (face == BLOCK_FACE::TOP) std::cout << "top";
+            if (face == BLOCK_FACE::BOTTOM) std::cout << "bottom";
+            if (face == BLOCK_FACE::FRONT) std::cout << "FRONT";
+            if (face == BLOCK_FACE::LEFT) std::cout << "LEFT";
+            if (face == BLOCK_FACE::RIGHT) std::cout << "RIGHT";
+            if (face == BLOCK_FACE::BACK) std::cout << "BACK";
+
+            if (target != nullptr) {
+                world->setBlock(target->getPos() + getBlockFaceDirection(face), BLOCK_TYPE::STONE, false);
+                placedBlock = true;
+            }
+        }
+    }
+    else {
+        placedBlock = false;
     }
 
     if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_HIDDEN) {
@@ -64,7 +97,7 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
 
         glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(-rotX), glm::normalize(glm::cross(orientation, up)));
 
-        if (abs(glm::angle(newOrientation, up) - glm::radians(90.0f)) <= glm::radians(85.0f))
+        if (abs(glm::angle(newOrientation, up) - glm::radians(90.0f)) <= glm::radians(90.0f))
         {
             orientation = newOrientation;
         }
@@ -77,15 +110,40 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
     }
 }
 
-Block* Camera::getTargetBlock()
+void Camera::getTargetBlock(Block** block, BLOCK_FACE* face)
 {
     for (int i = 0; i < 10; i++) {
+        glm::vec3 blockPosNoCeil = pos + (float)i * orientation;
         glm::vec3 blockPos = pos + (float)i * orientation;
         blockPos.x = ceil(blockPos.x);
         blockPos.y = ceil(blockPos.y);
         blockPos.z = ceil(blockPos.z);
-        Block* block = world->getBlock(blockPos);
-        if (block != nullptr) return block;
+        Block* targetBlock = world->getBlock(blockPos);
+        if (targetBlock != nullptr) {
+            if (block != nullptr) *block = targetBlock;
+            if (face != nullptr) {
+                glm::vec3 ceiled = blockPosNoCeil - blockPos;
+                glm::vec3 dir = glm::normalize(orientation - (targetBlock->getPos() + ceiled - pos));
+
+                if (abs(dir.x) > abs(dir.y) && abs(dir.x) > abs(dir.y)) {
+                    if (dir.x > 0) *face = BLOCK_FACE::RIGHT;
+                    if (dir.x < 0) *face = BLOCK_FACE::LEFT;
+                }
+
+                if (abs(dir.y) > abs(dir.x) && abs(dir.y) > abs(dir.z)) {
+                    if (dir.y > 0) *face = BLOCK_FACE::TOP;
+                    if (dir.y < 0) *face = BLOCK_FACE::BOTTOM;
+                }
+
+                if (abs(dir.z) > abs(dir.x) && abs(dir.z) > abs(dir.x)) {
+                    if (dir.z > 0) *face = BLOCK_FACE::FRONT;
+                    if (dir.z < 0) *face = BLOCK_FACE::BACK;
+                }
+
+                std::cout << "X: " << dir.x << " Y: " << dir.y << " Z: " << dir.z << "\n";
+            }
+            return;
+        }
     }
-    return nullptr;
+    *block = nullptr;
 }

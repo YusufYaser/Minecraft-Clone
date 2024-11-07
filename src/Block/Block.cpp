@@ -1,6 +1,31 @@
 #include "Block.h"
 #include "CubeVertices.h"
 
+glm::vec3 getBlockFaceDirection(BLOCK_FACE face) {
+	switch (face) {
+	case BLOCK_FACE::FRONT:
+		return glm::vec3(0.0f, 0.0f, 1.0f);
+
+	case BLOCK_FACE::BACK:
+		return glm::vec3(0.0f, 0.0f, -1.0f);
+
+	case BLOCK_FACE::TOP:
+		return glm::vec3(0.0f, 1.0f, 0.0f);
+
+	case BLOCK_FACE::BOTTOM:
+		return glm::vec3(0.0f, -1.0f, 0.0f);
+
+	case BLOCK_FACE::RIGHT:
+		return glm::vec3(1.0f, 0.0f, 0.0f);
+
+	case BLOCK_FACE::LEFT:
+		return glm::vec3(-1.0f, 0.0f, 0.0f);
+
+	default:
+		return glm::vec3();
+	}
+}
+
 Block::Block(BLOCK_TYPE type, glm::vec3 pos)
 {
 	Block::type = type;

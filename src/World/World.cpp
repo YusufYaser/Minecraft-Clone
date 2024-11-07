@@ -33,10 +33,11 @@ Block* World::getBlock(glm::vec3 pos)
     return nullptr;
 }
 
-void World::setBlock(glm::vec3 pos, BLOCK_TYPE type)
+void World::setBlock(glm::vec3 pos, BLOCK_TYPE type, bool replace)
 {
     for (auto& block : blocks) {
         if (block->getPos() == pos) {
+            if (!replace) return;
             delete block;
             break;
         }

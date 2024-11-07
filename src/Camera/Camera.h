@@ -22,11 +22,12 @@ public:
 
 	void checkInputs(GLFWwindow* window, float delta);
 
-	Block* getTargetBlock();
+	void getTargetBlock(Block** block, BLOCK_FACE* face);
 
 private:
 	bool wasHidden = false;
 	bool brokeBlock = false;
+	bool placedBlock = false;
 	glm::vec2 originalPos;
 	World* world;
 };

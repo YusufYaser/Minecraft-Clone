@@ -11,6 +11,17 @@ enum class BLOCK_TYPE {
 	DIRT
 };
 
+enum class BLOCK_FACE {
+	FRONT = 0,
+	BACK,
+	TOP,
+	BOTTOM,
+	LEFT,
+	RIGHT
+};
+
+glm::vec3 getBlockFaceDirection(BLOCK_FACE face);
+
 class Block {
 public:
 	Block(BLOCK_TYPE type, glm::vec3 pos);

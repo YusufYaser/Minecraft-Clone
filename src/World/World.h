@@ -13,7 +13,7 @@ public:
 	void Render(GLuint shader);
 
 	Block* getBlock(glm::vec3 pos);
-	void setBlock(glm::vec3 pos, BLOCK_TYPE type);
+	void setBlock(glm::vec3 pos, BLOCK_TYPE type, bool replace = true);
 
 private:
 	std::vector<Block*> blocks;
