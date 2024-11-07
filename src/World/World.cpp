@@ -50,7 +50,67 @@ void World::setBlock(glm::vec3 pos, BLOCK_TYPE type, bool replace)
         blocks[ch]->~Block();
         blocks.erase(ch);
     }
-    if (type == BLOCK_TYPE::AIR) return;
+    if (type == BLOCK_TYPE::AIR) {
+        for (int i = 0; i < 6; i++) {
+            Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
+            if (otherBlock == nullptr) continue;
+            int opposite = 0;
+            switch ((BLOCK_FACE)i) {
+            case BLOCK_FACE::TOP:
+                opposite = (int)BLOCK_FACE::BOTTOM;
+                break;
+            case BLOCK_FACE::BOTTOM:
+                opposite = (int)BLOCK_FACE::TOP;
+                break;
+            case BLOCK_FACE::RIGHT:
+                opposite = (int)BLOCK_FACE::LEFT;
+                break;
+            case BLOCK_FACE::LEFT:
+                opposite = (int)BLOCK_FACE::RIGHT;
+                break;
+            case BLOCK_FACE::FRONT:
+                opposite = (int)BLOCK_FACE::BACK;
+                break;
+            case BLOCK_FACE::BACK:
+                opposite = (int)BLOCK_FACE::FRONT;
+                break;
+            }
+            otherBlock->hiddenFaces -= 1 << opposite;
+            otherBlock->updateVertices();
+        }
+        return;
+    }
 
-    blocks[ch] = new Block(type, pos);
+    uint8_t hiddenFaces = 0;
+
+    for (int i = 0; i < 6; i++) {
+        Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
+        if (otherBlock == nullptr) continue;
+        int opposite = 0;
+        switch ((BLOCK_FACE)i) {
+        case BLOCK_FACE::TOP:
+            opposite = (int)BLOCK_FACE::BOTTOM;
+            break;
+        case BLOCK_FACE::BOTTOM:
+            opposite = (int)BLOCK_FACE::TOP;
+            break;
+        case BLOCK_FACE::RIGHT:
+            opposite = (int)BLOCK_FACE::LEFT;
+            break;
+        case BLOCK_FACE::LEFT:
+            opposite = (int)BLOCK_FACE::RIGHT;
+            break;
+        case BLOCK_FACE::FRONT:
+            opposite = (int)BLOCK_FACE::BACK;
+            break;
+        case BLOCK_FACE::BACK:
+            opposite = (int)BLOCK_FACE::FRONT;
+            break;
+        }
+        otherBlock->hiddenFaces += 1 << opposite;
+        otherBlock->updateVertices();
+        hiddenFaces += 1 << i;
+    }
+
+    blocks[ch] = new Block(type, pos, hiddenFaces);
 }

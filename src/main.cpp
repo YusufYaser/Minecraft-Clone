@@ -86,6 +86,7 @@ int main(int argc, char* argv[]) {
 	glm::mat4 ortho;
 
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 
 	double prevTime = glfwGetTime();
 	double lastFpsUpdate = glfwGetTime();

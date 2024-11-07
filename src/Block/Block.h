@@ -24,17 +24,22 @@ glm::vec3 getBlockFaceDirection(BLOCK_FACE face);
 
 class Block {
 public:
-	Block(BLOCK_TYPE type, glm::vec3 pos);
+	Block(BLOCK_TYPE type, glm::vec3 pos, uint8_t hiddenFaces = 0);
 	~Block();
 
 	void Render(GLuint shader);
 	const char* getName();
 	glm::vec3 getPos();
 
+	void updateVertices();
+
 	bool highlighted = false;
+	uint8_t hiddenFaces;
 
 private:
 	GLuint VAO, VBO, EBO;
 	BLOCK_TYPE type;
 	glm::vec3 pos;
+
+	int faceCount;
 };
