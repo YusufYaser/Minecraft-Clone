@@ -9,7 +9,7 @@ out vec2 texCoord;
 
 uniform mat4 projection;
 uniform mat4 view;
-uniform vec3 blockPos;
+uniform ivec3 blockPos;
 
 void main() {
 	gl_Position = projection * view * vec4(position + blockPos, 1.0f);

@@ -115,12 +115,12 @@ void Camera::getTargetBlock(Block** block, BLOCK_FACE* face)
         if (targetBlock != nullptr) {
             if (block != nullptr) *block = targetBlock;
             if (face != nullptr) {
-                BLOCK_FACE curFace;
+                BLOCK_FACE curFace = BLOCK_FACE::FRONT;
                 float distance = 1000.0f;
 
                 for (int i = 0; i < 6; i++) {
-                    glm::vec3 facePos = getBlockFaceDirection((BLOCK_FACE)i) + targetBlock->getPos();
-                    float curDistance = glm::distance(facePos, blockPosNoCeil);
+                    glm::ivec3 facePos = getBlockFaceDirection((BLOCK_FACE)i) + targetBlock->getPos();
+                    float curDistance = glm::distance(glm::vec3(facePos), blockPosNoCeil);
                     if (curDistance < distance) {
                         curFace = (BLOCK_FACE)i;
                         distance = curDistance;

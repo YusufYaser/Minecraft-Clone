@@ -16,6 +16,8 @@
 #include "World/World.h"
 #include "GUI/GUI.h"
 #include <sstream>
+#include <random>
+#include <ctime>
 
 const char* vertexShaderFile = {
 #include "Shaders/DefaultShader/Shader.vert"
@@ -74,7 +76,11 @@ int main(int argc, char* argv[]) {
 	print("Loaded textures");
 
 	print("Creating world");
-	World world(123u, glm::vec2(30, 30));
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(0, std::numeric_limits<siv::PerlinNoise::seed_type>::max());
+	print("World Seed:", dis(gen));
+	World world(dis(gen), glm::vec2(50, 50));
 	print("Created world");
 
 	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));

@@ -1,32 +1,32 @@
 #include "Block.h"
 #include "CubeVertices.h"
 
-glm::vec3 getBlockFaceDirection(BLOCK_FACE face) {
+glm::ivec3 getBlockFaceDirection(BLOCK_FACE face) {
 	switch (face) {
 	case BLOCK_FACE::FRONT:
-		return glm::vec3(0.0f, 0.0f, 1.0f);
+		return glm::ivec3(0.0f, 0.0f, 1.0f);
 
 	case BLOCK_FACE::BACK:
-		return glm::vec3(0.0f, 0.0f, -1.0f);
+		return glm::ivec3(0.0f, 0.0f, -1.0f);
 
 	case BLOCK_FACE::TOP:
-		return glm::vec3(0.0f, 1.0f, 0.0f);
+		return glm::ivec3(0.0f, 1.0f, 0.0f);
 
 	case BLOCK_FACE::BOTTOM:
-		return glm::vec3(0.0f, -1.0f, 0.0f);
+		return glm::ivec3(0.0f, -1.0f, 0.0f);
 
 	case BLOCK_FACE::RIGHT:
-		return glm::vec3(1.0f, 0.0f, 0.0f);
+		return glm::ivec3(1.0f, 0.0f, 0.0f);
 
 	case BLOCK_FACE::LEFT:
-		return glm::vec3(-1.0f, 0.0f, 0.0f);
+		return glm::ivec3(-1.0f, 0.0f, 0.0f);
 
 	default:
-		return glm::vec3();
+		return glm::ivec3();
 	}
 }
 
-Block::Block(BLOCK_TYPE type, glm::vec3 pos, uint8_t hiddenFaces)
+Block::Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces)
 {
 	Block::type = type;
 	Block::pos = pos;
@@ -39,11 +39,15 @@ void Block::updateVertices() {
 	if (VAO != 0) glDeleteVertexArrays(1, &VAO);
 	if (VBO != 0) glDeleteBuffers(1, &VBO);
 	if (EBO != 0) glDeleteBuffers(1, &EBO);
-
-	GLfloat vertices[6 * 5 * 4] = {};
-	GLuint indices[6 * 6] = {};
-
+	VAO = 0;
+	VBO = 0;
+	EBO = 0;
 	faceCount = 0;
+	
+	if (hiddenFaces >= 63) return; // nothing to do
+
+	GLfloat *vertices = new GLfloat[6 * 5 * 4];
+	GLuint *indices = new GLuint[6 * 6];
 
 	for (int i = 0; i < 6; i++) {
 		if ((hiddenFaces & (1 << i)) != 0) continue;
@@ -77,12 +81,17 @@ void Block::updateVertices() {
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	delete[] vertices;
+	delete[] indices;
 }
 
 void Block::Render(GLuint shader)
 {
+	if (faceCount == 0) return; // nothing to do
+
 	glUseProgram(shader);
-	glUniform3fv(glGetUniformLocation(shader, "blockPos"), 1, glm::value_ptr(pos));
+	glUniform3iv(glGetUniformLocation(shader, "blockPos"), 1, glm::value_ptr(pos));
 
 	glm::vec3 highlightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	if (highlighted) {
@@ -115,14 +124,14 @@ const char* Block::getName()
 	}
 }
 
-glm::vec3 Block::getPos()
+glm::ivec3 Block::getPos()
 {
 	return pos;
 }
 
 Block::~Block()
 {
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+	if (VAO != 0) glDeleteVertexArrays(1, &VAO);
+	if (VBO != 0) glDeleteBuffers(1, &VBO);
+	if (EBO != 0) glDeleteBuffers(1, &EBO);
 }

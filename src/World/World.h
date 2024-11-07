@@ -13,9 +13,12 @@ public:
 
 	void Render(GLuint shader);
 
-	Block* getBlock(glm::vec3 pos);
-	void setBlock(glm::vec3 pos, BLOCK_TYPE type, bool replace = true);
+	Block* getBlock(glm::ivec3 pos);
+	void setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
+
+	siv::PerlinNoise::seed_type getSeed();
 
 private:
 	std::unordered_map<int, Block*> blocks;
+	siv::PerlinNoise::seed_type seed;
 };
