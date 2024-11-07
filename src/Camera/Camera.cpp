@@ -139,8 +139,6 @@ void Camera::getTargetBlock(Block** block, BLOCK_FACE* face)
                     if (dir.z > 0) *face = BLOCK_FACE::FRONT;
                     if (dir.z < 0) *face = BLOCK_FACE::BACK;
                 }
-
-                std::cout << "X: " << dir.x << " Y: " << dir.y << " Z: " << dir.z << "\n";
             }
             return;
         }
