@@ -101,7 +101,7 @@ void Block::Render(GLuint shader)
 
 	glBindTexture(GL_TEXTURE_2D, getTexture(getName()));
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, sizeof(blockIndices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, faceCount * 6, GL_UNSIGNED_INT, 0);
 }
 
 const char* Block::getName()

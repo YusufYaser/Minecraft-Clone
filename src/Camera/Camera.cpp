@@ -31,6 +31,12 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
         pos -= (speed * delta) * up;
     }
 
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        speed = 20.f;
+    } else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE) {
+        speed = 10.f;
+    }
+
     static BLOCK_TYPE selectedBlock = BLOCK_TYPE::STONE;
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::STONE;
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::GRASS;
