@@ -35,7 +35,7 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
         if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) brokeBlock = true; // prevent block breaking when capturing mouse
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-        if (!brokeBlock || true) {
+        if (!brokeBlock) {
             Block* target = nullptr;
             BLOCK_FACE face;
             getTargetBlock(&target, &face);
@@ -110,23 +110,19 @@ void Camera::getTargetBlock(Block** block, BLOCK_FACE* face)
         if (targetBlock != nullptr) {
             if (block != nullptr) *block = targetBlock;
             if (face != nullptr) {
-                glm::vec3 ceiled = blockPosNoCeil - blockPos;
-                glm::vec3 dir = glm::normalize(orientation - (targetBlock->getPos() + ceiled - pos));
+                BLOCK_FACE curFace;
+                float distance = 1000.0f;
 
-                if (abs(dir.x) > abs(dir.y) && abs(dir.x) > abs(dir.y)) {
-                    if (dir.x > 0) *face = BLOCK_FACE::RIGHT;
-                    if (dir.x < 0) *face = BLOCK_FACE::LEFT;
+                for (int i = 0; i < 6; i++) {
+                    glm::vec3 facePos = getBlockFaceDirection((BLOCK_FACE)i) + targetBlock->getPos();
+                    float curDistance = glm::distance(facePos, blockPosNoCeil);
+                    if (curDistance < distance) {
+                        curFace = (BLOCK_FACE)i;
+                        distance = curDistance;
+                    }
                 }
 
-                if (abs(dir.y) > abs(dir.x) && abs(dir.y) > abs(dir.z)) {
-                    if (dir.y > 0) *face = BLOCK_FACE::TOP;
-                    if (dir.y < 0) *face = BLOCK_FACE::BOTTOM;
-                }
-
-                if (abs(dir.z) > abs(dir.x) && abs(dir.z) > abs(dir.x)) {
-                    if (dir.z > 0) *face = BLOCK_FACE::FRONT;
-                    if (dir.z < 0) *face = BLOCK_FACE::BACK;
-                }
+                *face = curFace;
             }
             return;
         }

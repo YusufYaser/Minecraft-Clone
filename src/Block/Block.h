@@ -8,16 +8,16 @@ enum class BLOCK_TYPE {
 	AIR = 0,
 	STONE,
 	GRASS,
-	DIRT
+	DIRT,
 };
 
 enum class BLOCK_FACE {
 	FRONT = 0,
 	BACK,
-	TOP,
-	BOTTOM,
+	RIGHT,
 	LEFT,
-	RIGHT
+	BOTTOM,
+	TOP,
 };
 
 glm::vec3 getBlockFaceDirection(BLOCK_FACE face);

@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
 	double lastFpsUpdate = glfwGetTime();
 
 	Block* oldHighlightedBlock = nullptr;
+	BLOCK_FACE face;
 
 	while (!glfwWindowShouldClose(gameWindow.getWindow()))
 	{
@@ -100,17 +101,22 @@ int main(int argc, char* argv[]) {
 
 		int width, height;
 		glfwGetWindowSize(gameWindow.getWindow(), &width, &height);
+		if (height == 0) height = 1; // prevent division by 0
 		projection = glm::perspective(glm::radians(45.0f), (float)width / height, .1f, 100.0f);
 		glViewport(0, 0, width, height);
 
 		if (currentTime - lastFpsUpdate > .25) {
 			lastFpsUpdate = currentTime;
+			glm::vec3 faceVec = getBlockFaceDirection(face);
 			std::stringstream newTitle;
 			newTitle << "Minecraft Clone";
 			newTitle << " | FPS: " << round(1 / delta);
 			newTitle << " | Position: (" << round(camera.pos.x * 100) / 100;
 			newTitle << ", " << round(camera.pos.y * 100) / 100;
 			newTitle << ", " << round(camera.pos.z * 100) / 100 << ")";
+			newTitle << " | Face: (" << round(faceVec.x * 100) / 100;
+			newTitle << ", " << round(faceVec.y * 100) / 100;
+			newTitle << ", " << round(faceVec.z * 100) / 100 << ")";
 			newTitle << " | Screen Resolution (ratio): " << width << "x" << height;
 			newTitle << " (" << round(((double)width / height) * 100) / 100 << ")";
 
@@ -142,7 +148,7 @@ int main(int argc, char* argv[]) {
 
 		world.Render(shader.ID);
 		Block* targetBlock = nullptr;
-		camera.getTargetBlock(&targetBlock, nullptr);
+		camera.getTargetBlock(&targetBlock, &face);
 
 		if (oldHighlightedBlock != nullptr) oldHighlightedBlock->highlighted = false;
 		oldHighlightedBlock = targetBlock;
