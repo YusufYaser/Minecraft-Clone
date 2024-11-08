@@ -32,6 +32,7 @@ World::~World()
 void World::Render(GLuint shader)
 {
     glUseProgram(shader);
+    glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
 
     for (auto& type : renderingGroups) {
         glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type.first)));

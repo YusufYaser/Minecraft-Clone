@@ -48,5 +48,5 @@ private:
 		uint8_t faceCount;
 	};
 
-	static std::unordered_map<int, BlockStructureData> blockStructures;
+	static BlockStructureData blockStructures[64];
 };

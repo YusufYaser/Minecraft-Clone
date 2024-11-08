@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 		glUniformMatrix4fv(glGetUniformLocation(shader.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
 		guiBlock.position = glm::vec2(-1.5f, 1.5f);
-		guiBlock.scale = .25f;
+		guiBlock.scale = .15f;
 
 		camera.checkInputs(gameWindow.getWindow(), delta);
 

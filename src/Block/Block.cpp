@@ -1,7 +1,7 @@
 #include "Block.h"
 #include "CubeVertices.h"
 
-std::unordered_map<int, Block::BlockStructureData> Block::blockStructures;
+Block::BlockStructureData Block::blockStructures[64];
 
 glm::ivec3 getBlockFaceDirection(BLOCK_FACE face) {
 	switch (face) {
@@ -67,9 +67,10 @@ void Block::Render(GLuint shader, bool bindTexture)
 	GLuint VBO, EBO, VAO;
 	uint8_t faceCount = 0;
 
-	if (blockStructures.find(hiddenFaces) != blockStructures.end())
+	BlockStructureData data = blockStructures[hiddenFaces];
+
+	if (data.VBO != 0)
 	{
-		BlockStructureData data = blockStructures[hiddenFaces];
 		VBO = data.VBO;
 		VAO = data.VAO;
 		EBO = data.EBO;
@@ -115,7 +116,6 @@ void Block::Render(GLuint shader, bool bindTexture)
 		delete[] vertices;
 		delete[] indices;
 
-		BlockStructureData data;
 		data.VBO = VBO;
 		data.VAO = VAO;
 		data.EBO = EBO;
@@ -124,19 +124,21 @@ void Block::Render(GLuint shader, bool bindTexture)
 	}
 
 	if (faceCount == 0) return;
-
+	
 	glUniform3iv(glGetUniformLocation(shader, "blockPos"), 1, glm::value_ptr(pos));
 
-	glm::vec3 highlightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	if (highlighted) {
-		highlightColor *= 1.5;
+		glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(glm::vec3(1.5f)));
 	}
-	glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(highlightColor));
 
 	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName()));
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, faceCount * 6, GL_UNSIGNED_INT, 0);
+
+	if (highlighted) {
+		glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	}
 }
 
 const char* Block::getName()
