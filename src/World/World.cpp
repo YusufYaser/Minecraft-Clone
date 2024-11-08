@@ -17,6 +17,9 @@ World::World(siv::PerlinNoise::seed_type seed, glm::vec2 size) {
             }
         }
     }
+
+    loading = false;
+    setBlocksToRender();
 }
 
 World::~World()
@@ -28,8 +31,14 @@ World::~World()
 
 void World::Render(GLuint shader)
 {
-    for (auto& block : blocks) {
-        block.second->Render(shader);
+    glUseProgram(shader);
+
+    for (auto& type : renderingGroups) {
+        glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type.first)));
+
+        for (auto& ch : type.second) {
+            blocks[ch]->Render(shader, false);
+        }
     }
 }
 
@@ -67,6 +76,7 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
             otherBlock->hiddenFaces -= 1 << opposite;
             otherBlock->updateVertices();
         }
+        setBlocksToRender();
         return;
     }
 
@@ -83,9 +93,31 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
 
     Block* block = new Block(type, pos, hiddenFaces);
     blocks[ch] = block;
+
+    if (!loading) setBlocksToRender();
 }
 
 siv::PerlinNoise::seed_type World::getSeed()
 {
     return seed;
+}
+
+void World::setBlocksToRender()
+{
+    renderingGroups.clear();
+    for (auto& block : blocks) {
+        if (block.second == NULL || block.second->hiddenFaces == 63) continue;
+        int x = block.second->getPos().x;
+        int y = block.second->getPos().y;
+        int z = block.second->getPos().z;
+        int ch = std::hash<int>()(x) ^ (std::hash<int>()(y) << 1) ^ (std::hash<int>()(z) << 2);
+
+        BLOCK_TYPE type = block.second->getType();
+
+        if (renderingGroups.find(type) == renderingGroups.end())
+        {
+            renderingGroups[type] = std::vector<int>();
+        }
+        renderingGroups[type].push_back(ch);
+    }
 }

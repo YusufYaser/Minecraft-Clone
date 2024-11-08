@@ -28,6 +28,27 @@ glm::ivec3 getBlockFaceDirection(BLOCK_FACE face) {
 	}
 }
 
+const char* getTextureName(BLOCK_TYPE type)
+{
+
+	switch (type) {
+	case BLOCK_TYPE::AIR:
+		return "air";
+
+	case BLOCK_TYPE::STONE:
+		return "stone";
+
+	case BLOCK_TYPE::GRASS:
+		return "grass";
+
+	case BLOCK_TYPE::DIRT:
+		return "dirt";
+
+	default:
+		return "invalid";
+	}
+}
+
 Block::Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces)
 {
 	Block::type = type;
@@ -41,7 +62,7 @@ void Block::updateVertices() {
 	if (hiddenFaces >= 63) return; // nothing to do
 }
 
-void Block::Render(GLuint shader)
+void Block::Render(GLuint shader, bool bindTexture)
 {
 	GLuint VBO, EBO, VAO;
 	uint8_t faceCount = 0;
@@ -104,7 +125,6 @@ void Block::Render(GLuint shader)
 
 	if (faceCount == 0) return;
 
-	glUseProgram(shader);
 	glUniform3iv(glGetUniformLocation(shader, "blockPos"), 1, glm::value_ptr(pos));
 
 	glm::vec3 highlightColor = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -113,34 +133,25 @@ void Block::Render(GLuint shader)
 	}
 	glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(highlightColor));
 
-	glBindTexture(GL_TEXTURE_2D, getTexture(getName()));
+	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName()));
+
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, faceCount * 6, GL_UNSIGNED_INT, 0);
 }
 
 const char* Block::getName()
 {
-	switch (type) {
-	case BLOCK_TYPE::AIR:
-		return "air";
-
-	case BLOCK_TYPE::STONE:
-		return "stone";
-
-	case BLOCK_TYPE::GRASS:
-		return "grass";
-
-	case BLOCK_TYPE::DIRT:
-		return "dirt";
-
-	default:
-		return "invalid";
-	}
+	return getTextureName(type);
 }
 
 glm::ivec3 Block::getPos()
 {
 	return pos;
+}
+
+BLOCK_TYPE Block::getType()
+{
+	return type;
 }
 
 Block::~Block()

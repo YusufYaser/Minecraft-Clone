@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include "../Block/Block.h"
 #include <unordered_map>
+#include <vector>
 #include <PerlinNoise/PerlinNoise.hpp>
 
 class World {
@@ -20,5 +21,10 @@ public:
 
 private:
 	std::unordered_map<int, Block*> blocks;
+	std::unordered_map<BLOCK_TYPE, std::vector<int>> renderingGroups;
 	siv::PerlinNoise::seed_type seed;
+
+	bool loading = true;
+
+	void setBlocksToRender();
 };

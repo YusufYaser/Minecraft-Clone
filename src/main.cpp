@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(0, std::numeric_limits<siv::PerlinNoise::seed_type>::max());
 	print("World Seed:", dis(gen));
-	World world(dis(gen), glm::vec2(50, 50));
+	World world(dis(gen), glm::vec2(100, 100));
 	print("Created world");
 
 	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));
