@@ -29,7 +29,6 @@ World::~World()
 void World::Render(GLuint shader)
 {
     for (auto& block : blocks) {
-        if (block.second->faceCount == 0) continue;
         block.second->Render(shader);
     }
 }

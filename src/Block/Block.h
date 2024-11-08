@@ -3,6 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "../Textures/Textures.h"
 #include <glad/gl.h>
+#include <unordered_map>
 
 enum class BLOCK_TYPE : uint8_t {
 	AIR = 0,
@@ -35,10 +36,15 @@ public:
 
 	bool highlighted = false;
 	uint8_t hiddenFaces;
-	uint8_t faceCount;
 
 private:
-	GLuint VAO, VBO, EBO;
 	BLOCK_TYPE type;
 	glm::ivec3 pos;
+
+	struct BlockStructureData {
+		GLuint VAO, VBO, EBO;
+		uint8_t faceCount;
+	};
+
+	static std::unordered_map<int, BlockStructureData> blockStructures;
 };
