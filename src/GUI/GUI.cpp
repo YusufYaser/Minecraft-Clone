@@ -1,9 +1,14 @@
 #include "GUI.h"
 
 GLfloat crosshairVertices[] = {
-	-0.05f, -0.05f, -1.0f,
-	 0.05f, -0.05f, -1.0f,
-	 0.05f,  0.05f, -1.0f,
+	-0.05f, -0.05f, -1.0f,		0.0f, 0.0f,
+	 0.05f, -0.05f, -1.0f,		1.0f, 0.0f,
+	 0.05f,  0.05f, -1.0f,		1.0f, 1.0f,
+	 -0.05f,  0.05f, -1.0f,		0.0f, 1.0f,
+};
+
+GLuint crosshairIndices[] = {
+	0, 1, 2, 0, 2, 3
 };
 
 Crosshair::Crosshair()
@@ -15,22 +20,31 @@ Crosshair::Crosshair()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(crosshairVertices), crosshairVertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(crosshairIndices), crosshairIndices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 Crosshair::~Crosshair()
 {
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 	glDeleteVertexArrays(1, &VAO);
 }
 
 void Crosshair::Render(GLuint shader)
 {
 	glUseProgram(shader);
+	glBindTexture(GL_TEXTURE_2D, getTexture("crosshair"));
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, sizeof(crosshairVertices) / sizeof(GLuint));
+	glDrawElements(GL_TRIANGLES, sizeof(crosshairIndices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 }

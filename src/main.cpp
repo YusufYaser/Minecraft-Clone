@@ -73,6 +73,8 @@ int main(int argc, char* argv[]) {
 
 	glUseProgram(shader.ID);
 	glUniform1i(glGetUniformLocation(shader.ID, "tex0"), 0);
+	glUseProgram(guiShader.ID);
+	glUniform1i(glGetUniformLocation(shader.ID, "tex0"), 0);
 	print("Loaded textures");
 
 	print("Creating world");
@@ -93,6 +95,8 @@ int main(int argc, char* argv[]) {
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 	double prevTime = glfwGetTime();
 	double lastFpsUpdate = glfwGetTime();
@@ -109,21 +113,17 @@ int main(int argc, char* argv[]) {
 		int width, height;
 		glfwGetWindowSize(gameWindow.getWindow(), &width, &height);
 		if (height == 0) height = 1; // prevent division by 0
-		projection = glm::perspective(glm::radians(45.0f), (float)width / height, .1f, 100.0f);
+		projection = glm::perspective(glm::radians(45.0f), (float)width / height, .1f, 1000.0f);
 		glViewport(0, 0, width, height);
 
 		if (currentTime - lastFpsUpdate > .25) {
 			lastFpsUpdate = currentTime;
-			glm::vec3 faceVec = getBlockFaceDirection(face);
 			std::stringstream newTitle;
 			newTitle << "Minecraft Clone";
 			newTitle << " | FPS: " << round(1 / delta);
 			newTitle << " | Position: (" << round(camera.pos.x * 100) / 100;
 			newTitle << ", " << round(camera.pos.y * 100) / 100;
 			newTitle << ", " << round(camera.pos.z * 100) / 100 << ")";
-			newTitle << " | Face: (" << round(faceVec.x * 100) / 100;
-			newTitle << ", " << round(faceVec.y * 100) / 100;
-			newTitle << ", " << round(faceVec.z * 100) / 100 << ")";
 			newTitle << " | Screen Resolution (ratio): " << width << "x" << height;
 			newTitle << " (" << round(((double)width / height) * 100) / 100 << ")";
 
@@ -132,16 +132,7 @@ int main(int argc, char* argv[]) {
 
 		glClearColor(.3f, .3f, 1.0f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glDepthRange(0, 0.01);
-		glUseProgram(guiShader.ID);
 		
-		float aspectRatio = static_cast<float>(width) / height;
-		float orthoHeight = 1.0f;
-		float orthoWidth = orthoHeight * aspectRatio;
-		ortho = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -1.0f, 1.0f);
-		glUniformMatrix4fv(glGetUniformLocation(guiShader.ID, "viewport"), 1, GL_FALSE, glm::value_ptr(ortho));
-
-		crosshair.Render(guiShader.ID);
 		glDepthRange(0.01, 1.0);
 
 		view = glm::lookAt(camera.pos, camera.pos + camera.orientation, camera.up);
@@ -154,12 +145,23 @@ int main(int argc, char* argv[]) {
 		camera.checkInputs(gameWindow.getWindow(), delta);
 
 		world.Render(shader.ID);
+
 		Block* targetBlock = nullptr;
 		camera.getTargetBlock(&targetBlock, &face);
 
 		if (oldHighlightedBlock != nullptr) oldHighlightedBlock->highlighted = false;
 		oldHighlightedBlock = targetBlock;
 		if (targetBlock != nullptr) targetBlock->highlighted = true;
+
+		glDepthRange(0, 0.01);
+		glUseProgram(guiShader.ID);
+		float aspectRatio = static_cast<float>(width) / height;
+		float orthoHeight = 1.0f;
+		float orthoWidth = orthoHeight * aspectRatio;
+		ortho = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -1.0f, 1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(guiShader.ID, "viewport"), 1, GL_FALSE, glm::value_ptr(ortho));
+
+		crosshair.Render(guiShader.ID);
 
 		glfwSwapBuffers(gameWindow.getWindow());
 		glfwPollEvents();

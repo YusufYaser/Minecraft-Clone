@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/gl.h>
+#include "../Textures/Textures.h"
 
 class Crosshair {
 public:
@@ -10,5 +11,5 @@ public:
 	void Render(GLuint shader);
 
 private:
-	GLuint VAO, VBO;
+	GLuint VAO, VBO, EBO;
 };
