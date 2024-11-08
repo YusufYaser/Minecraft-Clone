@@ -37,7 +37,6 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
         speed = 10.f;
     }
 
-    static BLOCK_TYPE selectedBlock = BLOCK_TYPE::STONE;
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::STONE;
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::GRASS;
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::DIRT;

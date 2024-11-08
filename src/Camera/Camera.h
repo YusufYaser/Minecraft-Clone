@@ -21,6 +21,8 @@ public:
 	float speed = 10.0f;
 	float reachDistance = 50.0f;
 
+	BLOCK_TYPE selectedBlock = BLOCK_TYPE::STONE;
+
 	void checkInputs(GLFWwindow* window, float delta);
 
 	void getTargetBlock(Block** block, BLOCK_FACE* face);

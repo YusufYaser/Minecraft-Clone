@@ -14,7 +14,8 @@
 #include "Shaders/Shaders.h"
 #include "Textures/Textures.h"
 #include "World/World.h"
-#include "GUI/GUI.h"
+#include "GUI/Crosshair.h"
+#include "GUI/GUIBlock.h"
 #include <sstream>
 #include <random>
 #include <ctime>
@@ -104,6 +105,10 @@ int main(int argc, char* argv[]) {
 	Block* oldHighlightedBlock = nullptr;
 	BLOCK_FACE face;
 
+	GUIBlock guiBlock;
+
+	BLOCK_TYPE prevSelectedBlock = camera.selectedBlock;
+
 	while (!glfwWindowShouldClose(gameWindow.getWindow()))
 	{
 		double currentTime = glfwGetTime();
@@ -142,6 +147,9 @@ int main(int argc, char* argv[]) {
 		glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(shader.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
+		guiBlock.position = glm::vec2(-1.5f, 1.5f);
+		guiBlock.scale = .25f;
+
 		camera.checkInputs(gameWindow.getWindow(), delta);
 
 		world.Render(shader.ID);
@@ -158,10 +166,17 @@ int main(int argc, char* argv[]) {
 		float aspectRatio = static_cast<float>(width) / height;
 		float orthoHeight = 1.0f;
 		float orthoWidth = orthoHeight * aspectRatio;
-		ortho = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -1.0f, 1.0f);
+		ortho = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -5.0f, 5.0f);
 		glUniformMatrix4fv(glGetUniformLocation(guiShader.ID, "viewport"), 1, GL_FALSE, glm::value_ptr(ortho));
 
 		crosshair.Render(guiShader.ID);
+
+		if (prevSelectedBlock != camera.selectedBlock) {
+			prevSelectedBlock = camera.selectedBlock;
+			guiBlock.setBlock(camera.selectedBlock);
+		}
+
+		guiBlock.Render(guiShader.ID);
 
 		glfwSwapBuffers(gameWindow.getWindow());
 		glfwPollEvents();

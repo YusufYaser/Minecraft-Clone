@@ -174,7 +174,8 @@
     <ClCompile Include="libraries\include\glad\gl.c" />
     <ClCompile Include="src\Block\Block.cpp" />
     <ClCompile Include="src\Camera\Camera.cpp" />
-    <ClCompile Include="src\GUI\GUI.cpp" />
+    <ClCompile Include="src\GUI\Crosshair.cpp" />
+    <ClCompile Include="src\GUI\GUIBlock.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\GameWindow\GameWindow.cpp" />
     <ClCompile Include="src\Shaders\Shaders.cpp" />
@@ -187,7 +188,8 @@
     <ClInclude Include="src\Block\Block.h" />
     <ClInclude Include="src\Block\CubeVertices.h" />
     <ClInclude Include="src\Camera\Camera.h" />
-    <ClInclude Include="src\GUI\GUI.h" />
+    <ClInclude Include="src\GUI\Crosshair.h" />
+    <ClInclude Include="src\GUI\GUIBlock.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\GameWindow\GameWindow.h" />
     <ClInclude Include="src\Shaders\Shaders.h" />
