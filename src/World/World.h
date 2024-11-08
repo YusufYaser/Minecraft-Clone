@@ -9,7 +9,7 @@
 
 class World {
 public:
-	World(siv::PerlinNoise::seed_type seed, glm::vec2 size = glm::vec2(20, 20));
+	World(siv::PerlinNoise::seed_type seed, glm::ivec2 size = glm::ivec2(20, 20));
 	~World();
 
 	void Render(GLuint shader);
@@ -17,14 +17,14 @@ public:
 	Block* getBlock(glm::ivec3 pos);
 	void setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
 
-	siv::PerlinNoise::seed_type getSeed();
+	siv::PerlinNoise::seed_type getSeed() const { return seed; };
 
 private:
-	std::unordered_map<int, Block*> blocks;
-	std::unordered_map<BLOCK_TYPE, std::vector<int>> renderingGroups;
+	std::unordered_map<std::size_t, Block*> blocks;
+	std::unordered_map<BLOCK_TYPE, std::vector<std::size_t>> renderingGroups;
 	siv::PerlinNoise::seed_type seed;
 
 	bool loading = true;
 
-	void setBlocksToRender();
+	void setRenderingGroups();
 };

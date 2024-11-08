@@ -82,8 +82,10 @@ int main(int argc, char* argv[]) {
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(0, std::numeric_limits<siv::PerlinNoise::seed_type>::max());
-	print("World Seed:", dis(gen));
-	World world(dis(gen), glm::vec2(100, 100));
+	//siv::PerlinNoise::seed_type seed = dis(gen);
+	siv::PerlinNoise::seed_type seed = 123u;
+	print("World Seed:", seed);
+	World world(seed, glm::ivec2(100, 100));
 	print("Created world");
 
 	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));
@@ -131,6 +133,7 @@ int main(int argc, char* argv[]) {
 			newTitle << ", " << round(camera.pos.z * 100) / 100 << ")";
 			newTitle << " | Screen Resolution (ratio): " << width << "x" << height;
 			newTitle << " (" << round(((double)width / height) * 100) / 100 << ")";
+			//newTitle << " | " << ((oldHighlightedBlock != nullptr) ? (oldHighlightedBlock->hiddenFaces + 0) : 0);
 
 			glfwSetWindowTitle(gameWindow.getWindow(), newTitle.str().c_str());
 		}

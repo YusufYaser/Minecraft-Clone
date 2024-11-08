@@ -1,25 +1,39 @@
 #include "World.h"
 
-World::World(siv::PerlinNoise::seed_type seed, glm::vec2 size) {
+inline std::size_t combineHashes(std::size_t hash1, std::size_t hash2) {
+    return hash1 ^ (hash2 + 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
+}
+
+std::size_t hashPos(const glm::ivec3& pos) {
+    std::size_t hx = std::hash<int32_t>()(pos.x);
+    std::size_t hy = std::hash<int32_t>()(pos.y);
+    std::size_t hz = std::hash<int32_t>()(pos.z);
+
+    std::size_t combinedHash = combineHashes(hx, hy);
+    combinedHash = combineHashes(combinedHash, hz);
+    return combinedHash;
+}
+
+World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
     World::seed = seed;
 
     const siv::PerlinNoise perlin{ seed };
 
-    for (int x = 0; x < size.x; x++) {
-        for (int z = 0; z < size.y; z++) {
+    for (int x = -size.x/2; x < size.x/2; x++) {
+        for (int z = -size.y/2; z < size.y/2; z++) {
             const double random = perlin.octave2D_01((x * 0.025), (z * 0.025), 4);
-            int height = random * 10 + 2;
+            int height = round(random * 10 + 2);
             for (int y = 0; y < height; y++) {
                 BLOCK_TYPE type = BLOCK_TYPE::STONE;
                 if (y == height - 1) type = BLOCK_TYPE::GRASS;
                 else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
-                setBlock(glm::vec3(x - size.x/2, y, z - size.y/2), type);
+                setBlock(glm::ivec3(x, y, z), type);
             }
         }
     }
 
     loading = false;
-    setBlocksToRender();
+    setRenderingGroups();
 }
 
 World::~World()
@@ -45,10 +59,7 @@ void World::Render(GLuint shader)
 
 Block* World::getBlock(glm::ivec3 pos)
 {
-    int x = pos.x;
-    int y = pos.y;
-    int z = pos.z;
-    int ch = std::hash<int>()(x) ^ (std::hash<int>()(y) << 1) ^ (std::hash<int>()(z) << 2);
+    std::size_t ch = hashPos(pos);
     if (blocks.find(ch) != blocks.end())
     {
         return blocks[ch];
@@ -59,12 +70,13 @@ Block* World::getBlock(glm::ivec3 pos)
 
 void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
 {
-    int x = pos.x;
-    int y = pos.y;
-    int z = pos.z;
-    int ch = std::hash<int>()(x) ^ (std::hash<int>()(y) << 1) ^ (std::hash<int>()(z) << 2);
+    std::size_t ch = hashPos(pos);
     if (blocks.find(ch) != blocks.end())
     {
+        if (loading) {
+            print("found block at same coords while loading world", pos.x, pos.y, pos.z);
+            return;
+        }
         if (!replace) return;
         blocks[ch]->~Block();
         blocks.erase(ch);
@@ -73,11 +85,10 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
         for (int i = 0; i < 6; i++) {
             Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
             if (otherBlock == nullptr) continue;
-            int opposite = i % 2 == 0 ? i + 1 : i - 1;
-            otherBlock->hiddenFaces -= 1 << opposite;
-            otherBlock->updateVertices();
+            int opposite = (i % 2 == 0) ? i + 1 : i - 1;
+            otherBlock->hiddenFaces ^= 1 << opposite;
         }
-        setBlocksToRender();
+        setRenderingGroups();
         return;
     }
 
@@ -86,38 +97,30 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
     for (int i = 0; i < 6; i++) {
         Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
         if (otherBlock == nullptr) continue;
-        int opposite = i % 2 == 0 ? i + 1 : i - 1;
-        otherBlock->hiddenFaces += 1 << opposite;
-        otherBlock->updateVertices();
-        hiddenFaces += 1 << i;
+        int opposite = (i % 2 == 0) ? i + 1 : i - 1;
+        otherBlock->hiddenFaces |= 1 << opposite;
+        hiddenFaces |= 1 << i;
     }
 
     Block* block = new Block(type, pos, hiddenFaces);
     blocks[ch] = block;
 
-    if (!loading) setBlocksToRender();
+    if (!loading) setRenderingGroups();
 }
 
-siv::PerlinNoise::seed_type World::getSeed()
-{
-    return seed;
-}
-
-void World::setBlocksToRender()
+void World::setRenderingGroups()
 {
     renderingGroups.clear();
     for (auto& block : blocks) {
         if (block.second == NULL || block.second->hiddenFaces == 63) continue;
-        int x = block.second->getPos().x;
-        int y = block.second->getPos().y;
-        int z = block.second->getPos().z;
-        int ch = std::hash<int>()(x) ^ (std::hash<int>()(y) << 1) ^ (std::hash<int>()(z) << 2);
+        glm::ivec3 pos = block.second->getPos();
+        std::size_t ch = hashPos(pos);
 
         BLOCK_TYPE type = block.second->getType();
 
         if (renderingGroups.find(type) == renderingGroups.end())
         {
-            renderingGroups[type] = std::vector<int>();
+            renderingGroups[type] = std::vector<std::size_t>();
         }
         renderingGroups[type].push_back(ch);
     }

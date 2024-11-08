@@ -34,8 +34,6 @@ public:
 	glm::ivec3 getPos();
 	BLOCK_TYPE getType();
 
-	void updateVertices();
-
 	bool highlighted = false;
 	uint8_t hiddenFaces;
 
