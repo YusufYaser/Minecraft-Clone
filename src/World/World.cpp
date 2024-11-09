@@ -56,9 +56,8 @@ void World::Render(GLuint shader, glm::vec3 pos, float renderDistance)
         for (auto& block : blocks) {
             glm::ivec3 blockPos = block->getPos();
             int x = pos.x - blockPos.x;
-            int y = pos.y - blockPos.y;
             int z = pos.z - blockPos.z;
-            float distanceSquared = x * x + y * y + z * z;
+            float distanceSquared = x * x + z * z;
 
             if (distanceSquared > renderDistance*renderDistance) continue;
 
