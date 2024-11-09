@@ -6,13 +6,14 @@
 #include <unordered_map>
 #include <vector>
 #include <PerlinNoise/PerlinNoise.hpp>
+#include <thread>
 
 class World {
 public:
 	World(siv::PerlinNoise::seed_type seed, glm::ivec2 size = glm::ivec2(20, 20));
 	~World();
 
-	void Render(GLuint shader);
+	void Render(GLuint shader, glm::vec3 pos, float renderDistance = 100.0f);
 
 	Block* getBlock(glm::ivec3 pos);
 	void setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
@@ -21,7 +22,7 @@ public:
 
 private:
 	std::unordered_map<std::size_t, Block*> blocks;
-	std::unordered_map<BLOCK_TYPE, std::vector<std::size_t>> renderingGroups;
+	std::unordered_map<BLOCK_TYPE, std::vector<Block*>> renderingGroups;
 	siv::PerlinNoise::seed_type seed;
 
 	bool loading = true;

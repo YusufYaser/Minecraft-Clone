@@ -75,17 +75,17 @@ int main(int argc, char* argv[]) {
 	glUseProgram(shader.ID);
 	glUniform1i(glGetUniformLocation(shader.ID, "tex0"), 0);
 	glUseProgram(guiShader.ID);
-	glUniform1i(glGetUniformLocation(shader.ID, "tex0"), 0);
+	glUniform1i(glGetUniformLocation(guiShader.ID, "tex0"), 0);
 	print("Loaded textures");
 
 	print("Creating world");
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(0, std::numeric_limits<siv::PerlinNoise::seed_type>::max());
-	//siv::PerlinNoise::seed_type seed = dis(gen);
-	siv::PerlinNoise::seed_type seed = 123u;
+	siv::PerlinNoise::seed_type seed = dis(gen);
+	//siv::PerlinNoise::seed_type seed = 123u;
 	print("World Seed:", seed);
-	World world(seed, glm::ivec2(100, 100));
+	World world(seed, glm::ivec2(250, 250));
 	print("Created world");
 
 	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
 
 		camera.checkInputs(gameWindow.getWindow(), delta);
 
-		world.Render(shader.ID);
+		world.Render(shader.ID, camera.pos);
 
 		Block* targetBlock = nullptr;
 		camera.getTargetBlock(&targetBlock, &face);
@@ -186,7 +186,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	print("Cleaning up");
-	//world.~World();
+	world.~World();
 	shader.~Shader();
 	gameWindow.~GameWindow();
 

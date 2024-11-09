@@ -22,7 +22,7 @@ World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
     for (int x = -size.x/2; x < size.x/2; x++) {
         for (int z = -size.y/2; z < size.y/2; z++) {
             const double random = perlin.octave2D_01((x * 0.025), (z * 0.025), 4);
-            int height = round(random * 10 + 2);
+            int height = round(random * 30 + 2);
             for (int y = 0; y < height; y++) {
                 BLOCK_TYPE type = BLOCK_TYPE::STONE;
                 if (y == height - 1) type = BLOCK_TYPE::GRASS;
@@ -43,16 +43,24 @@ World::~World()
     }
 }
 
-void World::Render(GLuint shader)
+void World::Render(GLuint shader, glm::vec3 pos, float renderDistance)
 {
     glUseProgram(shader);
     glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
 
-    for (auto& type : renderingGroups) {
-        glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type.first)));
+    for (auto& [type, blocks] : renderingGroups) {
+        glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type)));
 
-        for (auto& ch : type.second) {
-            blocks[ch]->Render(shader, false);
+        for (auto& block : blocks) {
+            glm::ivec3 blockPos = block->getPos();
+            int x = pos.x - blockPos.x;
+            int y = pos.y - blockPos.y;
+            int z = pos.y - blockPos.z;
+            float distanceSquared = x * x + y * y + z * z;
+
+            if (distanceSquared > renderDistance*renderDistance) continue;
+
+            block->Render(shader, false);
         }
     }
 }
@@ -110,7 +118,6 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
 
 void World::setRenderingGroups()
 {
-    renderingGroups.clear();
     for (auto& block : blocks) {
         if (block.second == NULL || block.second->hiddenFaces == 63) continue;
         glm::ivec3 pos = block.second->getPos();
@@ -120,8 +127,8 @@ void World::setRenderingGroups()
 
         if (renderingGroups.find(type) == renderingGroups.end())
         {
-            renderingGroups[type] = std::vector<std::size_t>();
+            renderingGroups[type] = std::vector<Block*>();
         }
-        renderingGroups[type].push_back(ch);
+        renderingGroups[type].push_back(block.second);
     }
 }
