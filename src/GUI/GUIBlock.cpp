@@ -9,7 +9,7 @@ GUIBlock::GUIBlock(BLOCK_TYPE type)
 
 GUIBlock::~GUIBlock()
 {
-	_block->~Block();
+	delete _block;
 }
 
 void GUIBlock::Render(GLuint shader)
@@ -27,6 +27,6 @@ void GUIBlock::Render(GLuint shader)
 
 void GUIBlock::setBlock(BLOCK_TYPE type)
 {
-	_block->~Block();
+	delete _block;
 	_block = new Block(type, glm::vec3());
 }

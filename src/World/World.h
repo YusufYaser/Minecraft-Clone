@@ -13,7 +13,7 @@ public:
 	World(siv::PerlinNoise::seed_type seed, glm::ivec2 size = glm::ivec2(20, 20));
 	~World();
 
-	void Render(GLuint shader, glm::vec3 pos, float renderDistance = 100.0f);
+	void Render(GLuint shader, glm::vec3 pos, float renderDistance = 50.0f);
 
 	Block* getBlock(glm::ivec3 pos);
 	void setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
@@ -27,5 +27,5 @@ private:
 
 	bool loading = true;
 
-	void setRenderingGroups();
+	void setRenderingGroup(Block* block);
 };

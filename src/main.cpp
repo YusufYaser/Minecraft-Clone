@@ -41,6 +41,12 @@ void glfw_error_callback(int error, const char* description) {
 }
 
 int main(int argc, char* argv[]) {
+	print("");
+	print("Starting Minecraft Clone");
+	print("");
+	print("GitHub: https://github.com/YusufYaser/Minecraft-Clone");
+	print("");
+
 	print("Initializing GLFW");
 
 	glfwSetErrorCallback(glfw_error_callback);
@@ -186,8 +192,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	print("Cleaning up");
-	world.~World();
+	//world.~World();
 	shader.~Shader();
+	guiShader.~Shader();
 	gameWindow.~GameWindow();
 
 	print("Terminating GLFW");

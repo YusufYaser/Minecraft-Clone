@@ -32,14 +32,16 @@ World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
         }
     }
 
+    for (auto& [ch, block] : blocks) {
+        setRenderingGroup(block);
+    }
     loading = false;
-    setRenderingGroups();
 }
 
 World::~World()
 {
-    for (auto& block : blocks) {
-        block.second->~Block();
+    for (auto& [ch, block] : blocks) {
+        delete block;
     }
 }
 
@@ -81,12 +83,9 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
     std::size_t ch = hashPos(pos);
     if (blocks.find(ch) != blocks.end())
     {
-        if (loading) {
-            print("found block at same coords while loading world", pos.x, pos.y, pos.z);
-            return;
-        }
+        if (loading) return;
         if (!replace) return;
-        blocks[ch]->~Block();
+        delete blocks[ch];
         blocks.erase(ch);
     }
     if (type == BLOCK_TYPE::AIR) {
@@ -95,8 +94,8 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
             if (otherBlock == nullptr) continue;
             int opposite = (i % 2 == 0) ? i + 1 : i - 1;
             otherBlock->hiddenFaces ^= 1 << opposite;
+            if (!loading) setRenderingGroup(otherBlock);
         }
-        setRenderingGroups();
         return;
     }
 
@@ -108,27 +107,42 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
         int opposite = (i % 2 == 0) ? i + 1 : i - 1;
         otherBlock->hiddenFaces |= 1 << opposite;
         hiddenFaces |= 1 << i;
+        if (!loading) setRenderingGroup(otherBlock);
     }
 
     Block* block = new Block(type, pos, hiddenFaces);
     blocks[ch] = block;
 
-    if (!loading) setRenderingGroups();
+    if (!loading) setRenderingGroup(block);
 }
 
-void World::setRenderingGroups()
+void World::setRenderingGroup(Block* block)
 {
-    for (auto& block : blocks) {
-        if (block.second == NULL || block.second->hiddenFaces == 63) continue;
-        glm::ivec3 pos = block.second->getPos();
-        std::size_t ch = hashPos(pos);
-
-        BLOCK_TYPE type = block.second->getType();
-
-        if (renderingGroups.find(type) == renderingGroups.end())
-        {
-            renderingGroups[type] = std::vector<Block*>();
-        }
-        renderingGroups[type].push_back(block.second);
+    BLOCK_TYPE type = block->getType();
+    if (renderingGroups.find(type) == renderingGroups.end())
+    {
+        renderingGroups[type] = std::vector<Block*>();
     }
+    if (block == NULL || block->hiddenFaces == 63) {
+        if (loading) return;
+        std::vector<Block*>::iterator begin = renderingGroups[type].begin();
+        std::vector<Block*>::iterator end = renderingGroups[type].end();
+        std::vector<Block*>::iterator it = std::find(begin, end, block);
+        if (it != renderingGroups[type].end())
+        {
+            renderingGroups[type].erase(it);
+        }
+        return;
+    }
+    std::vector<Block*>::iterator begin = renderingGroups[type].begin();
+    std::vector<Block*>::iterator end = renderingGroups[type].end();
+    std::vector<Block*>::iterator it = std::find(begin, end, block);
+    if (it != renderingGroups[type].end())
+    {
+        return;
+    }
+    glm::ivec3 pos = block->getPos();
+    std::size_t ch = hashPos(pos);
+
+    renderingGroups[type].push_back(block);
 }
