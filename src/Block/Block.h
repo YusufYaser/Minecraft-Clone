@@ -10,6 +10,8 @@ enum class BLOCK_TYPE : uint8_t {
 	STONE,
 	GRASS,
 	DIRT,
+	OAK_LOG,
+	OAK_LEAVES,
 };
 
 enum class BLOCK_FACE : uint8_t {

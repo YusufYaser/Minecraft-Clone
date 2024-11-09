@@ -40,6 +40,8 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::STONE;
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::GRASS;
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::DIRT;
+    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::OAK_LOG;
+    if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::OAK_LEAVES;
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) brokeBlock = true; // prevent block breaking when capturing mouse

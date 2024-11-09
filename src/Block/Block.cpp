@@ -44,6 +44,12 @@ const char* getTextureName(BLOCK_TYPE type)
 	case BLOCK_TYPE::DIRT:
 		return "dirt";
 
+	case BLOCK_TYPE::OAK_LOG:
+		return "oak_log";
+
+	case BLOCK_TYPE::OAK_LEAVES:
+		return "oak_leaves";
+
 	default:
 		return "invalid";
 	}

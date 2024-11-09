@@ -4,10 +4,6 @@
 #include "GameWindow/GameWindow.h"
 #include "Logging.h"
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtx/vector_angle.hpp>
 #include <string>
 #include "Camera/Camera.h"
 #include "Block/Block.h"
@@ -92,7 +88,7 @@ int main(int argc, char* argv[]) {
 	//siv::PerlinNoise::seed_type seed = 123u;
 	print("World Seed:", seed);
 	float progress = 0.0f;
-	World world(seed, &progress, glm::ivec2(250, 250));
+	World world(seed, glm::ivec2(250, 250));
 	print("Created world");
 
 	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));

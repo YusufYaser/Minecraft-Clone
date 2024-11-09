@@ -14,14 +14,17 @@ std::size_t hashPos(const glm::ivec3& pos) {
     return combinedHash;
 }
 
-World::World(siv::PerlinNoise::seed_type seed, float* progress, glm::ivec2 size) {
-    const int THREAD_COUNT = 8;
-
+World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
     World::seed = seed;
+    loading = true;
 
+    const int THREAD_COUNT = 8;
     const siv::PerlinNoise perlin{ seed };
+    std::mutex progressMutex;
 
-    auto generate = [&perlin, &size, this](int startX, int endX, int startZ, int endZ) {
+    auto generate = [&perlin, &seed, &size, &progressMutex, this](int startX, int endX, int startZ, int endZ) {
+        std::uniform_real_distribution<> dist(0.0, 1.0);
+
         for (int x = startX; x < endX; x++) {
             for (int z = startZ; z < endZ; z++) {
                 const double random = perlin.octave2D_01((x * 0.025), (z * 0.025), 4);
@@ -32,13 +35,32 @@ World::World(siv::PerlinNoise::seed_type seed, float* progress, glm::ivec2 size)
                     else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
                     setBlock(glm::ivec3(x - size.x / 2, y, z - size.y / 2), type);
                 }
+
+                std::mt19937 rng(seed * x * z);
+                if (dist(rng) < .0025) {
+                    glm::ivec3 base = glm::ivec3(x - size.x / 2, height, z - size.y / 2);
+                    int treeHeight = 4;
+                    for (int i = 0; i < treeHeight; i++) {
+                        setBlock(base + glm::ivec3(0, i, 0), BLOCK_TYPE::OAK_LOG);
+                    }
+
+                    for (int i = treeHeight - 1; i < treeHeight + 2; i++) {
+                        int s = 2;
+                        if (i == treeHeight + 1) s = 1;
+                        for (int tx = -s; tx <= s; tx++) {
+                            for (int tz = -s; tz <= s; tz++) {
+                                setBlock(base + glm::ivec3(tx, i, tz), BLOCK_TYPE::OAK_LEAVES);
+                            }
+                        }
+                    }
+                }
             }
         }
     };
 
     std::thread threads[THREAD_COUNT];
     for (int i = 0; i < THREAD_COUNT; i++) {
-        threads[i] = std::thread(generate, 0, size.x*i / THREAD_COUNT, 0, size.y);
+        threads[i] = std::thread(generate, 0, size.x * i / THREAD_COUNT, 0, size.y);
     }
 
     for (int i = 0; i < THREAD_COUNT; i++) {
