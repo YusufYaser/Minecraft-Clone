@@ -18,7 +18,7 @@ public:
 	void Render(GLuint shader, glm::vec3 pos, float renderDistance = 50.0f);
 
 	Block* getBlock(glm::ivec3 pos);
-	void setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
+	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
 
 	siv::PerlinNoise::seed_type getSeed() const { return seed; };
 

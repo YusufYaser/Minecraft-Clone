@@ -110,12 +110,15 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
 
 void Camera::getTargetBlock(Block** block, BLOCK_FACE* face)
 {
-    for (float i = 0; i < reachDistance; i += .25) {
+    glm::vec3 oldBlockPos;
+    for (float i = 0; i < reachDistance; i += .01f) {
         glm::vec3 blockPosNoCeil = pos + i * orientation;
         glm::vec3 blockPos = pos + i * orientation;
         blockPos.x = round(blockPos.x);
         blockPos.y = round(blockPos.y);
         blockPos.z = round(blockPos.z);
+        if (blockPos == oldBlockPos) continue;
+        oldBlockPos = blockPos;
         Block* targetBlock = world->getBlock(blockPos);
         if (targetBlock != nullptr) {
             if (block != nullptr) *block = targetBlock;

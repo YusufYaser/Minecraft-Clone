@@ -91,14 +91,14 @@ Block* World::getBlock(glm::ivec3 pos)
     return nullptr;
 }
 
-void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
+Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
 {
     std::size_t ch = hashPos(pos);
     std::lock_guard<std::mutex> guard(blocksMutex);
     if (blocks.find(ch) != blocks.end())
     {
-        if (loading) return;
-        if (!replace) return;
+        if (loading) return nullptr;
+        if (!replace) return nullptr;
         delete blocks[ch];
         blocks.erase(ch);
     }
@@ -110,7 +110,7 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
             otherBlock->hiddenFaces ^= 1 << opposite;
             if (!loading) setRenderingGroup(otherBlock);
         }
-        return;
+        return nullptr;
     }
 
     uint8_t hiddenFaces = 0;
@@ -128,6 +128,8 @@ void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
     blocks[ch] = block;
 
     if (!loading) setRenderingGroup(block);
+
+    return block;
 }
 
 void World::setRenderingGroup(Block* block)
