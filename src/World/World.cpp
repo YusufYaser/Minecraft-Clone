@@ -14,22 +14,36 @@ std::size_t hashPos(const glm::ivec3& pos) {
     return combinedHash;
 }
 
-World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
+World::World(siv::PerlinNoise::seed_type seed, float* progress, glm::ivec2 size) {
+    const int THREAD_COUNT = 8;
+
     World::seed = seed;
 
     const siv::PerlinNoise perlin{ seed };
 
-    for (int x = -size.x/2; x < size.x/2; x++) {
-        for (int z = -size.y/2; z < size.y/2; z++) {
-            const double random = perlin.octave2D_01((x * 0.025), (z * 0.025), 4);
-            int height = round(random * 30 + 2);
-            for (int y = 0; y < height; y++) {
-                BLOCK_TYPE type = BLOCK_TYPE::STONE;
-                if (y == height - 1) type = BLOCK_TYPE::GRASS;
-                else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
-                setBlock(glm::ivec3(x, y, z), type);
+    auto generate = [&perlin, &size, this](int startX, int endX, int startZ, int endZ) {
+        for (int x = startX; x < endX; x++) {
+            for (int z = startZ; z < endZ; z++) {
+                const double random = perlin.octave2D_01((x * 0.025), (z * 0.025), 4);
+                int height = round(random * 30 + 2);
+                for (int y = 0; y < height; y++) {
+                    BLOCK_TYPE type = BLOCK_TYPE::STONE;
+                    if (y == height - 1) type = BLOCK_TYPE::GRASS;
+                    else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
+                    setBlock(glm::ivec3(x - size.x / 2, y, z - size.y / 2), type);
+                }
             }
         }
+    };
+
+    std::thread threads[THREAD_COUNT];
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        threads[i] = std::thread(generate, 0, size.x*i / THREAD_COUNT, 0, size.y);
+    }
+
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        while (!threads[i].joinable()) {}
+        threads[i].join();
     }
 
     for (auto& [ch, block] : blocks) {
@@ -80,6 +94,7 @@ Block* World::getBlock(glm::ivec3 pos)
 void World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
 {
     std::size_t ch = hashPos(pos);
+    std::lock_guard<std::mutex> guard(blocksMutex);
     if (blocks.find(ch) != blocks.end())
     {
         if (loading) return;
@@ -133,12 +148,14 @@ void World::setRenderingGroup(Block* block)
         }
         return;
     }
-    std::vector<Block*>::iterator begin = renderingGroups[type].begin();
-    std::vector<Block*>::iterator end = renderingGroups[type].end();
-    std::vector<Block*>::iterator it = std::find(begin, end, block);
-    if (it != renderingGroups[type].end())
-    {
-        return;
+    if (!loading) {
+        std::vector<Block*>::iterator begin = renderingGroups[type].begin();
+        std::vector<Block*>::iterator end = renderingGroups[type].end();
+        std::vector<Block*>::iterator it = std::find(begin, end, block);
+        if (it != renderingGroups[type].end())
+        {
+            return;
+        }
     }
     glm::ivec3 pos = block->getPos();
     std::size_t ch = hashPos(pos);

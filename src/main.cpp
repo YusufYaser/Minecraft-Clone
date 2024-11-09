@@ -91,7 +91,8 @@ int main(int argc, char* argv[]) {
 	siv::PerlinNoise::seed_type seed = dis(gen);
 	//siv::PerlinNoise::seed_type seed = 123u;
 	print("World Seed:", seed);
-	World world(seed, glm::ivec2(250, 250));
+	float progress = 0.0f;
+	World world(seed, &progress, glm::ivec2(250, 250));
 	print("Created world");
 
 	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));
@@ -139,6 +140,7 @@ int main(int argc, char* argv[]) {
 			newTitle << ", " << round(camera.pos.z * 100) / 100 << ")";
 			newTitle << " | Screen Resolution (ratio): " << width << "x" << height;
 			newTitle << " (" << round(((double)width / height) * 100) / 100 << ")";
+			newTitle << " | " << round(progress * 100);
 			//newTitle << " | " << ((oldHighlightedBlock != nullptr) ? (oldHighlightedBlock->hiddenFaces + 0) : 0);
 
 			glfwSetWindowTitle(gameWindow.getWindow(), newTitle.str().c_str());
