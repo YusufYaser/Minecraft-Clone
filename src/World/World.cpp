@@ -49,6 +49,7 @@ World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
                         if (i == treeHeight + 1) s = 1;
                         for (int tx = -s; tx <= s; tx++) {
                             for (int tz = -s; tz <= s; tz++) {
+                                if (i == treeHeight - 1 && tx == 0 && tz == 0) continue;
                                 setBlock(base + glm::ivec3(tx, i, tz), BLOCK_TYPE::OAK_LEAVES);
                             }
                         }
@@ -157,26 +158,29 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
 void World::setRenderingGroup(Block* block)
 {
     BLOCK_TYPE type = block->getType();
+    std::vector<Block*>::iterator begin;
+    std::vector<Block*>::iterator end;
+    std::vector<Block*>::iterator it;
     if (renderingGroups.find(type) == renderingGroups.end())
     {
         renderingGroups[type] = std::vector<Block*>();
     }
     if (block == NULL || block->hiddenFaces == 63) {
         if (loading) return;
-        std::vector<Block*>::iterator begin = renderingGroups[type].begin();
-        std::vector<Block*>::iterator end = renderingGroups[type].end();
-        std::vector<Block*>::iterator it = std::find(begin, end, block);
-        if (it != renderingGroups[type].end())
+        begin = renderingGroups[type].begin();
+        end = renderingGroups[type].end();
+        it = std::find(begin, end, block);
+        if (it != end)
         {
             renderingGroups[type].erase(it);
         }
         return;
     }
     if (!loading) {
-        std::vector<Block*>::iterator begin = renderingGroups[type].begin();
-        std::vector<Block*>::iterator end = renderingGroups[type].end();
-        std::vector<Block*>::iterator it = std::find(begin, end, block);
-        if (it != renderingGroups[type].end())
+        begin = renderingGroups[type].begin();
+        end = renderingGroups[type].end();
+        it = std::find(begin, end, block);
+        if (it != end)
         {
             return;
         }

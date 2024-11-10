@@ -10,9 +10,9 @@
 #include "../World/World.h"
 #include <GLFW/glfw3.h>
 
-class Camera {
+class Player {
 public:
-	Camera(World* world, glm::vec3 pos);
+	Player(World* world, glm::vec3 pos);
 
 	glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -23,9 +23,11 @@ public:
 
 	BLOCK_TYPE selectedBlock = BLOCK_TYPE::STONE;
 
+	void update(float delta);
 	void checkInputs(GLFWwindow* window, float delta);
 
 	void getTargetBlock(Block** block, BLOCK_FACE* face);
+	glm::vec3 getCameraPos();
 
 private:
 	bool wasHidden = false;
@@ -33,4 +35,7 @@ private:
 	bool placedBlock = false;
 	glm::vec2 originalPos;
 	World* world;
+
+	glm::vec3 velocity;
+	glm::vec3 acceleration;
 };

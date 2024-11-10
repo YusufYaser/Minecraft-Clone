@@ -5,7 +5,7 @@
 #include "Logging.h"
 #include <glm/glm.hpp>
 #include <string>
-#include "Camera/Camera.h"
+#include "Player/Player.h"
 #include "Block/Block.h"
 #include "Shaders/Shaders.h"
 #include "Textures/Textures.h"
@@ -15,6 +15,7 @@
 #include <sstream>
 #include <random>
 #include <ctime>
+#include <chrono>
 
 const char* vertexShaderFile = {
 #include "Shaders/DefaultShader/Shader.vert"
@@ -91,7 +92,7 @@ int main(int argc, char* argv[]) {
 	World world(seed, glm::ivec2(250, 250));
 	print("Created world");
 
-	Camera camera = Camera(&world, glm::vec3(.0f, 10.0f, .0f));
+	Player player = Player(&world, glm::vec3(.0f, 10.0f, .0f));
 	Crosshair crosshair;
 
 	glm::mat4 rotation = glm::mat4(1.0f);
@@ -112,7 +113,7 @@ int main(int argc, char* argv[]) {
 
 	GUIBlock guiBlock;
 
-	BLOCK_TYPE prevSelectedBlock = camera.selectedBlock;
+	BLOCK_TYPE prevSelectedBlock = player.selectedBlock;
 
 	while (!glfwWindowShouldClose(gameWindow.getWindow()))
 	{
@@ -131,9 +132,9 @@ int main(int argc, char* argv[]) {
 			std::stringstream newTitle;
 			newTitle << "Minecraft Clone";
 			newTitle << " | FPS: " << round(1 / delta);
-			newTitle << " | Position: (" << round(camera.pos.x * 100) / 100;
-			newTitle << ", " << round(camera.pos.y * 100) / 100;
-			newTitle << ", " << round(camera.pos.z * 100) / 100 << ")";
+			newTitle << " | Position: (" << round(player.pos.x * 100) / 100;
+			newTitle << ", " << round(player.pos.y * 100) / 100;
+			newTitle << ", " << round(player.pos.z * 100) / 100 << ")";
 			newTitle << " | Screen Resolution (ratio): " << width << "x" << height;
 			newTitle << " (" << round(((double)width / height) * 100) / 100 << ")";
 			newTitle << " | " << round(progress * 100);
@@ -147,7 +148,7 @@ int main(int argc, char* argv[]) {
 		
 		glDepthRange(0.01, 1.0);
 
-		view = glm::lookAt(camera.pos, camera.pos + camera.orientation, camera.up);
+		view = glm::lookAt(player.getCameraPos(), player.getCameraPos() + player.orientation, player.up);
 
 		glUseProgram(shader.ID);
 
@@ -157,12 +158,13 @@ int main(int argc, char* argv[]) {
 		guiBlock.position = glm::vec2(-1.5f, 1.5f);
 		guiBlock.scale = .15f;
 
-		camera.checkInputs(gameWindow.getWindow(), delta);
+		player.update(delta);
+		player.checkInputs(gameWindow.getWindow(), delta);
 
-		world.Render(shader.ID, camera.pos);
+		world.Render(shader.ID, player.getCameraPos());
 
 		Block* targetBlock = nullptr;
-		camera.getTargetBlock(&targetBlock, &face);
+		player.getTargetBlock(&targetBlock, &face);
 
 		if (oldHighlightedBlock != nullptr) oldHighlightedBlock->highlighted = false;
 		oldHighlightedBlock = targetBlock;
@@ -178,9 +180,9 @@ int main(int argc, char* argv[]) {
 
 		crosshair.Render(guiShader.ID);
 
-		if (prevSelectedBlock != camera.selectedBlock) {
-			prevSelectedBlock = camera.selectedBlock;
-			guiBlock.setBlock(camera.selectedBlock);
+		if (prevSelectedBlock != player.selectedBlock) {
+			prevSelectedBlock = player.selectedBlock;
+			guiBlock.setBlock(player.selectedBlock);
 		}
 
 		guiBlock.Render(guiShader.ID);

@@ -1,34 +1,51 @@
-#include "Camera.h"
+#include "Player.h"
 
-Camera::Camera(World* world, glm::vec3 pos)
+Player::Player(World* world, glm::vec3 pos)
 {
-    Camera::pos = pos;
-    Camera::world = world;
-    Camera::originalPos = glm::vec3();
+    Player::pos = pos;
+    Player::world = world;
+    Player::originalPos = glm::vec3();
+    Player::acceleration = glm::vec3();
+    Player::velocity = glm::vec3();
 }
 
-void Camera::checkInputs(GLFWwindow* window, float delta) {
+void Player::update(float delta)
+{
+    velocity += acceleration * delta;
+    pos += velocity * delta;
+
+    velocity = glm::vec3();
+    acceleration = glm::vec3();
+}
+
+void Player::checkInputs(GLFWwindow* window, float delta) {
     if (glfwGetWindowAttrib(window, GLFW_FOCUSED) == GLFW_FALSE) return;
 
     glm::vec3 orientation2 = glm::vec3(orientation.x, 0.0f, orientation.z);
 
+    if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+            pos = glm::vec3(0.0f, 30.0f, 0.0f);
+        }
+    }
+
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        pos += (speed * delta) * glm::normalize(orientation2);
+        velocity += speed * glm::normalize(orientation2);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        pos -= (speed * delta) * glm::normalize(orientation2);
+        velocity -= speed * glm::normalize(orientation2);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        pos -= (speed * delta) * glm::normalize(glm::cross(orientation2, up));
+        velocity -= speed * glm::normalize(glm::cross(orientation2, up));
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        pos += (speed * delta) * glm::normalize(glm::cross(orientation2, up));
+        velocity += speed * glm::normalize(glm::cross(orientation2, up));
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        pos += (speed * delta) * up;
+        velocity += speed * up;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        pos -= (speed * delta) * up;
+        velocity -= speed * up;
     }
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
@@ -110,12 +127,13 @@ void Camera::checkInputs(GLFWwindow* window, float delta) {
     }
 }
 
-void Camera::getTargetBlock(Block** block, BLOCK_FACE* face)
+void Player::getTargetBlock(Block** block, BLOCK_FACE* face)
 {
     glm::vec3 oldBlockPos;
+    glm::vec3 cameraPos = getCameraPos();
     for (float i = 0; i < reachDistance; i += .01f) {
-        glm::vec3 blockPosNoCeil = pos + i * orientation;
-        glm::vec3 blockPos = pos + i * orientation;
+        glm::vec3 blockPosNoCeil = cameraPos + i * orientation;
+        glm::vec3 blockPos = cameraPos + i * orientation;
         blockPos.x = round(blockPos.x);
         blockPos.y = round(blockPos.y);
         blockPos.z = round(blockPos.z);
@@ -143,4 +161,9 @@ void Camera::getTargetBlock(Block** block, BLOCK_FACE* face)
         }
     }
     *block = nullptr;
+}
+
+glm::vec3 Player::getCameraPos()
+{
+    return pos + up;
 }
