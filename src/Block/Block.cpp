@@ -64,6 +64,8 @@ Block::Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces)
 
 void Block::Render(GLuint shader, bool bindTexture)
 {
+	if (hiddenFaces == 63) return;
+
 	GLuint VBO, EBO, VAO;
 	uint8_t faceCount = 0;
 
@@ -91,11 +93,6 @@ void Block::Render(GLuint shader, bool bindTexture)
 			}
 
 			faceCount++;
-		}
-
-		if (hiddenFaces == 63) {
-			data.VBO = -1; // fake value
-			return;
 		}
 
 		glGenVertexArrays(1, &VAO);

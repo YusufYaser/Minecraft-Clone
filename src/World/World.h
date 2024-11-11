@@ -10,26 +10,53 @@
 #include <future>
 #include <mutex>
 #include <random>
+#include <time.h>
 
 class World {
 public:
 	World(siv::PerlinNoise::seed_type seed, glm::ivec2 size = glm::ivec2(20, 20));
 	~World();
 
-	void Render(GLuint shader, glm::vec3 pos, float renderDistance = 50.0f);
+	void Render(GLuint shader, glm::vec3 pos, int renderDistance = 6);
 
 	Block* getBlock(glm::ivec3 pos);
 	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
 
 	siv::PerlinNoise::seed_type getSeed() const { return seed; };
 
+	void loadChunk(glm::ivec2 pos);
+
 private:
-	std::unordered_map<std::size_t, Block*> blocks;
-	std::mutex blocksMutex;
-	std::unordered_map<BLOCK_TYPE, std::vector<Block*>> renderingGroups;
 	siv::PerlinNoise::seed_type seed;
 
-	bool loading = true;
+	struct Chunk {
+		bool loaded;
+		std::mutex blocksMutex;
+		std::mutex renderingGroupsMutex;
+		time_t lastRendered;
+		std::unordered_map<std::size_t, Block*> blocks;
+		std::unordered_map<BLOCK_TYPE, std::vector<Block*>> renderingGroups;
+
+		~Chunk() {
+			blocksMutex.lock();
+			for (auto& [ch, block] : blocks) {
+				delete block;
+			}
+			blocks.clear();
+			blocksMutex.unlock();
+			renderingGroupsMutex.lock();
+			for (auto& [ch, blocks] : renderingGroups) {
+				blocks.clear();
+			}
+			renderingGroups.clear();
+			renderingGroupsMutex.unlock();
+		}
+	};
+
+	std::unordered_map<std::size_t, Chunk*> chunks;
+	std::mutex chunksMutex;
+
+	std::thread chunkUnloader;
 
 	void setRenderingGroup(Block* block);
 };
