@@ -44,6 +44,34 @@ int main(int argc, char* argv[]) {
 	print("GitHub: https://github.com/YusufYaser/Minecraft-Clone");
 	print("");
 
+	uint32_t seedArg = 0;
+
+	for (int i = 1; i < argc; ++i) {
+		std::string arg = argv[i];
+		if (arg == "--seed") {
+			if (i + 1 < argc) {
+				std::string newSeed = argv[i + 1];
+				if (seedArg != 0) {
+					error("Two or more seeds were specified");
+					return 1;
+				}
+				try {
+					seedArg = std::stoi(newSeed);
+				}
+				catch (std::invalid_argument&) {
+					seedArg = static_cast<uint32_t>(std::hash<std::string>{}(newSeed));
+				}
+				i++;
+				print("Using custom seed:", seedArg);
+				continue;
+			}
+			else {
+				error("No seed specified in --seed");
+				return 1;
+			}
+		}
+	}
+
 	print("Initializing GLFW");
 
 	glfwSetErrorCallback(glfw_error_callback);
@@ -82,11 +110,17 @@ int main(int argc, char* argv[]) {
 	print("Loaded textures");
 
 	print("Creating world");
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(0, std::numeric_limits<siv::PerlinNoise::seed_type>::max());
-	siv::PerlinNoise::seed_type seed = dis(gen);
-	//siv::PerlinNoise::seed_type seed = 123u;
+	siv::PerlinNoise::seed_type seed = seedArg;
+	if (seedArg == 0) {
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(
+			std::numeric_limits<siv::PerlinNoise::seed_type>::min(),
+			std::numeric_limits<siv::PerlinNoise::seed_type>::max()
+		);
+			
+		seed = dis(gen);
+	}
 	print("World Seed:", seed);
 	float progress = 0.0f;
 	World world(seed, glm::ivec2(250, 250));
@@ -192,7 +226,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	print("Cleaning up");
-	//world.~World();
+	world.~World();
 	shader.~Shader();
 	guiShader.~Shader();
 	gameWindow.~GameWindow();
