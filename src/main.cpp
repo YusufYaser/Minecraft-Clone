@@ -154,17 +154,42 @@ int main(int argc, char* argv[]) {
 	GLTtext* text = gltCreateText();
 
 	bool showDebugText = true;
+	int frameNum = 0;
+
+	bool isRunning = false;
+	bool wasRunning = false;
+	double startedRunning = glfwGetTime();
 
 	while (!glfwWindowShouldClose(gameWindow.getWindow()))
 	{
+		frameNum++;
 		double currentTime = glfwGetTime();
 		float delta = float(currentTime - prevTime);
 		prevTime = currentTime;
 
+		float simDelta = delta;
+		if (simDelta > .5f) simDelta = .5f;
+
 		int width, height;
 		glfwGetWindowSize(gameWindow.getWindow(), &width, &height);
+		if (width == 0) width = 1;
 		if (height == 0) height = 1; // prevent division by 0
-		projection = glm::perspective(glm::radians(45.0f), (float)width / height, .1f, 1000.0f);
+
+		isRunning = player.speed > PLAYER_SPEED;
+		if (isRunning && !wasRunning) {
+			startedRunning = currentTime;
+		}
+		wasRunning = isRunning;
+		float FOV = 45.0f;
+		if (isRunning) {
+			if (currentTime - startedRunning > .1f) {
+				FOV += 5.0f * player.speed / PLAYER_SPEED;
+			}
+			else {
+				FOV += (currentTime - startedRunning) * (5.0f * player.speed / PLAYER_SPEED) * 10.0f;
+			}
+		}
+		projection = glm::perspective(glm::radians(FOV), (float)width / height, .1f, 1000.0f);
 		glViewport(0, 0, width, height);
 
 		glClearColor(.3f, .3f, 1.0f, 1);
@@ -182,8 +207,8 @@ int main(int argc, char* argv[]) {
 		guiBlock.position = glm::vec2(-1.5f, 1.5f);
 		guiBlock.scale = .15f;
 
-		player.update(delta);
-		player.checkInputs(gameWindow.getWindow(), delta);
+		player.update(simDelta);
+		player.checkInputs(gameWindow.getWindow(), simDelta);
 
 		world.Render(shader.ID, player.getCameraPos());
 

@@ -10,6 +10,8 @@
 #include "../World/World.h"
 #include <GLFW/glfw3.h>
 
+#define PLAYER_SPEED 5.0f
+
 class Player {
 public:
 	Player(World* world, glm::vec3 pos);
@@ -18,7 +20,7 @@ public:
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	glm::vec3 pos;
-	float speed = 10.0f;
+	float speed = PLAYER_SPEED;
 	float reachDistance = 10.0f;
 
 	BLOCK_TYPE selectedBlock = BLOCK_TYPE::STONE;
@@ -36,6 +38,6 @@ private:
 	glm::vec2 originalPos;
 	World* world;
 
-	glm::vec3 velocity;
-	glm::vec3 acceleration;
+	float jumpSpeed = 0.0f;
+	float fallSpeed = 0.0f;
 };

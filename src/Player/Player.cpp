@@ -5,17 +5,43 @@ Player::Player(World* world, glm::vec3 pos)
     Player::pos = pos;
     Player::world = world;
     Player::originalPos = glm::vec3();
-    Player::acceleration = glm::vec3();
-    Player::velocity = glm::vec3();
 }
 
 void Player::update(float delta)
 {
-    velocity += acceleration * delta;
-    pos += velocity * delta;
+    glm::ivec3 iPos = glm::ivec3(
+        round(pos.x),
+        round(pos.y),
+        round(pos.z)
+    );
 
-    velocity = glm::vec3();
-    acceleration = glm::vec3();
+    if (jumpSpeed == 0.0f) {
+        Block* belowBlock = world->getBlock(glm::vec3(iPos.x, pos.y, iPos.z) - up * delta);
+        if (belowBlock == nullptr) {
+            fallSpeed += 10.0f * delta;
+            if (fallSpeed > 50.0f) fallSpeed = 50.0f;
+        }
+        else {
+            fallSpeed = 0.0f;
+            pos.y = belowBlock->getPos().y + 1.0f;
+        }
+    } else if (jumpSpeed != 0.0f) {
+        pos += (jumpSpeed * delta) * up;
+        jumpSpeed -= 10.0f * delta;
+        if (jumpSpeed <= 0.0f) {
+            jumpSpeed = 0.0f;
+            fallSpeed = 10.0f * delta;
+        }
+    }
+
+    pos -= (fallSpeed * delta) * up;
+
+    if (fallSpeed == 0.0f) {
+        Block* collBlock = world->getBlock(iPos);
+        if (collBlock != nullptr) {
+            pos.y = collBlock->getPos().y + 1.0f;
+        }
+    }
 }
 
 void Player::checkInputs(GLFWwindow* window, float delta) {
@@ -30,28 +56,49 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        velocity += speed * glm::normalize(orientation2);
+        glm::vec3 change = (speed * delta) * glm::normalize(orientation2);
+        glm::ivec3 newIPos = glm::ivec3(
+            round(pos.x + change.x),
+            round(pos.y + change.y),
+            round(pos.z + change.z)
+        );
+        if (world->getBlock(newIPos) == nullptr) pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        velocity -= speed * glm::normalize(orientation2);
+        glm::vec3 change = (-speed * delta) * glm::normalize(orientation2);
+        glm::ivec3 newIPos = glm::ivec3(
+            round(pos.x + change.x),
+            round(pos.y + change.y),
+            round(pos.z + change.z)
+        );
+        if (world->getBlock(newIPos) == nullptr) pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        velocity -= speed * glm::normalize(glm::cross(orientation2, up));
+        glm::vec3 change = (-speed * delta) * glm::normalize(glm::cross(orientation2, up));
+        glm::ivec3 newIPos = glm::ivec3(
+            round(pos.x + change.x),
+            round(pos.y + change.y),
+            round(pos.z + change.z)
+        );
+        if (world->getBlock(newIPos) == nullptr) pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        velocity += speed * glm::normalize(glm::cross(orientation2, up));
+        glm::vec3 change = (speed * delta) * glm::normalize(glm::cross(orientation2, up));
+        glm::ivec3 newIPos = glm::ivec3(
+            round(pos.x + change.x),
+            round(pos.y + change.y),
+            round(pos.z + change.z)
+        );
+        if (world->getBlock(newIPos) == nullptr) pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        velocity += speed * up;
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        velocity -= speed * up;
+        if (fallSpeed == 0.0f && jumpSpeed == 0.0f) jumpSpeed = 4.5f;
     }
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        speed = 20.f;
+        speed = PLAYER_SPEED * 2.0f;
     } else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE) {
-        speed = 10.f;
+        speed = PLAYER_SPEED;
     }
 
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) selectedBlock = BLOCK_TYPE::STONE;
@@ -88,8 +135,17 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
             getTargetBlock(&target, &face);
 
             if (target != nullptr) {
-                world->setBlock(target->getPos() + getBlockFaceDirection(face), selectedBlock, false);
-                placedBlock = true;
+                glm::ivec3 iPos = glm::ivec3(
+                    round(pos.x),
+                    round(pos.y),
+                    round(pos.z)
+                );
+
+                if (target->getPos() + getBlockFaceDirection(face) != iPos &&
+                    target->getPos() + getBlockFaceDirection(face) != iPos + glm::ivec3(up)) {
+                    world->setBlock(target->getPos() + getBlockFaceDirection(face), selectedBlock, false);
+                    placedBlock = true;
+                }
             }
         }
     }
