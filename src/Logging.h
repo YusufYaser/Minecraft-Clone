@@ -1,11 +1,14 @@
-#pragma once
+﻿#pragma once
 #include <iostream>
+#include "Colors.h"
 
 #define print(...)\
-(std::cout << "Game | ", printArgs(__VA_ARGS__));
+(std::cout << BOLD << BRIGHT_BLUE << "Info "\
+            BRIGHT_GREEN << "(game)" << BLUE << " -> " << RESET, printArgs(__VA_ARGS__), std::cout << RESET);
 
 #define error(...)\
-(std::cout << "Game | Error | ", printArgs(__VA_ARGS__));
+(std::cout << BOLD << BRIGHT_RED << "Err  "\
+            BRIGHT_GREEN << "(game)" << RED << " -> " << RESET, printArgs(__VA_ARGS__), std::cout << RESET);
 
 template<typename T>
 void printArgs(T&& arg) {

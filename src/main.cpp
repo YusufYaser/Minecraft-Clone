@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 	print("");
 	print("Starting Minecraft Clone");
 	print("");
-	print("GitHub: https://github.com/YusufYaser/Minecraft-Clone");
+	print("GitHub:", UNDERLINE "https://github.com/YusufYaser/Minecraft-Clone");
 	print("");
 
 	uint32_t seedArg = 0;

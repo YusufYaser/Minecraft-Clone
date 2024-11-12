@@ -188,6 +188,7 @@
     <ClInclude Include="libraries\include\PerlinNoise\PerlinNoise.hpp" />
     <ClInclude Include="src\Block\Block.h" />
     <ClInclude Include="src\Block\CubeVertices.h" />
+    <ClInclude Include="src\Colors.h" />
     <ClInclude Include="src\Player\Player.h" />
     <ClInclude Include="src\GUI\Crosshair.h" />
     <ClInclude Include="src\GUI\GUIBlock.h" />
