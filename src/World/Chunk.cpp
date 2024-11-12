@@ -119,3 +119,19 @@ void World::loadChunk(glm::ivec2 pos)
     chunkLoadQueue.push_back(pos);
     chunkLoadQueueMutex.unlock();
 }
+
+int World::chunksLoaded()
+{
+    chunksMutex.lock();
+    int size = chunks.size();
+    chunksMutex.unlock();
+    return size;
+}
+
+int World::chunkLoadQueueCount()
+{
+    chunkLoadQueueMutex.lock();
+    int size = chunkLoadQueue.size();
+    chunkLoadQueueMutex.unlock();
+    return size;
+}

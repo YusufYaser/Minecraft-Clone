@@ -16,6 +16,8 @@
 #include <random>
 #include <ctime>
 #include <chrono>
+#define GLT_IMPLEMENTATION
+#include <gltext/gltext.h>
 
 const char* vertexShaderFile = {
 #include "Shaders/DefaultShader/Shader.vert"
@@ -107,6 +109,8 @@ int main(int argc, char* argv[]) {
 	glUniform1i(glGetUniformLocation(shader.ID, "tex0"), 0);
 	glUseProgram(guiShader.ID);
 	glUniform1i(glGetUniformLocation(guiShader.ID, "tex0"), 0);
+
+	gltInit();
 	print("Loaded textures");
 
 	print("Creating world");
@@ -122,7 +126,6 @@ int main(int argc, char* argv[]) {
 		seed = dis(gen);
 	}
 	print("World Seed:", seed);
-	float progress = 0.0f;
 	World world(seed, glm::ivec2(250, 250));
 	print("Created world");
 
@@ -140,7 +143,6 @@ int main(int argc, char* argv[]) {
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 	double prevTime = glfwGetTime();
-	double lastFpsUpdate = glfwGetTime();
 
 	Block* oldHighlightedBlock = nullptr;
 	BLOCK_FACE face;
@@ -148,6 +150,10 @@ int main(int argc, char* argv[]) {
 	GUIBlock guiBlock;
 
 	BLOCK_TYPE prevSelectedBlock = player.selectedBlock;
+
+	GLTtext* text = gltCreateText();
+
+	bool showDebugText = true;
 
 	while (!glfwWindowShouldClose(gameWindow.getWindow()))
 	{
@@ -160,22 +166,6 @@ int main(int argc, char* argv[]) {
 		if (height == 0) height = 1; // prevent division by 0
 		projection = glm::perspective(glm::radians(45.0f), (float)width / height, .1f, 1000.0f);
 		glViewport(0, 0, width, height);
-
-		if (currentTime - lastFpsUpdate > .25) {
-			lastFpsUpdate = currentTime;
-			std::stringstream newTitle;
-			newTitle << "Minecraft Clone";
-			newTitle << " | FPS: " << round(1 / delta);
-			newTitle << " | Position: (" << round(player.pos.x * 100) / 100;
-			newTitle << ", " << round(player.pos.y * 100) / 100;
-			newTitle << ", " << round(player.pos.z * 100) / 100 << ")";
-			newTitle << " | Screen Resolution (ratio): " << width << "x" << height;
-			newTitle << " (" << round(((double)width / height) * 100) / 100 << ")";
-			newTitle << " | " << round(progress * 100);
-			//newTitle << " | " << ((oldHighlightedBlock != nullptr) ? (oldHighlightedBlock->hiddenFaces + 0) : 0);
-
-			glfwSetWindowTitle(gameWindow.getWindow(), newTitle.str().c_str());
-		}
 
 		glClearColor(.3f, .3f, 1.0f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -219,19 +209,47 @@ int main(int argc, char* argv[]) {
 			guiBlock.setBlock(player.selectedBlock);
 		}
 
-		guiBlock.Render(guiShader.ID);
+		if (showDebugText) {
+			std::stringstream newTitle;
+			newTitle << "Minecraft Clone\n";
+			newTitle << "github.com/YusufYaser/Minecraft-Clone\n\n";
+			newTitle << "FPS: " << round(1 / delta) << " (" << delta << ")" << "\n";
+
+			newTitle << "Screen Resolution (ratio): " << width << "x" << height;
+			newTitle << " (" << round(((double)width / height) * 100) / 100 << ")\n\n";
+
+			newTitle << "Position: " << round(player.pos.x * 100) / 100;
+			newTitle << ", " << round(player.pos.y * 100) / 100;
+			newTitle << ", " << round(player.pos.z * 100) / 100 << "\n\n";
+
+			newTitle << "Chunks Loaded: " << world.chunksLoaded() - world.chunkLoadQueueCount() << "\n";
+			newTitle << "Chunks Load Queue Count: " << world.chunkLoadQueueCount() << "\n\n";
+
+			newTitle << "World Seed: " << world.getSeed() << "\n";
+
+			gltSetText(text, newTitle.str().c_str());
+			gltBeginDraw();
+			gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+			gltDrawText2D(text, 0, 0, 1.0f);
+			gltEndDraw();
+		}
+		else {
+			guiBlock.Render(guiShader.ID);
+		}
 
 		glfwSwapBuffers(gameWindow.getWindow());
 		glfwPollEvents();
 	}
 
 	print("Cleaning up");
+	gltDeleteText(text);
 	world.~World();
 	shader.~Shader();
 	guiShader.~Shader();
 	gameWindow.~GameWindow();
 
 	print("Terminating GLFW");
+	gltTerminate();
 	glfwTerminate();
 	return 0;
 }

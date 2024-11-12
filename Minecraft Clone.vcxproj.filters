@@ -92,6 +92,9 @@
     <ClInclude Include="src\Colors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="libraries\include\gltext\gltext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\DefaultShader\Shader.frag" />

@@ -26,6 +26,9 @@ public:
 
 	void loadChunk(glm::ivec2 pos);
 
+	int chunksLoaded();
+	int chunkLoadQueueCount();
+
 private:
 	std::atomic<bool> unloading;
 

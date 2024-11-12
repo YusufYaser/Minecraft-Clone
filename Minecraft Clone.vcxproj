@@ -185,6 +185,7 @@
     <ClCompile Include="src\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libraries\include\gltext\gltext.h" />
     <ClInclude Include="libraries\include\PerlinNoise\PerlinNoise.hpp" />
     <ClInclude Include="src\Block\Block.h" />
     <ClInclude Include="src\Block\CubeVertices.h" />
