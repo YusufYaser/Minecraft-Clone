@@ -18,16 +18,16 @@ World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
 World::~World()
 {
     unloading.store(true);
-    print("Deleting chunks");
+    print("Waiting for chunk loader thread...");
+    chunkLoader.join();
+    print("Waiting for chunk unloader thread...");
+    chunkUnloader.join();
+
+    print("Removing chunks");
     for (auto& [ch, chunk] : chunks) {
         // TODO: use chunk unloader instead
         delete chunk;
     }
-
-    /*print("Waiting for chunk loader thread...");
-    chunkLoader.join();
-    print("Waiting for chunk unloader thread...");
-    chunkUnloader.join();*/
 }
 
 void World::Render(GLuint shader, glm::vec3 pos, int renderDistance)

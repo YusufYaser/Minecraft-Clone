@@ -15,6 +15,8 @@ void Player::update(float delta)
         round(pos.z)
     );
 
+    pos -= (fallSpeed * delta) * up;
+
     if (jumpSpeed == 0.0f) {
         Block* belowBlock = world->getBlock(glm::vec3(iPos.x, pos.y, iPos.z) - up * delta);
         if (belowBlock == nullptr) {
@@ -33,8 +35,6 @@ void Player::update(float delta)
             fallSpeed = 10.0f * delta;
         }
     }
-
-    pos -= (fallSpeed * delta) * up;
 
     if (fallSpeed == 0.0f) {
         Block* collBlock = world->getBlock(iPos);

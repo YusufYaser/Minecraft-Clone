@@ -32,6 +32,7 @@ void World::chunkLoaderFunc()
 
     while (true) {
         if (unloading.load()) break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
         if (chunkLoadQueue.size() == 0) continue;
         chunkLoadQueueMutex.lock();
@@ -87,7 +88,7 @@ void World::chunkUnloaderFunc()
 {
     while (true) {
         if (unloading.load()) break;
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
         time_t current = time(nullptr);
         if (!chunksMutex.try_lock()) continue;
         unloader_func_chunks_loop:

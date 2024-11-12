@@ -17,7 +17,7 @@ public:
 	World(siv::PerlinNoise::seed_type seed, glm::ivec2 size = glm::ivec2(20, 20));
 	~World();
 
-	void Render(GLuint shader, glm::vec3 pos, int renderDistance = 10);
+	void Render(GLuint shader, glm::vec3 pos, int renderDistance = 6);
 
 	Block* getBlock(glm::ivec3 pos);
 	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
