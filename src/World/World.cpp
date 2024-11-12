@@ -4,31 +4,30 @@
 World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
     World::seed = seed;
 
-    auto chunkUnloaderFunc = [this]() {
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-            time_t current = time(nullptr);
-            if (!chunksMutex.try_lock()) continue;
-            unloader_func_chunks_loop:
-            for (auto& [ch, chunk] : chunks) {
-                if (chunk->loaded && current - chunk->lastRendered > 30) {
-                    delete chunks[ch];
-                    chunks.erase(ch);
-                    goto unloader_func_chunks_loop;
-                }
-            }
-            chunksMutex.unlock();
-        }
-    };
+    unloading.store(false);
 
-    chunkUnloader = std::thread(chunkUnloaderFunc);
+    chunkLoader = std::thread([this]() {
+        chunkLoaderFunc();
+        });
+
+    chunkUnloader = std::thread([this]() {
+        chunkUnloaderFunc();
+        });
 }
 
 World::~World()
 {
+    unloading.store(true);
+    print("Deleting chunks");
     for (auto& [ch, chunk] : chunks) {
+        // TODO: use chunk unloader instead
         delete chunk;
     }
+
+    /*print("Waiting for chunk loader thread...");
+    chunkLoader.join();
+    print("Waiting for chunk unloader thread...");
+    chunkUnloader.join();*/
 }
 
 void World::Render(GLuint shader, glm::vec3 pos, int renderDistance)
@@ -40,15 +39,17 @@ void World::Render(GLuint shader, glm::vec3 pos, int renderDistance)
         for (int y = -(renderDistance / 2) + (pos.z / 16); y < (renderDistance / 2) + (pos.z / 16); y++) {
             glm::ivec2 cPos = glm::ivec2(x, y);
             std::size_t chunkCh = hashPos(cPos);
-            if (chunks.find(chunkCh) == chunks.end())
+            std::unordered_map<std::size_t, Chunk*>::iterator it = chunks.find(chunkCh);
+            if (it == chunks.end())
             {
                 loadChunk(cPos);
                 continue;
             }
-            if (!chunks[chunkCh]->loaded) continue;
+            Chunk* chunk = it->second;
+            if (!chunk->loaded) continue;
 
-            if (!chunks[chunkCh]->renderingGroupsMutex.try_lock()) continue;
-            for (auto& [type, blocks] : chunks[chunkCh]->renderingGroups) {
+            if (!chunk->renderingGroupsMutex.try_lock()) continue;
+            for (auto& [type, blocks] : chunk->renderingGroups) {
                 glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type)));
 
                 for (auto& block : blocks) {
@@ -56,8 +57,8 @@ void World::Render(GLuint shader, glm::vec3 pos, int renderDistance)
                     block->Render(shader, false);
                 }
             }
-            chunks[chunkCh]->lastRendered = time(nullptr);
-            chunks[chunkCh]->renderingGroupsMutex.unlock();
+            chunk->lastRendered = time(nullptr);
+            chunk->renderingGroupsMutex.unlock();
         }
     }
 }
@@ -76,7 +77,6 @@ Block* World::getBlock(glm::ivec3 pos)
 
     Chunk* chunk = chunks[chunkCh];
     chunksMutex.unlock();
-    //if (!chunk->ready) return nullptr;
 
     chunk->blocksMutex.lock();
     if (chunk->blocks.find(blockCh) != chunk->blocks.end()) {

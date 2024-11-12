@@ -25,31 +25,31 @@ glm::ivec2 getPosChunk(const glm::ivec3& pos) {
     return glm::ivec2(chunkX, chunkZ);
 }
 
-void World::loadChunk(glm::ivec2 pos)
+void World::chunkLoaderFunc()
 {
-    std::size_t chunkCh = hashPos(pos);
+    const siv::PerlinNoise perlin{ seed };
+    std::uniform_real_distribution<> dist(0.0, 1.0);
 
-    if (chunks.find(chunkCh) == chunks.end())
-    {
-        Chunk* chunk = new Chunk();
-        chunk->blocks = std::unordered_map<std::size_t, Block*>();
-        chunksMutex.lock();
-        chunks[chunkCh] = chunk;
-        chunksMutex.unlock();
-    }
+    while (true) {
+        if (unloading.load()) break;
 
-    auto generate = [this](glm::ivec2 pos) {
+        if (chunkLoadQueue.size() == 0) continue;
+        chunkLoadQueueMutex.lock();
+        glm::ivec2 pos = chunkLoadQueue.front();
+        chunkLoadQueue.erase(chunkLoadQueue.begin());
+        chunkLoadQueueMutex.unlock();
+
         std::size_t chunkCh = hashPos(pos);
         Chunk* chunk = chunks[chunkCh];
 
-        const siv::PerlinNoise perlin{ seed };
-        std::uniform_real_distribution<> dist(0.0, 1.0);
-
         for (int x = pos.x * 16; x < 16 + pos.x * 16; x++) {
             for (int z = pos.y * 16; z < 16 + pos.y * 16; z++) {
+                if (unloading.load()) break;
+
                 const double random = perlin.octave2D_01((x * 0.025), (z * 0.025), 4);
-                int height = round(random * 30 + 2);
+                int height = round(random * 10 + 2);
                 for (int y = 0; y < height; y++) {
+                    if (unloading.load()) break;
                     BLOCK_TYPE type = BLOCK_TYPE::STONE;
                     if (y == height - 1) type = BLOCK_TYPE::GRASS;
                     else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
@@ -57,7 +57,7 @@ void World::loadChunk(glm::ivec2 pos)
                     setBlock(glm::ivec3(x, y, z), type);
                 }
 
-                /*std::mt19937 rng(seed * x * z);
+                std::mt19937 rng(seed * x * z);
                 if (dist(rng) < .0025) {
                     glm::ivec3 base = glm::ivec3(x, height, z);
                     int treeHeight = 4;
@@ -75,13 +75,47 @@ void World::loadChunk(glm::ivec2 pos)
                             }
                         }
                     }
-                }*/
+                }
             }
         }
 
         chunk->loaded = true;
-    };
+    }
+}
 
-    std::thread t = std::thread(generate, pos);
-    t.detach();
+void World::chunkUnloaderFunc()
+{
+    while (true) {
+        if (unloading.load()) break;
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        time_t current = time(nullptr);
+        if (!chunksMutex.try_lock()) continue;
+        unloader_func_chunks_loop:
+        for (auto& [ch, chunk] : chunks) {
+            if (chunk->loaded && current - chunk->lastRendered > 30) {
+                delete chunks[ch];
+                chunks.erase(ch);
+                goto unloader_func_chunks_loop;
+            }
+        }
+        chunksMutex.unlock();
+    }
+}
+
+void World::loadChunk(glm::ivec2 pos)
+{
+    std::size_t chunkCh = hashPos(pos);
+
+    if (chunks.find(chunkCh) == chunks.end())
+    {
+        Chunk* chunk = new Chunk();
+        chunk->blocks = std::unordered_map<std::size_t, Block*>();
+        chunksMutex.lock();
+        chunks[chunkCh] = chunk;
+        chunksMutex.unlock();
+    }
+
+    chunkLoadQueueMutex.lock();
+    chunkLoadQueue.push_back(pos);
+    chunkLoadQueueMutex.unlock();
 }

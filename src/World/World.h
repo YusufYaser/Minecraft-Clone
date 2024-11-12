@@ -17,7 +17,7 @@ public:
 	World(siv::PerlinNoise::seed_type seed, glm::ivec2 size = glm::ivec2(20, 20));
 	~World();
 
-	void Render(GLuint shader, glm::vec3 pos, int renderDistance = 6);
+	void Render(GLuint shader, glm::vec3 pos, int renderDistance = 10);
 
 	Block* getBlock(glm::ivec3 pos);
 	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
@@ -27,6 +27,8 @@ public:
 	void loadChunk(glm::ivec2 pos);
 
 private:
+	std::atomic<bool> unloading;
+
 	siv::PerlinNoise::seed_type seed;
 
 	struct Chunk {
@@ -56,7 +58,12 @@ private:
 	std::unordered_map<std::size_t, Chunk*> chunks;
 	std::mutex chunksMutex;
 
-	std::thread chunkUnloader;
-
 	void setRenderingGroup(Block* block);
+
+	std::thread chunkLoader;
+	void chunkLoaderFunc();
+	std::thread chunkUnloader;
+	void chunkUnloaderFunc();
+	std::vector<glm::ivec2> chunkLoadQueue;
+	std::mutex chunkLoadQueueMutex;
 };
