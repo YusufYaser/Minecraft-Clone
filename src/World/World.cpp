@@ -36,19 +36,23 @@ void World::Render(Shader* shader)
     glm::vec3 pos = Game::getInstance()->getPlayer()->getCameraPos();
     int renderDistance = Game::getInstance()->getRenderDistance();
     shader->activate();
-    glUniform3fv(shader->getUniformLoc("highlightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
+    glUniform1i(shader->getUniformLoc("highlighted"), 0);
 
     for (int x = -(renderDistance / 2) + (pos.x / 16); x < (renderDistance / 2) + (pos.x / 16); x++) {
         for (int y = -(renderDistance / 2) + (pos.z / 16); y < (renderDistance / 2) + (pos.z / 16); y++) {
             glm::ivec2 cPos = glm::ivec2(x, y);
             std::size_t chunkCh = hashPos(cPos);
+            chunksMutex.lock();
             std::unordered_map<std::size_t, Chunk*>::iterator it = chunks.find(chunkCh);
             if (it == chunks.end())
             {
+                chunksMutex.unlock();
                 loadChunk(cPos);
                 continue;
             }
             Chunk* chunk = it->second;
+            chunksMutex.unlock();
+            if (chunk == nullptr) continue;
             if (!chunk->loaded) continue;
 
             if (!chunk->renderingGroupsMutex.try_lock()) continue;
@@ -80,6 +84,7 @@ Block* World::getBlock(glm::ivec3 pos)
 
     Chunk* chunk = chunks[chunkCh];
     chunksMutex.unlock();
+    if (chunk == nullptr) return nullptr;
 
     chunk->blocksMutex.lock();
     if (chunk->blocks.find(blockCh) != chunk->blocks.end()) {
@@ -106,6 +111,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
 
     Chunk* chunk = chunks[chunkCh];
     chunksMutex.unlock();
+    if (chunk == nullptr) return nullptr;
 
     chunk->blocksMutex.lock();
     if (chunk->blocks.find(blockCh) != chunk->blocks.end())
@@ -159,7 +165,7 @@ void World::setRenderingGroup(Block* block)
     chunksMutex.lock();
     Chunk* chunk = chunks[chunkCh];
     chunksMutex.unlock();
-    assert(chunk);
+    if (chunk == nullptr) return;
 
     BLOCK_TYPE type = block->getType();
     std::vector<Block*>::iterator begin;

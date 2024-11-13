@@ -6,10 +6,16 @@ in vec2 texCoord;
 out vec4 FragColor;
 
 uniform sampler2D tex0;
-uniform vec3 highlightColor;
+uniform bool highlighted;
 
 void main() {
-    FragColor = texture(tex0, texCoord) * vec4(highlightColor, 1.0);
+    FragColor = texture(tex0, texCoord);
+
+    if (highlighted && !(texCoord.x < .95f && texCoord.x > .05f &&
+       texCoord.y < .95f && texCoord.y > .05f)) {
+
+        FragColor *= vec4(.25f, .25f, .25f, 1.0f);
+    }
 }
 
 )END"

@@ -7,39 +7,41 @@ void glfw_error_callback(int error, const char* description) {
 }
 
 int main(int argc, char* argv[]) {
-	print("");
-	print("Starting Minecraft Clone");
-	print("");
-	print("GitHub:", UNDERLINE "https://github.com/YusufYaser/Minecraft-Clone");
-	print("");
 
-	uint32_t seedArg = 0;
+	int renderDistance = 0;
 
 	for (int i = 1; i < argc; ++i) {
 		std::string arg = argv[i];
-		if (arg == "--seed") {
+		if (arg == "--render-distance") {
 			if (i + 1 < argc) {
-				std::string newSeed = argv[i + 1];
-				if (seedArg != 0) {
+				std::string value = argv[i + 1];
+				if (renderDistance != 0) {
 					error("Two or more seeds were specified");
 					return 1;
 				}
 				try {
-					seedArg = std::stoi(newSeed);
+					renderDistance = std::stoi(value);
 				}
 				catch (std::invalid_argument&) {
-					seedArg = static_cast<uint32_t>(std::hash<std::string>{}(newSeed));
+					error("The render distance must be a number");
+					return 1;
 				}
 				i++;
-				print("Using custom seed:", seedArg);
+				print("Using render distance:", renderDistance);
 				continue;
 			}
 			else {
-				error("No seed specified in --seed");
+				error("No render distance specified in --render-distance");
 				return 1;
 			}
 		}
 	}
+
+	print("");
+	print("Minecraft Clone");
+	print("");
+	print("GitHub:", UNDERLINE "https://github.com/YusufYaser/Minecraft-Clone");
+	print("");
 
 	print("Initializing GLFW");
 
@@ -58,6 +60,7 @@ int main(int argc, char* argv[]) {
 		error("Failed to start game");
 		return 1;
 	}
+	game->setRenderDistance(renderDistance == 0 ? 6 : renderDistance);
 
 	double prevTime = glfwGetTime();
 
@@ -77,7 +80,6 @@ int main(int argc, char* argv[]) {
 	game = nullptr;
 
 	print("Terminating GLFW");
-	gltTerminate();
 	glfwTerminate();
 	return 0;
 }

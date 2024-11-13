@@ -35,8 +35,6 @@ Game::Game()
 	glUniform1i(shader->getUniformLoc("tex0"), 0);
 	guiShader->activate();
 	glUniform1i(shader->getUniformLoc("tex0"), 0);
-
-	gltInit();
 	print("Loaded textures");
 
 	// create world
@@ -91,6 +89,9 @@ Game::~Game()
 	guiShader = nullptr;
 
 	gltDeleteText(m_debugText);
+	gltTerminate();
+
+	_instance = nullptr;
 }
 
 Game* Game::getInstance()
@@ -153,9 +154,15 @@ void Game::update(float delta)
 	std::stringstream newTitle;
 	newTitle << "Minecraft Clone\n";
 	newTitle << "https://github.com/YusufYaser/Minecraft-Clone\n\n";
-	newTitle << "FPS: " << round(1 / delta) << " (" << delta << ")" << "\n";
+	static double lastFpsUpdated = 0;
+	static int lastFps = 0;
+	if (currentTime - lastFpsUpdated > .25) {
+		lastFps = round(1 / delta);
+		lastFpsUpdated = currentTime;
+	}
+	newTitle << "FPS: " << lastFps << " (" << delta << ")" << "\n";
 
-	newTitle << "Screen Resolution: " << size.x << "x" << size.y;
+	newTitle << "Screen Resolution: " << size.x << "x" << size.y << "\n";
 
 	newTitle << "Position: " << round(m_player->pos.x * 100) / 100;
 	newTitle << ", " << round(m_player->pos.y * 100) / 100;
@@ -170,6 +177,10 @@ void Game::update(float delta)
 		newTitle << "=== Target Block ===\n";
 		newTitle << " Block ID: " << (int)targetBlock->getType() << "\n";
 		newTitle << " Block Type: " << targetBlock->getName() << "\n";
+		glm::vec3 bPos = targetBlock->getPos();
+		newTitle << " Block Position: " << round(bPos.x * 100) / 100;
+		newTitle << ", " << round(bPos.y * 100) / 100;
+		newTitle << ", " << round(bPos.z * 100) / 100 << "\n";
 		newTitle << "==================\n";
 	}
 
@@ -216,6 +227,11 @@ float Game::getDelta()
 int Game::getRenderDistance()
 {
 	return m_renderDistance;
+}
+
+void Game::setRenderDistance(int newRenderDistance)
+{
+	m_renderDistance = newRenderDistance;
 }
 
 bool Game::successfullyLoaded()

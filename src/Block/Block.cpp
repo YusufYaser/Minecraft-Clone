@@ -130,7 +130,7 @@ void Block::Render(Shader* shader, bool bindTexture)
 	glUniform3iv(shader->getUniformLoc("blockPos"), 1, glm::value_ptr(pos));
 
 	if (highlighted) {
-		glUniform3fv(shader->getUniformLoc("highlightColor"), 1, glm::value_ptr(glm::vec3(1.5f)));
+		glUniform1i(shader->getUniformLoc("highlighted"), 1);
 	}
 
 	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName()));
@@ -139,7 +139,7 @@ void Block::Render(Shader* shader, bool bindTexture)
 	glDrawElements(GL_TRIANGLES, faceCount * 6, GL_UNSIGNED_INT, 0);
 
 	if (highlighted) {
-		glUniform3fv(shader->getUniformLoc("highlightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
+		glUniform1i(shader->getUniformLoc("highlighted"), 0);
 	}
 }
 

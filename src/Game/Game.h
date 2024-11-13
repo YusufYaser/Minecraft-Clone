@@ -32,6 +32,7 @@ public:
 	float getDelta();
 
 	int getRenderDistance();
+	void setRenderDistance(int newRenderDistance);
 
 	bool successfullyLoaded();
 
