@@ -237,7 +237,7 @@ int main(int argc, char* argv[]) {
 		if (showDebugText) {
 			std::stringstream newTitle;
 			newTitle << "Minecraft Clone\n";
-			newTitle << "github.com/YusufYaser/Minecraft-Clone\n\n";
+			newTitle << "https://github.com/YusufYaser/Minecraft-Clone\n\n";
 			newTitle << "FPS: " << round(1 / delta) << " (" << delta << ")" << "\n";
 
 			newTitle << "Screen Resolution (ratio): " << width << "x" << height;
@@ -250,7 +250,14 @@ int main(int argc, char* argv[]) {
 			newTitle << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
 			newTitle << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n\n";
 
-			newTitle << "World Seed: " << world->getSeed() << "\n";
+			newTitle << "World Seed: " << world->getSeed() << "\n\n";
+
+			if (targetBlock != nullptr) {
+				newTitle << "=== Target Block ===\n";
+				newTitle << " Block ID: " << (int)targetBlock->getType() << "\n";
+				newTitle << " Block Type: " << targetBlock->getName() << "\n";
+				newTitle << "==================\n";
+			}
 
 			gltSetText(debugText, newTitle.str().c_str());
 			gltBeginDraw();

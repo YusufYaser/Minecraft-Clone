@@ -115,6 +115,9 @@ void World::loadChunk(glm::ivec2 pos)
         chunks[chunkCh] = chunk;
         chunksMutex.unlock();
     }
+    else {
+        return; // already loaded
+    }
 
     chunkLoadQueueMutex.lock();
     chunkLoadQueue.push_back(pos);
