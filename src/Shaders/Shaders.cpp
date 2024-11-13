@@ -34,11 +34,11 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource)
 		return;
 	}
 
-	ID = glCreateProgram();
-	glAttachShader(ID, vertexShader);
-	glAttachShader(ID, fragmentShader);
+	m_id = glCreateProgram();
+	glAttachShader(m_id, vertexShader);
+	glAttachShader(m_id, fragmentShader);
 
-	glLinkProgram(ID);
+	glLinkProgram(m_id);
 	glGetProgramiv(fragmentShader, GL_LINK_STATUS, &shaderCompiled);
 	if (shaderCompiled == false) {
 		error("Failed to link shader");
@@ -53,9 +53,25 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource)
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+
+	m_successfullyLoaded = true;
 }
 
 Shader::~Shader()
 {
-	glDeleteProgram(ID);
+	glDeleteProgram(m_id);
+}
+
+void Shader::activate()
+{
+	glUseProgram(m_id);
+}
+
+GLuint Shader::getUniformLoc(const GLchar *name)
+{
+	return glGetUniformLocation(m_id, name);
+}
+
+bool Shader::successfullyLoaded() {
+	return m_successfullyLoaded;
 }

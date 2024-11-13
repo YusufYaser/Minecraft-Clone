@@ -1,9 +1,10 @@
 #include "Player.h"
+#include "../Game/Game.h" 
 
-Player::Player(World* world, glm::vec3 pos)
+Player::Player(glm::vec3 pos)
 {
     Player::pos = pos;
-    Player::world = world;
+    Player::world = Game::getInstance()->getWorld();
     Player::originalPos = glm::vec3();
 }
 
@@ -41,6 +42,10 @@ void Player::update(float delta)
         if (collBlock != nullptr) {
             pos.y = collBlock->getPos().y + 1.0f;
         }
+    }
+
+    if (pos.y < -20.0f) {
+        pos.y = 20.0f;
     }
 }
 
@@ -222,4 +227,35 @@ void Player::getTargetBlock(Block** block, BLOCK_FACE* face)
 glm::vec3 Player::getCameraPos()
 {
     return pos + up;
+}
+
+glm::mat4 Player::getProjection()
+{
+    static bool wasRunning = false;
+    static double startedRunning;
+    double currentTime = glfwGetTime();
+
+    glm::vec2 size = Game::getInstance()->getGameWindow()->getSize();
+
+    bool isRunning = speed > PLAYER_SPEED;
+    if (isRunning && !wasRunning) {
+        startedRunning = currentTime;
+    }
+    wasRunning = isRunning;
+    float FOV = 45.0f;
+    if (isRunning) {
+        if (currentTime - startedRunning > .1f) {
+            FOV += 5.0f * speed / PLAYER_SPEED;
+        }
+        else {
+            FOV += (currentTime - startedRunning) * (5.0f * speed / PLAYER_SPEED) * 10.0f;
+        }
+    }
+
+    return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, 1000.0f);
+}
+
+glm::mat4 Player::getView()
+{
+    return glm::lookAt(getCameraPos(), getCameraPos() + orientation, up);
 }

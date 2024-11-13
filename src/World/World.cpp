@@ -1,5 +1,6 @@
 #include "World.h"
 #include "Utils.h"
+#include "../Game/Game.h"
 
 World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
     World::seed = seed;
@@ -30,10 +31,12 @@ World::~World()
     }
 }
 
-void World::Render(GLuint shader, glm::vec3 pos, int renderDistance)
+void World::Render(Shader* shader)
 {
-    glUseProgram(shader);
-    glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
+    glm::vec3 pos = Game::getInstance()->getPlayer()->getCameraPos();
+    int renderDistance = Game::getInstance()->getRenderDistance();
+    shader->activate();
+    glUniform3fv(shader->getUniformLoc("highlightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
 
     for (int x = -(renderDistance / 2) + (pos.x / 16); x < (renderDistance / 2) + (pos.x / 16); x++) {
         for (int y = -(renderDistance / 2) + (pos.z / 16); y < (renderDistance / 2) + (pos.z / 16); y++) {
@@ -154,40 +157,30 @@ void World::setRenderingGroup(Block* block)
     std::size_t chunkCh = hashPos(getPosChunk(block->getPos()));
 
     chunksMutex.lock();
-    if (chunks.find(chunkCh) == chunks.end())
-    {
-        chunksMutex.unlock();
-        return; // chunk not loaded
-    }
-
     Chunk* chunk = chunks[chunkCh];
     chunksMutex.unlock();
+    assert(chunk);
 
     BLOCK_TYPE type = block->getType();
     std::vector<Block*>::iterator begin;
     std::vector<Block*>::iterator end;
     std::vector<Block*>::iterator it;
     chunk->renderingGroupsMutex.lock();
-    if (chunk->renderingGroups.find(type) == chunk->renderingGroups.end())
-    {
-        chunk->renderingGroups[type] = std::vector<Block*>();
-    }
+    std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[type]);
     if (block == NULL || block->hiddenFaces == 63) {
-        begin = chunk->renderingGroups[type].begin();
-        end = chunk->renderingGroups[type].end();
+        begin = renderingGroup->begin();
+        end = renderingGroup->end();
         it = std::find(begin, end, block);
         if (it != end)
         {
-            chunk->renderingGroups[type].erase(it);
+            renderingGroup->erase(it);
         }
         chunk->renderingGroupsMutex.unlock();
         return;
     }
-    chunk->renderingGroupsMutex.unlock();
 
-    chunk->renderingGroupsMutex.lock();
-    begin = chunk->renderingGroups[type].begin();
-    end = chunk->renderingGroups[type].end();
+    begin = renderingGroup->begin();
+    end = renderingGroup->end();
     it = std::find(begin, end, block);
     if (it != end)
     {
@@ -200,6 +193,6 @@ void World::setRenderingGroup(Block* block)
     std::size_t ch = hashPos(pos);
 
     chunk->renderingGroupsMutex.lock();
-    chunk->renderingGroups[type].push_back(block);
+    renderingGroup->push_back(block);
     chunk->renderingGroupsMutex.unlock();
 }

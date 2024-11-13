@@ -6,5 +6,13 @@ public:
 	Shader(const char* vertexSource, const char* fragmentSource);
 	~Shader();
 
-	GLuint ID;
+	void activate();
+	GLuint getUniformLoc(const GLchar* name);
+
+	bool successfullyLoaded();
+
+private:
+	GLuint m_id;
+
+	bool m_successfullyLoaded = false;
 };

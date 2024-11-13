@@ -62,7 +62,7 @@ Block::Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces)
 	Block::hiddenFaces = hiddenFaces;
 }
 
-void Block::Render(GLuint shader, bool bindTexture)
+void Block::Render(Shader* shader, bool bindTexture)
 {
 	if (hiddenFaces == 63) return;
 
@@ -127,10 +127,10 @@ void Block::Render(GLuint shader, bool bindTexture)
 
 	if (faceCount == 0) return;
 	
-	glUniform3iv(glGetUniformLocation(shader, "blockPos"), 1, glm::value_ptr(pos));
+	glUniform3iv(shader->getUniformLoc("blockPos"), 1, glm::value_ptr(pos));
 
 	if (highlighted) {
-		glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(glm::vec3(1.5f)));
+		glUniform3fv(shader->getUniformLoc("highlightColor"), 1, glm::value_ptr(glm::vec3(1.5f)));
 	}
 
 	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName()));
@@ -139,7 +139,7 @@ void Block::Render(GLuint shader, bool bindTexture)
 	glDrawElements(GL_TRIANGLES, faceCount * 6, GL_UNSIGNED_INT, 0);
 
 	if (highlighted) {
-		glUniform3fv(glGetUniformLocation(shader, "highlightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
+		glUniform3fv(shader->getUniformLoc("highlightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
 	}
 }
 

@@ -93,6 +93,7 @@ void World::chunkUnloaderFunc()
         if (!chunksMutex.try_lock()) continue;
         unloader_func_chunks_loop:
         for (auto& [ch, chunk] : chunks) {
+            if (chunk == nullptr) continue;
             if (chunk->loaded && current - chunk->lastRendered > 30) {
                 delete chunks[ch];
                 chunks.erase(ch);
@@ -111,6 +112,9 @@ void World::loadChunk(glm::ivec2 pos)
     {
         Chunk* chunk = new Chunk();
         chunk->blocks = std::unordered_map<std::size_t, Block*>();
+        for (int i = 0; i < BLOCK_TYPE_COUNT; i++) {
+            chunk->renderingGroups[(BLOCK_TYPE)i] = std::vector<Block*>();
+        }
         chunksMutex.lock();
         chunks[chunkCh] = chunk;
         chunksMutex.unlock();

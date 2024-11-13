@@ -12,16 +12,16 @@ GUIBlock::~GUIBlock()
 	delete _block;
 }
 
-void GUIBlock::Render(GLuint shader)
+void GUIBlock::Render(Shader* shader)
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-	glUseProgram(shader);
-	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-	glUniform2fv(glGetUniformLocation(shader, "guiPos"), 1, glm::value_ptr(position));
-	glUniform1f(glGetUniformLocation(shader, "guiScale"), scale);
+	shader->activate();
+	glUniformMatrix4fv(shader->getUniformLoc("model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniform2fv(shader->getUniformLoc("guiPos"), 1, glm::value_ptr(position));
+	glUniform1f(shader->getUniformLoc("guiScale"), scale);
 	_block->Render(shader);
 }
 

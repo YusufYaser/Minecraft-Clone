@@ -14,25 +14,32 @@ GameWindow::GameWindow(int width, int height, const char* title)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
-	window = glfwCreateWindow(width, height, title, NULL, NULL);
-	if (!window) {
+	glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
+	if (!glfwWindow) {
 		return;
 	}
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(glfwWindow);
 	gladLoadGL(glfwGetProcAddress);
 
-	glfwGetFramebufferSize(window, &width, &height);
+	glfwGetFramebufferSize(glfwWindow, &width, &height);
 	glViewport(0, 0, width, height);
 
-	glfwSetKeyCallback(window, key_callback);
+	glfwSetKeyCallback(glfwWindow, key_callback);
 }
 
 GameWindow::~GameWindow()
 {
-	glfwDestroyWindow(window);
+	glfwDestroyWindow(glfwWindow);
 }
 
-GLFWwindow* GameWindow::getWindow()
+GLFWwindow* GameWindow::getGlfwWindow()
 {
-	return window;
+	return glfwWindow;
+}
+
+glm::vec2 GameWindow::getSize()
+{
+	int width, height;
+	glfwGetWindowSize(getGlfwWindow(), &width, &height);
+	return glm::vec2(width, height);
 }

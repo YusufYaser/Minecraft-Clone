@@ -41,12 +41,12 @@ Crosshair::~Crosshair()
 	glDeleteVertexArrays(1, &VAO);
 }
 
-void Crosshair::Render(GLuint shader)
+void Crosshair::Render(Shader* shader)
 {
-	glUseProgram(shader);
-	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
-	glUniform2fv(glGetUniformLocation(shader, "guiPos"), 1, glm::value_ptr(glm::vec2()));
-	glUniform1f(glGetUniformLocation(shader, "guiScale"), .75f);
+	shader->activate();
+	glUniformMatrix4fv(shader->getUniformLoc("model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+	glUniform2fv(shader->getUniformLoc("guiPos"), 1, glm::value_ptr(glm::vec2()));
+	glUniform1f(shader->getUniformLoc("guiScale"), .75f);
 	glBindTexture(GL_TEXTURE_2D, getTexture("crosshair"));
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, sizeof(crosshairIndices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);

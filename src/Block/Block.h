@@ -2,6 +2,7 @@
 #include <glm/vec3.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "../Textures/Textures.h"
+#include "../Shaders/Shaders.h"
 #include <glad/gl.h>
 #include <unordered_map>
 
@@ -13,6 +14,8 @@ enum class BLOCK_TYPE : uint8_t {
 	OAK_LOG,
 	OAK_LEAVES,
 };
+
+const int BLOCK_TYPE_COUNT = 6;
 
 enum class BLOCK_FACE : uint8_t {
 	FRONT = 0,
@@ -31,7 +34,7 @@ public:
 	Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces = 0);
 	~Block();
 
-	void Render(GLuint shader, bool bindTexture = true);
+	void Render(Shader* shader, bool bindTexture = true);
 	const char* getName();
 	glm::ivec3 getPos();
 	BLOCK_TYPE getType();

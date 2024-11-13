@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 #include "../Block/Block.h"
+#include "../Shaders/Shaders.h"
 #include <unordered_map>
 #include <vector>
 #include <PerlinNoise/PerlinNoise.hpp>
@@ -17,7 +18,7 @@ public:
 	World(siv::PerlinNoise::seed_type seed, glm::ivec2 size = glm::ivec2(20, 20));
 	~World();
 
-	void Render(GLuint shader, glm::vec3 pos, int renderDistance = 6);
+	void Render(Shader* shader);
 
 	Block* getBlock(glm::ivec3 pos);
 	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);

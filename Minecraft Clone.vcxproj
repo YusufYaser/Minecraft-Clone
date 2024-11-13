@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="libraries\include\glad\gl.c" />
     <ClCompile Include="src\Block\Block.cpp" />
+    <ClCompile Include="src\Game\Game.cpp" />
     <ClCompile Include="src\Player\Player.cpp" />
     <ClCompile Include="src\GUI\Crosshair.cpp" />
     <ClCompile Include="src\GUI\GUIBlock.cpp" />
@@ -190,6 +191,8 @@
     <ClInclude Include="src\Block\Block.h" />
     <ClInclude Include="src\Block\CubeVertices.h" />
     <ClInclude Include="src\Colors.h" />
+    <ClInclude Include="src\Game\Game.h" />
+    <ClInclude Include="src\Game\ShaderSources.h" />
     <ClInclude Include="src\Player\Player.h" />
     <ClInclude Include="src\GUI\Crosshair.h" />
     <ClInclude Include="src\GUI\GUIBlock.h" />

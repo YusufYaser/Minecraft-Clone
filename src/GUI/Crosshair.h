@@ -2,6 +2,7 @@
 
 #include <glad/gl.h>
 #include "../Textures/Textures.h"
+#include "../Shaders/Shaders.h"
 #include <glm/vec3.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -10,7 +11,7 @@ public:
 	Crosshair();
 	~Crosshair();
 
-	void Render(GLuint shader);
+	void Render(Shader* shader);
 
 private:
 	GLuint VAO, VBO, EBO;

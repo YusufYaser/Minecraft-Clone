@@ -5,7 +5,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp>
-#include "../GameWindow/GameWindow.h"
 #include "../Block/Block.h"
 #include "../World/World.h"
 #include <GLFW/glfw3.h>
@@ -14,7 +13,7 @@
 
 class Player {
 public:
-	Player(World* world, glm::vec3 pos);
+	Player(glm::vec3 pos);
 
 	glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -28,8 +27,11 @@ public:
 	void update(float delta);
 	void checkInputs(GLFWwindow* window, float delta);
 
-	void getTargetBlock(Block** block, BLOCK_FACE* face);
+	void getTargetBlock(Block** block, BLOCK_FACE* face = nullptr);
 	glm::vec3 getCameraPos();
+
+	glm::mat4 getProjection();
+	glm::mat4 getView();
 
 private:
 	bool wasHidden = false;
