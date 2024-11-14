@@ -14,6 +14,16 @@ World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
     chunkUnloader = std::thread([this]() {
         chunkUnloaderFunc();
         });
+
+    for (int x = -2; x < 2; x++) {
+        for (int y = -2; y < 2; y++) {
+            loadChunk(glm::ivec2(x, y), true);
+        }
+    }
+
+    print("Waiting for spawn chunks");
+    while (chunkLoadQueueCount() != 0) {}
+    print("Loaded spawn chunks");
 }
 
 World::~World()

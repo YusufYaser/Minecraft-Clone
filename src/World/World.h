@@ -25,7 +25,7 @@ public:
 
 	siv::PerlinNoise::seed_type getSeed() const { return seed; };
 
-	void loadChunk(glm::ivec2 pos);
+	void loadChunk(glm::ivec2 pos, bool permanentlyLoaded = false);
 
 	int chunksLoaded();
 	int chunkLoadQueueCount();
@@ -37,6 +37,7 @@ private:
 
 	struct Chunk {
 		bool loaded;
+		bool permanentlyLoaded;
 		std::mutex blocksMutex;
 		std::mutex renderingGroupsMutex;
 		time_t lastRendered;

@@ -94,7 +94,7 @@ void World::chunkUnloaderFunc()
         unloader_func_chunks_loop:
         for (auto& [ch, chunk] : chunks) {
             if (chunk == nullptr) continue;
-            if (chunk->loaded && current - chunk->lastRendered > 30) {
+            if (chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 30) {
                 delete chunks[ch];
                 chunks.erase(ch);
                 goto unloader_func_chunks_loop;
@@ -104,7 +104,7 @@ void World::chunkUnloaderFunc()
     }
 }
 
-void World::loadChunk(glm::ivec2 pos)
+void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded)
 {
     std::size_t chunkCh = hashPos(pos);
 
@@ -115,6 +115,8 @@ void World::loadChunk(glm::ivec2 pos)
         for (int i = 0; i < BLOCK_TYPE_COUNT; i++) {
             chunk->renderingGroups[(BLOCK_TYPE)i] = std::vector<Block*>();
         }
+        chunk->permanentlyLoaded = permanentlyLoaded;
+        chunk->lastRendered = time(nullptr);
         chunksMutex.lock();
         chunks[chunkCh] = chunk;
         chunksMutex.unlock();
