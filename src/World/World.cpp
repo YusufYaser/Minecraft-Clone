@@ -128,8 +128,23 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
     {
         chunk->blocksMutex.unlock();
         if (!replace) return nullptr;
+
+        Block* oldBlock = chunk->blocks[blockCh];
+        chunk->renderingGroupsMutex.lock();
+        std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[oldBlock->getType()]);
+        std::vector<Block*>::iterator begin = renderingGroup->begin();
+        std::vector<Block*>::iterator end = renderingGroup->end();
+        std::vector<Block*>::iterator it = std::find(begin, end, chunk->blocks[blockCh]);
+        if (it != end)
+        {
+            renderingGroup->erase(it);
+        }
+        chunk->renderingGroupsMutex.unlock();
+
+        chunk->blocksMutex.lock();
         delete chunk->blocks[blockCh];
         chunk->blocks.erase(blockCh);
+        chunk->blocksMutex.unlock();
     }
     else {
         chunk->blocksMutex.unlock();

@@ -57,26 +57,6 @@ void World::chunkLoaderFunc()
 
                     setBlock(glm::ivec3(x, y, z), type);
                 }
-
-                std::mt19937 rng(seed * x * z);
-                if (dist(rng) < .0025) {
-                    glm::ivec3 base = glm::ivec3(x, height, z);
-                    int treeHeight = 4;
-                    for (int i = 0; i < treeHeight; i++) {
-                        setBlock(base + glm::ivec3(0, i, 0), BLOCK_TYPE::OAK_LOG);
-                    }
-
-                    for (int i = treeHeight - 1; i < treeHeight + 2; i++) {
-                        int s = 2;
-                        if (i == treeHeight + 1) s = 1;
-                        for (int tx = -s; tx <= s; tx++) {
-                            for (int tz = -s; tz <= s; tz++) {
-                                if (i == treeHeight - 1 && tx == 0 && tz == 0) continue;
-                                setBlock(base + glm::ivec3(tx, i, tz), BLOCK_TYPE::OAK_LEAVES);
-                            }
-                        }
-                    }
-                }
             }
         }
 
