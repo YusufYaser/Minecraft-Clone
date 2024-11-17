@@ -56,7 +56,10 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
 
     if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
         if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-            pos = glm::vec3(0.0f, 30.0f, 0.0f);
+            pos = { 0.0f, 30.0f, 0.0f };
+        }
+        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+            pos.y = 30.0f;
         }
     }
 

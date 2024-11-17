@@ -15,7 +15,7 @@
 
 class World {
 public:
-	World(siv::PerlinNoise::seed_type seed, glm::ivec2 size = glm::ivec2(20, 20));
+	World(siv::PerlinNoise::seed_type seed);
 	~World();
 
 	void Render(Shader* shader);
@@ -29,6 +29,9 @@ public:
 
 	int chunksLoaded();
 	int chunkLoadQueueCount();
+
+	int getHeight(glm::ivec2 pos);
+	double random(glm::ivec2 pos);
 
 private:
 	std::atomic<bool> unloading;
@@ -71,4 +74,6 @@ private:
 	void chunkUnloaderFunc();
 	std::vector<glm::ivec2> chunkLoadQueue;
 	std::mutex chunkLoadQueueMutex;
+
+	siv::PerlinNoise perlin;
 };

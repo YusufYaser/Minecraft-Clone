@@ -49,11 +49,11 @@ Game::Game()
 
 	seed = dis(gen);
 	print("World Seed:", seed);
-	m_world = new World(seed, glm::ivec2(250, 250));
+	m_world = new World(seed);
 	print("Created world");
 
 	// initialize other stuff
-	m_player = new Player(glm::vec3(.0f, 10.0f, .0f));
+	m_player = new Player({.0f, m_world->getHeight({ 0, 0 }), .0f});
 
 	m_crosshair = new Crosshair();
 

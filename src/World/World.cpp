@@ -2,8 +2,9 @@
 #include "Utils.h"
 #include "../Game/Game.h"
 
-World::World(siv::PerlinNoise::seed_type seed, glm::ivec2 size) {
+World::World(siv::PerlinNoise::seed_type seed) {
     World::seed = seed;
+    World::perlin = siv::PerlinNoise{ seed };
 
     unloading.store(false);
 
@@ -48,6 +49,10 @@ void World::Render(Shader* shader)
     shader->activate();
     glUniform1i(shader->getUniformLoc("highlighted"), 0);
 
+    const int CHUNKS_TO_LOAD_SIZE = 256;
+    glm::ivec2 chunksToLoad[CHUNKS_TO_LOAD_SIZE];
+    int chunksToLoadc = 0;
+
     for (int x = -(renderDistance / 2) + (pos.x / 16); x < (renderDistance / 2) + (pos.x / 16); x++) {
         for (int y = -(renderDistance / 2) + (pos.z / 16); y < (renderDistance / 2) + (pos.z / 16); y++) {
             glm::ivec2 cPos = glm::ivec2(x, y);
@@ -57,7 +62,8 @@ void World::Render(Shader* shader)
             if (it == chunks.end())
             {
                 chunksMutex.unlock();
-                loadChunk(cPos);
+                if (chunksToLoadc >= CHUNKS_TO_LOAD_SIZE) continue;
+                chunksToLoad[chunksToLoadc++] = cPos;
                 continue;
             }
             Chunk* chunk = it->second;
@@ -77,6 +83,28 @@ void World::Render(Shader* shader)
             chunk->lastRendered = time(nullptr);
             chunk->renderingGroupsMutex.unlock();
         }
+    }
+
+    if (chunksToLoadc < 4) { // sorting doesn't really matter in that case
+        for (int i = 0; i < chunksToLoadc; i++) {
+            loadChunk(chunksToLoad[i]);
+        }
+        return;
+    }
+
+    auto sorter = [&pos](glm::ivec2 a, glm::ivec2 b) {
+        glm::ivec2 pos2 = { pos.x, pos.z };
+        glm::ivec2 aDiff = a - pos2;
+        glm::ivec2 bDiff = b - pos2;
+        int aDist = aDiff.x * aDiff.x + aDiff.y * aDiff.y;
+        int bDist = bDiff.x * bDiff.x + bDiff.y * bDiff.y;
+        return aDist < bDist;
+    };
+
+    std::sort(chunksToLoad, chunksToLoad + chunksToLoadc, sorter);
+
+    for (int i = 0; i < chunksToLoadc; i++) {
+        loadChunk(chunksToLoad[i]);
     }
 }
 
