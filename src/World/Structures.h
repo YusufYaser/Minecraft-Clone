@@ -5,7 +5,7 @@
 
 enum class STRUCTURE_TYPE : uint8_t {
 	TREE = 0,
-	HOUSE
+	LAKE
 };
 
 #define STRUCTURES_COUNT 2

@@ -50,8 +50,22 @@ const char* getTextureName(BLOCK_TYPE type)
 	case BLOCK_TYPE::OAK_LEAVES:
 		return "oak_leaves";
 
+	case BLOCK_TYPE::WATER:
+		return "water";
+
 	default:
 		return "invalid";
+	}
+}
+
+bool isBlockTypeTransparent(BLOCK_TYPE type)
+{
+	switch (type) {
+	case BLOCK_TYPE::WATER:
+		return true;
+
+	default:
+		return false;
 	}
 }
 
@@ -158,6 +172,18 @@ BLOCK_TYPE Block::getType()
 	return type;
 }
 
-Block::~Block()
+bool Block::hasCollision()
 {
+	switch (type) {
+	case BLOCK_TYPE::WATER:
+		return false;
+
+	default:
+		return true;
+	}
+}
+
+bool Block::hasTransparency()
+{
+	return isBlockTypeTransparent(type);
 }

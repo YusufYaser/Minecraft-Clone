@@ -14,6 +14,7 @@ enum class BLOCK_TYPE : uint8_t {
 	DIRT,
 	OAK_LOG,
 	OAK_LEAVES,
+	WATER,
 };
 
 const int BLOCK_TYPE_COUNT = 6;
@@ -29,16 +30,18 @@ enum class BLOCK_FACE : uint8_t {
 
 glm::ivec3 getBlockFaceDirection(BLOCK_FACE face);
 const char* getTextureName(BLOCK_TYPE type);
+bool isBlockTypeTransparent(BLOCK_TYPE type);
 
 class Block {
 public:
 	Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces = 0);
-	~Block();
 
 	void Render(Shader* shader, bool bindTexture = true);
 	const char* getName();
 	glm::ivec3 getPos();
 	BLOCK_TYPE getType();
+	bool hasCollision();
+	bool hasTransparency();
 
 	bool highlighted = false;
 	uint8_t hiddenFaces;

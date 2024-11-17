@@ -62,7 +62,21 @@ void World::Render(Shader* shader)
             if (!chunk->loaded) continue;
 
             if (!chunk->renderingGroupsMutex.try_lock()) continue;
+            std::vector<BLOCK_TYPE> queued;
             for (auto& [type, blocks] : chunk->renderingGroups) {
+                if (isBlockTypeTransparent(type)) { // TODO: do something better than this
+                    queued.push_back(type);
+                    continue;
+                }
+                glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type)));
+
+                for (auto& block : blocks) {
+                    if (block == nullptr) continue;
+                    block->Render(shader, false);
+                }
+            }
+            for (auto& type : queued) {
+                auto& blocks = chunk->renderingGroups[type];
                 glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type)));
 
                 for (auto& block : blocks) {
@@ -178,7 +192,9 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
             Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
             if (otherBlock == nullptr) continue;
             int opposite = (i % 2 == 0) ? i + 1 : i - 1;
-            otherBlock->hiddenFaces ^= 1 << opposite;
+            if ((otherBlock->hiddenFaces & (1 << opposite)) != 0) {
+                otherBlock->hiddenFaces ^= 1 << opposite;
+            }
             setRenderingGroup(otherBlock);
         }
         return nullptr;
@@ -186,16 +202,25 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
 
     uint8_t hiddenFaces = 0;
 
+    Block* block = new Block(type, pos);
+
     for (int i = 0; i < 6; i++) {
         Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
         if (otherBlock == nullptr) continue;
         int opposite = (i % 2 == 0) ? i + 1 : i - 1;
+        if (block->hasTransparency() != otherBlock->hasTransparency()) {
+            if ((otherBlock->hiddenFaces & (1 << opposite)) != 0) {
+                otherBlock->hiddenFaces ^= 1 << opposite;
+            }
+            continue;
+        }
         otherBlock->hiddenFaces |= 1 << opposite;
         hiddenFaces |= 1 << i;
         setRenderingGroup(otherBlock);
     }
 
-    Block* block = new Block(type, pos, hiddenFaces);
+    block->hiddenFaces = hiddenFaces;
+
     chunk->blocksMutex.lock();
     chunk->blocks[blockCh] = block;
     chunk->blocksMutex.unlock();

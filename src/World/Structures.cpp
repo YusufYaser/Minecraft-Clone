@@ -15,7 +15,7 @@ void Structure::initialize() {
 	treeConfig.priority = 0;
 	treeConfig.probability = .0625f;
 	treeConfig.size = { 5, 5, 5 };
-	treeConfig.pivot = { 0, 0, 0 };
+	treeConfig.pivot = { 2, 0, 2 };
 	Structure* tree = new Structure(STRUCTURE_TYPE::TREE, treeConfig, [](glm::ivec2 sPos, glm::ivec3 vPos) {
 		// no blocks will be placed on corners
 		if ((vPos.x == 0 || vPos.x == 4) && (vPos.z == 0 || vPos.z == 4)) return BLOCK_TYPE::NONE;
@@ -33,6 +33,45 @@ void Structure::initialize() {
 		return BLOCK_TYPE::NONE;
 		});
 	structures[(int)STRUCTURE_TYPE::TREE] = tree;
+
+	print("Initializing lake");
+	StructureConfig lakeConfig;
+	lakeConfig.priority = 1;
+	lakeConfig.probability = .05f;
+	lakeConfig.size = { 15, 3, 15 };
+	lakeConfig.pivot = { 7, 3, 7 };
+	Structure* lake = new Structure(STRUCTURE_TYPE::LAKE, lakeConfig, [](glm::ivec2 sPos, glm::ivec3 vPos) {
+		int depth, sizeX, sizeY;
+		std::uint32_t posHash = 0;
+		posHash ^= sPos.x + 0x9e3779b9 + (posHash << 6) + (posHash >> 2);
+		posHash ^= sPos.y + 0x9e3779b9 + (posHash << 6) + (posHash >> 2);
+		{
+			std::uniform_real_distribution<> dist(2.0, 4.0);
+			std::mt19937 rng(0 ^ posHash);
+			depth = round(dist(rng));
+		}
+		{
+			std::uniform_real_distribution<> dist(4.0, 12.0);
+			std::mt19937 rng(0 ^ posHash);
+			sizeX = round(dist(rng));
+		}
+		{
+			std::uniform_real_distribution<> dist(4.0, 12.0);
+			std::mt19937 rng(0 ^ posHash);
+			sizeY = round(dist(rng));
+		}
+
+		float distFromCenterX = abs(vPos.x - sizeX / 2.0f);
+		float distFromCenterY = abs(vPos.z - sizeY / 2.0f);
+		float normalizedDist = sqrt((distFromCenterX * distFromCenterX) + (distFromCenterY * distFromCenterY)) / (sizeX / 2.0f);
+
+		int adjustedDepth = round(depth * (normalizedDist));
+
+		if (vPos.y < adjustedDepth) return BLOCK_TYPE::NONE;
+
+		return BLOCK_TYPE::WATER;
+		});
+	structures[(int)STRUCTURE_TYPE::LAKE] = lake;
 
 	initialized = true;
 }
@@ -88,7 +127,7 @@ int Structure::getBase(glm::ivec2 pos)
 	World* world = Game::getInstance()->getWorld();
 
 	return world->getHeight({
-		(sPos.x * m_size.x) + m_size.x / 2,
-		(sPos.y * m_size.z) + m_size.z / 2
+		(sPos.x * m_size.x) + m_pivot.x,
+		(sPos.y * m_size.z) + m_pivot.z
 	}) - m_pivot.y;
 }

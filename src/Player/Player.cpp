@@ -20,7 +20,7 @@ void Player::update(float delta)
 
     if (jumpSpeed == 0.0f) {
         Block* belowBlock = world->getBlock(glm::vec3(iPos.x, pos.y, iPos.z) - up * delta);
-        if (belowBlock == nullptr) {
+        if (belowBlock == nullptr || !belowBlock->hasCollision()) {
             fallSpeed += 10.0f * delta;
             if (fallSpeed > 50.0f) fallSpeed = 50.0f;
         }
@@ -39,7 +39,7 @@ void Player::update(float delta)
 
     if (fallSpeed == 0.0f) {
         Block* collBlock = world->getBlock(iPos);
-        if (collBlock != nullptr) {
+        if (collBlock != nullptr && collBlock->hasCollision()) {
             pos.y = collBlock->getPos().y + 1.0f;
         }
     }
@@ -70,7 +70,8 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
             round(pos.y + change.y),
             round(pos.z + change.z)
         );
-        if (world->getBlock(newIPos) == nullptr) pos += change;
+        Block* block = world->getBlock(newIPos);
+        if (block == nullptr || !block->hasCollision()) pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         glm::vec3 change = (-speed * delta) * glm::normalize(orientation2);
@@ -79,7 +80,8 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
             round(pos.y + change.y),
             round(pos.z + change.z)
         );
-        if (world->getBlock(newIPos) == nullptr) pos += change;
+        Block* block = world->getBlock(newIPos);
+        if (block == nullptr || !block->hasCollision()) pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         glm::vec3 change = (-speed * delta) * glm::normalize(glm::cross(orientation2, up));
@@ -88,7 +90,8 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
             round(pos.y + change.y),
             round(pos.z + change.z)
         );
-        if (world->getBlock(newIPos) == nullptr) pos += change;
+        Block* block = world->getBlock(newIPos);
+        if (block == nullptr || !block->hasCollision()) pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         glm::vec3 change = (speed * delta) * glm::normalize(glm::cross(orientation2, up));
@@ -97,7 +100,8 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
             round(pos.y + change.y),
             round(pos.z + change.z)
         );
-        if (world->getBlock(newIPos) == nullptr) pos += change;
+        Block* block = world->getBlock(newIPos);
+        if (block == nullptr || !block->hasCollision()) pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         if (fallSpeed == 0.0f && jumpSpeed == 0.0f) jumpSpeed = 4.5f;
@@ -204,7 +208,7 @@ void Player::getTargetBlock(Block** block, BLOCK_FACE* face)
         if (blockPos == oldBlockPos) continue;
         oldBlockPos = blockPos;
         Block* targetBlock = world->getBlock(blockPos);
-        if (targetBlock != nullptr) {
+        if (targetBlock != nullptr && targetBlock->hasCollision()) {
             if (block != nullptr) *block = targetBlock;
             if (face != nullptr) {
                 BLOCK_FACE curFace = BLOCK_FACE::FRONT;
