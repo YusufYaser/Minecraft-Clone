@@ -11,7 +11,7 @@ Game::Game()
 	}
 	_instance = this;
 
-	m_gameWindow = new GameWindow(800, 600, "Minecraft Clone");
+	m_gameWindow = new GameWindow(854, 480, "Minecraft Clone");
 	if (m_gameWindow->getGlfwWindow() == NULL) {
 		error("Failed to create game window");
 		return;
@@ -37,6 +37,11 @@ Game::Game()
 	glUniform1i(shader->getUniformLoc("tex0"), 0);
 	print("Loaded textures");
 
+	// load structures
+	print("Loading structures");
+	Structure::initialize();
+	print("Loaded structures");
+
 	// create world
 	print("Creating world");
 	siv::PerlinNoise::seed_type seed = 0;
@@ -50,6 +55,15 @@ Game::Game()
 	seed = dis(gen);
 	print("World Seed:", seed);
 	m_world = new World(seed);
+	for (int x = -2; x < 2; x++) {
+		for (int y = -2; y < 2; y++) {
+			m_world->loadChunk(glm::ivec2(x, y), true);
+		}
+	}
+
+	print("Waiting for spawn chunks");
+	while (m_world->chunkLoadQueueCount() != 0) {}
+	print("Loaded spawn chunks");
 	print("Created world");
 
 	// initialize other stuff

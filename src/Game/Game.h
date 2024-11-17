@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <sstream>
+#include "../World/Structures.h"
 
 #define GLT_IMPLEMENTATION
 #define GLT_MANUAL_VIEWPORT

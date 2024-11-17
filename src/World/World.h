@@ -12,6 +12,7 @@
 #include <mutex>
 #include <random>
 #include <time.h>
+#include "Structures.h"
 
 class World {
 public:

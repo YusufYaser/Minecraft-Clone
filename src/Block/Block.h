@@ -7,7 +7,8 @@
 #include <unordered_map>
 
 enum class BLOCK_TYPE : uint8_t {
-	AIR = 0,
+	NONE = 0,
+	AIR,
 	STONE,
 	GRASS,
 	DIRT,

@@ -15,16 +15,6 @@ World::World(siv::PerlinNoise::seed_type seed) {
     chunkUnloader = std::thread([this]() {
         chunkUnloaderFunc();
         });
-
-    for (int x = -2; x < 2; x++) {
-        for (int y = -2; y < 2; y++) {
-            loadChunk(glm::ivec2(x, y), true);
-        }
-    }
-
-    print("Waiting for spawn chunks");
-    while (chunkLoadQueueCount() != 0) {}
-    print("Loaded spawn chunks");
 }
 
 World::~World()
@@ -139,6 +129,8 @@ Block* World::getBlock(glm::ivec3 pos)
 
 Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
 {
+    if (type == BLOCK_TYPE::NONE) return nullptr;
+
     std::size_t blockCh = hashPos(pos);
     std::size_t chunkCh = hashPos(getPosChunk(pos));
 
