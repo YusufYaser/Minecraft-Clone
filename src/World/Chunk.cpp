@@ -3,6 +3,15 @@
 
 void World::chunkLoaderFunc()
 {
+    Structure* structures[STRUCTURES_COUNT];
+    for (int i = 0; i < STRUCTURES_COUNT; i++) {
+        structures[i] = Structure::getStructure(STRUCTURE_TYPE(i));
+    }
+
+    std::sort(structures, structures + STRUCTURES_COUNT, [](Structure* a, Structure* b) {
+        return a->getPriority() > b->getPriority();
+    });
+
     while (true) {
         if (unloading.load()) break;
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -30,12 +39,37 @@ void World::chunkLoaderFunc()
                     setBlock(glm::ivec3(x, y, z), type);
                 }
 
-                Structure* tree = Structure::getStructure(STRUCTURE_TYPE::TREE);
-                int base = tree->getBase({ x, z });
-                for (int y = base; y < base + tree->getHeight(); y++) {
-                    BLOCK_TYPE bt = tree->getBlock({ x, y, z });
-                    if (bt != BLOCK_TYPE::NONE) {
-                        setBlock(glm::ivec3(x, y, z), bt);
+                int MAX_STRUCTURE_HEIGHT = 0;
+
+                int bases[STRUCTURES_COUNT]{};
+                Structure* structuresInChunk[STRUCTURES_COUNT]{};
+                int structuresInXYCount = 0;
+
+                for (int i = 0; i < STRUCTURES_COUNT; i++) {
+                    Structure* structure = structures[i];
+                    if (!structure->isInXZ({ x, z })) continue;
+
+                    int height = structure->getHeight();
+                    height -= structure->getPivot().y;
+                    if (height > MAX_STRUCTURE_HEIGHT) MAX_STRUCTURE_HEIGHT = height;
+
+                    int base = structure->getBase({ x, z });
+                    bases[structuresInXYCount] = base;
+                    structuresInChunk[structuresInXYCount++] = structure;
+                }
+                
+                if (structuresInXYCount == 0) continue;
+
+                for (int y = 0; y < height + MAX_STRUCTURE_HEIGHT + 15; y++) {
+                    for (int i = 0; i < structuresInXYCount; i++) {
+                        Structure* structure = structuresInChunk[i];
+                        int base = bases[i];
+
+                        BLOCK_TYPE blockType = structure->getBlock({ x, y, z });
+                        if (blockType != BLOCK_TYPE::NONE) {
+                            setBlock(glm::ivec3(x, y, z), blockType);
+                            break;
+                        }
                     }
                 }
             }

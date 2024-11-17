@@ -170,6 +170,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
     }
     else {
         chunk->blocksMutex.unlock();
+        if (type == BLOCK_TYPE::AIR) return nullptr; // it was already air, nothing to change
     }
 
     if (type == BLOCK_TYPE::AIR) {

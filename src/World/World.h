@@ -32,7 +32,7 @@ public:
 	int chunkLoadQueueCount();
 
 	int getHeight(glm::ivec2 pos);
-	double random(glm::ivec2 pos);
+	double random(glm::ivec2 pos, int seed = 0);
 
 private:
 	std::atomic<bool> unloading;

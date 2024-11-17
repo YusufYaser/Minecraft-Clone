@@ -32,12 +32,13 @@ int World::getHeight(glm::ivec2 pos)
     return height;
 }
 
-double World::random(glm::ivec2 pos)
+double World::random(glm::ivec2 pos, int otherSeed)
 {
     std::uniform_real_distribution<> dist(0.0, 1.0);
     std::uint32_t hash = seed;
     hash ^= pos.x + 0x9e3779b9 + (hash << 6) + (hash >> 2);
     hash ^= pos.y + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    hash ^= otherSeed + 0x9e3779b9 + (hash << 6) + (hash >> 2);
     std::mt19937 rng(hash);
     return dist(rng);
 }
