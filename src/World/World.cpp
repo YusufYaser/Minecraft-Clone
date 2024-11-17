@@ -85,7 +85,7 @@ void World::Render(Shader* shader)
         }
     }
 
-    if (chunksToLoadc < 4) { // sorting doesn't really matter in that case
+    if (chunksToLoadc < 2) { // sorting doesn't really matter in that case
         for (int i = 0; i < chunksToLoadc; i++) {
             loadChunk(chunksToLoad[i]);
         }
@@ -95,9 +95,11 @@ void World::Render(Shader* shader)
     auto sorter = [&pos](glm::ivec2 a, glm::ivec2 b) {
         glm::ivec2 pos2 = { pos.x, pos.z };
         glm::ivec2 aDiff = a - pos2;
-        glm::ivec2 bDiff = b - pos2;
         int aDist = aDiff.x * aDiff.x + aDiff.y * aDiff.y;
+
+        glm::ivec2 bDiff = b - pos2;
         int bDist = bDiff.x * bDiff.x + bDiff.y * bDiff.y;
+
         return aDist < bDist;
     };
 

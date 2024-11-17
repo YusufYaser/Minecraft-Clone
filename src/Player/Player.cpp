@@ -104,7 +104,7 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
     }
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        speed = PLAYER_SPEED * 2.0f;
+        speed = PLAYER_RUN_SPEED;
     } else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE) {
         speed = PLAYER_SPEED;
     }
@@ -235,24 +235,31 @@ glm::vec3 Player::getCameraPos()
 glm::mat4 Player::getProjection()
 {
     static bool wasRunning = false;
-    static double startedRunning;
+    static double toggledRunning;
     double currentTime = glfwGetTime();
 
     glm::vec2 size = Game::getInstance()->getGameWindow()->getSize();
 
-    bool isRunning = speed > PLAYER_SPEED;
+    bool isRunning = speed == PLAYER_RUN_SPEED;
     if (isRunning && !wasRunning) {
-        startedRunning = currentTime;
+        toggledRunning = currentTime;
+    }
+    else if (!isRunning && wasRunning) { // stopped running
+        toggledRunning = currentTime;
     }
     wasRunning = isRunning;
     float FOV = 45.0f;
     if (isRunning) {
-        if (currentTime - startedRunning > .1f) {
+        if (currentTime - toggledRunning > .1f) {
             FOV += 5.0f * speed / PLAYER_SPEED;
         }
         else {
-            FOV += (currentTime - startedRunning) * (5.0f * speed / PLAYER_SPEED) * 10.0f;
+            FOV += (currentTime - toggledRunning) * (5.0f * speed / PLAYER_SPEED) * 10.0f;
         }
+    }
+    else if (currentTime - toggledRunning < .1f) {
+        FOV += 5.0f * PLAYER_RUN_SPEED / PLAYER_SPEED;
+        FOV -= (currentTime - toggledRunning) * (5.0f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
     }
 
     return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, 1000.0f);

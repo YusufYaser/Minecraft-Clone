@@ -19,6 +19,16 @@ GameWindow::GameWindow(int width, int height, const char* title)
 		return;
 	}
 	glfwMakeContextCurrent(glfwWindow);
+
+	int count;
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
+	const GLFWvidmode* videoMode = glfwGetVideoMode(monitors[0]);
+
+	int mWidth = videoMode->width;
+	int mHeight = videoMode->height;
+
+	glfwSetWindowPos(glfwWindow, (mWidth - width) / 2, (mHeight - height) / 2);
+
 	gladLoadGL(glfwGetProcAddress);
 
 	glfwGetFramebufferSize(glfwWindow, &width, &height);

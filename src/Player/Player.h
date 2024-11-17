@@ -10,6 +10,7 @@
 #include <GLFW/glfw3.h>
 
 #define PLAYER_SPEED 5.0f
+#define PLAYER_RUN_SPEED 7.5f
 
 class Player {
 public:
