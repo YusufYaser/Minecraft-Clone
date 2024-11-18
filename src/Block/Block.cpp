@@ -62,6 +62,7 @@ bool isBlockTypeTransparent(BLOCK_TYPE type)
 {
 	switch (type) {
 	case BLOCK_TYPE::WATER:
+	case BLOCK_TYPE::OAK_LEAVES:
 		return true;
 
 	default:

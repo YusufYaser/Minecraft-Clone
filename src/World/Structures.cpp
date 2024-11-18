@@ -67,6 +67,7 @@ void Structure::initialize() {
 
 		int adjustedDepth = round(depth * (normalizedDist));
 
+		if (vPos.y == adjustedDepth) return BLOCK_TYPE::GRASS;
 		if (vPos.y < adjustedDepth) return BLOCK_TYPE::NONE;
 
 		return BLOCK_TYPE::WATER;

@@ -21,7 +21,7 @@ void Player::update(float delta)
     if (jumpSpeed == 0.0f) {
         Block* belowBlock = world->getBlock(glm::vec3(iPos.x, pos.y, iPos.z) - up * delta);
         if (belowBlock == nullptr || !belowBlock->hasCollision()) {
-            fallSpeed += 10.0f * delta;
+            fallSpeed += 15.0f * delta;
             if (fallSpeed > 50.0f) fallSpeed = 50.0f;
         }
         else {
@@ -30,10 +30,10 @@ void Player::update(float delta)
         }
     } else if (jumpSpeed != 0.0f) {
         pos += (jumpSpeed * delta) * up;
-        jumpSpeed -= 10.0f * delta;
+        jumpSpeed -= 15.0f * delta;
         if (jumpSpeed <= 0.0f) {
             jumpSpeed = 0.0f;
-            fallSpeed = 10.0f * delta;
+            fallSpeed = 15.0f * delta;
         }
     }
 
@@ -104,7 +104,7 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
         if (block == nullptr || !block->hasCollision()) pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        if (fallSpeed == 0.0f && jumpSpeed == 0.0f) jumpSpeed = 4.5f;
+        if (fallSpeed == 0.0f && jumpSpeed == 0.0f) jumpSpeed = 5.5f;
     }
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
@@ -180,14 +180,22 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
         float rotX = 100.0f * (float)(posY - originalPos.y) / height;
         float rotY = 100.0f * (float)(posX - originalPos.x) / width;
 
-        glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(-rotX), glm::normalize(glm::cross(orientation, up)));
+        float pitch = glm::degrees(glm::asin(glm::dot(orientation, up)));
 
-        if (abs(glm::angle(newOrientation, up) - glm::radians(90.0f)) <= glm::radians(90.0f))
-        {
-            orientation = newOrientation;
+        float maxPitch = 89.0f;
+        if ((pitch - rotX) > maxPitch) {
+            rotX = pitch - maxPitch;
+        }
+        else if ((pitch - rotX) < -maxPitch) {
+            rotX = pitch + maxPitch;
         }
 
-        orientation = glm::rotate(orientation, glm::radians(-rotY), up);
+        glm::vec3 right = glm::normalize(glm::cross(orientation, up));
+        glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(-rotX), right);
+
+        newOrientation = glm::rotate(newOrientation, glm::radians(-rotY), up);
+
+        orientation = glm::normalize(newOrientation);
 
         glfwSetCursorPos(window, originalPos.x, originalPos.y);
     } else {
