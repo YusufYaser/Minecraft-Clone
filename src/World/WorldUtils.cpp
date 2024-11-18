@@ -27,6 +27,10 @@ glm::ivec2 getPosChunk(const glm::ivec3& pos) {
 
 int World::getHeight(glm::ivec2 pos)
 {
+    if (generator == Generator::Flat) {
+        return 5;
+    }
+
     const double random = perlin.octave2D_01((pos.x * 0.025), (pos.y * 0.025), 4);
     int height = round(random * 10 + 2);
     return height;

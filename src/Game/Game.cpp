@@ -54,7 +54,9 @@ Game::Game()
 
 	seed = dis(gen);
 	print("World Seed:", seed);
-	m_world = new World(seed);
+	WorldSettings worldSettings;
+	worldSettings.seed = seed;
+	m_world = new World(worldSettings);
 	for (int x = -2; x < 2; x++) {
 		for (int y = -2; y < 2; y++) {
 			m_world->loadChunk(glm::ivec2(x, y), true);

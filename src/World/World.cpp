@@ -2,9 +2,21 @@
 #include "Utils.h"
 #include "../Game/Game.h"
 
-World::World(siv::PerlinNoise::seed_type seed) {
-    World::seed = seed;
+World::World(WorldSettings& settings) {
+    World::seed = settings.seed;
     World::perlin = siv::PerlinNoise{ seed };
+    World::generator = settings.generator;
+
+    int structureCount = 0;
+    for (STRUCTURE_TYPE structureType : settings.structures) {
+        print((int)structureType);
+        Structure* structure = Structure::getStructure(structureType);
+        structures.push_back(structure);
+    }
+
+    std::sort(structures.begin(), structures.end(), [](Structure* a, Structure* b) {
+        return a->getPriority() > b->getPriority();
+        });
 
     unloading.store(false);
 

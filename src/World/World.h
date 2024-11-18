@@ -13,10 +13,22 @@
 #include <random>
 #include <time.h>
 #include "Structures.h"
+#include "stdint.h"
+
+enum class Generator : uint8_t {
+	Default = 0,
+	Flat
+};
+
+struct WorldSettings {
+	siv::PerlinNoise::seed_type seed;
+	Generator generator = Generator::Default;
+	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE, STRUCTURE_TYPE::LAKE };
+};
 
 class World {
 public:
-	World(siv::PerlinNoise::seed_type seed);
+	World(WorldSettings& settings);
 	~World();
 
 	void Render(Shader* shader);
@@ -38,6 +50,9 @@ private:
 	std::atomic<bool> unloading;
 
 	siv::PerlinNoise::seed_type seed;
+	Generator generator;
+
+	std::vector<Structure*> structures;
 
 	struct Chunk {
 		bool loaded;
