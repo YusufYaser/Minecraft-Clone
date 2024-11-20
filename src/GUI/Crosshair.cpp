@@ -11,8 +11,7 @@ GLuint crosshairIndices[] = {
 	0, 1, 2, 0, 2, 3
 };
 
-Crosshair::Crosshair()
-{
+Crosshair::Crosshair() {
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
@@ -34,15 +33,13 @@ Crosshair::Crosshair()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-Crosshair::~Crosshair()
-{
+Crosshair::~Crosshair() {
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
 	glDeleteVertexArrays(1, &VAO);
 }
 
-void Crosshair::Render(Shader* shader)
-{
+void Crosshair::render(Shader* shader) {
 	shader->activate();
 	glUniformMatrix4fv(shader->getUniformLoc("model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 	glUniform2fv(shader->getUniformLoc("guiPos"), 1, glm::value_ptr(glm::vec2()));

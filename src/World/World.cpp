@@ -9,7 +9,6 @@ World::World(WorldSettings& settings) {
 
     int structureCount = 0;
     for (STRUCTURE_TYPE structureType : settings.structures) {
-        print((int)structureType);
         Structure* structure = Structure::getStructure(structureType);
         structures.push_back(structure);
     }
@@ -44,11 +43,21 @@ World::~World()
     }
 }
 
-void World::Render(Shader* shader)
-{
-    glm::vec3 pos = Game::getInstance()->getPlayer()->getCameraPos();
-    int renderDistance = Game::getInstance()->getRenderDistance();
+void World::render(Shader* shader) {
+    Player* player = Game::getInstance()->getPlayer();
+    if (player == nullptr) return;
+
     shader->activate();
+    glUniformMatrix4fv(shader->getUniformLoc("view"), 1, GL_FALSE, glm::value_ptr(player->getView()));
+    glUniformMatrix4fv(shader->getUniformLoc("projection"), 1, GL_FALSE, glm::value_ptr(player->getProjection()));
+
+    Block* targetBlock = nullptr;
+    player->getTargetBlock(&targetBlock);
+
+    if (targetBlock != nullptr) targetBlock->highlighted = true;
+
+    glm::vec3 pos = player->getCameraPos();
+    int renderDistance = Game::getInstance()->getRenderDistance();
     glUniform1i(shader->getUniformLoc("highlighted"), 0);
 
     const int CHUNKS_TO_LOAD_SIZE = 256;
@@ -105,29 +114,30 @@ void World::Render(Shader* shader)
         for (int i = 0; i < chunksToLoadc; i++) {
             loadChunk(chunksToLoad[i]);
         }
-        return;
+    }
+    else {
+        auto sorter = [&pos](glm::ivec2 a, glm::ivec2 b) {
+            glm::ivec2 pos2 = { pos.x, pos.z };
+            glm::ivec2 aDiff = a - pos2;
+            int aDist = aDiff.x * aDiff.x + aDiff.y * aDiff.y;
+
+            glm::ivec2 bDiff = b - pos2;
+            int bDist = bDiff.x * bDiff.x + bDiff.y * bDiff.y;
+
+            return aDist < bDist;
+            };
+
+        std::sort(chunksToLoad, chunksToLoad + chunksToLoadc, sorter);
+
+        for (int i = 0; i < chunksToLoadc; i++) {
+            loadChunk(chunksToLoad[i]);
+        }
     }
 
-    auto sorter = [&pos](glm::ivec2 a, glm::ivec2 b) {
-        glm::ivec2 pos2 = { pos.x, pos.z };
-        glm::ivec2 aDiff = a - pos2;
-        int aDist = aDiff.x * aDiff.x + aDiff.y * aDiff.y;
-
-        glm::ivec2 bDiff = b - pos2;
-        int bDist = bDiff.x * bDiff.x + bDiff.y * bDiff.y;
-
-        return aDist < bDist;
-    };
-
-    std::sort(chunksToLoad, chunksToLoad + chunksToLoadc, sorter);
-
-    for (int i = 0; i < chunksToLoadc; i++) {
-        loadChunk(chunksToLoad[i]);
-    }
+    if (targetBlock != nullptr) targetBlock->highlighted = false;
 }
 
-Block* World::getBlock(glm::ivec3 pos)
-{
+Block* World::getBlock(glm::ivec3 pos) {
     std::size_t blockCh = hashPos(pos);
     std::size_t chunkCh = hashPos(getPosChunk(pos));
 
@@ -153,8 +163,7 @@ Block* World::getBlock(glm::ivec3 pos)
     return nullptr;
 }
 
-Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
-{
+Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
     if (type == BLOCK_TYPE::NONE) return nullptr;
 
     std::size_t blockCh = hashPos(pos);
@@ -242,8 +251,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace)
     return block;
 }
 
-void World::setRenderingGroup(Block* block)
-{
+void World::setRenderingGroup(Block* block) {
     std::size_t blockCh = hashPos(block->getPos());
     std::size_t chunkCh = hashPos(getPosChunk(block->getPos()));
 

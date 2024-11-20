@@ -9,7 +9,7 @@ public:
 	void activate();
 	GLuint getUniformLoc(const GLchar* name);
 
-	bool successfullyLoaded();
+	bool successfullyLoaded() { return m_successfullyLoaded; };
 
 private:
 	GLuint m_id;

@@ -4,8 +4,7 @@ using recursive_directory_iterator = std::filesystem::recursive_directory_iterat
 
 std::map<std::string, GLuint> textures;
 
-void initializeTextures()
-{
+void initializeTextures() {
 	stbi_set_flip_vertically_on_load(true);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -40,7 +39,6 @@ void initializeTextures()
 	}
 }
 
-GLuint getTexture(std::string name)
-{
+GLuint getTexture(std::string name) {
 	return textures[name];
 }

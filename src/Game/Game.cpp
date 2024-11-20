@@ -3,8 +3,7 @@
 
 Game* Game::_instance = nullptr;
 
-Game::Game()
-{
+Game::Game() {
 	if (_instance != nullptr) {
 		error("You cannot initialize 2 game instances");
 		return;
@@ -69,7 +68,8 @@ Game::Game()
 	print("Created world");
 
 	// initialize other stuff
-	m_player = new Player({.0f, m_world->getHeight({ 0, 0 }), .0f});
+	m_player = new Player();
+	m_player->pos = { .0f, m_world->getHeight({ 0, 0 }), .0f };
 
 	m_crosshair = new Crosshair();
 
@@ -78,14 +78,12 @@ Game::Game()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-	gltInit();
-	m_debugText = gltCreateText();
+	DebugText::initialize();
 
 	m_successfullyLoaded = true;
 }
 
-Game::~Game()
-{
+Game::~Game() {
 	delete m_gameWindow;
 	m_gameWindow = nullptr;
 
@@ -104,153 +102,43 @@ Game::~Game()
 	delete guiShader;
 	guiShader = nullptr;
 
-	gltDeleteText(m_debugText);
-	gltTerminate();
-
+	DebugText::cleanup();
+	
 	_instance = nullptr;
 }
 
-Game* Game::getInstance()
-{
-	return _instance;
-}
-
-void Game::update(float delta)
-{
+void Game::update(float delta) {
 	m_delta = delta;
-	double currentTime = glfwGetTime();
 
-	// change window size
-	static glm::vec2 oldSize = glm::vec2();
-	glm::vec2 size = m_gameWindow->getSize();
-	if (size.x == 0) size.x = 1;
-	if (size.y == 0) size.y = 1;
-	if (size.x != oldSize.y || size.y != oldSize.y) {
-		glViewport(0, 0, size.x, size.y);
-		gltViewport(size.x, size.y);
-	}
-	oldSize = size;
-
-	// get running FOV
+	m_gameWindow->update();
 
 	glClearColor(.3f, .3f, 1.0f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDepthRange(0.01, 1.0);
 
-	glm::mat4 projection = m_player->getProjection();
+	glm::vec2 size = m_gameWindow->getSize();
 
-	m_player->update(getSimDelta());
-	m_player->checkInputs(getGlfwWindow(), getSimDelta());
+	if (m_world != nullptr) {
+		if (m_player != nullptr) {
+			m_player->checkInputs(getGlfwWindow(), getSimDelta());
+			m_player->update(getSimDelta());
+		}
 
-	glm::mat4 view = m_player->getView();
-	shader->activate();
-	glUniformMatrix4fv(shader->getUniformLoc("view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(shader->getUniformLoc("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		m_world->render(shader);
 
-	Block* targetBlock = nullptr;
-	m_player->getTargetBlock(&targetBlock);
+		glDepthRange(0, 0.01);
+		guiShader->activate();
+		float aspectRatio = size.x / size.y;
+		float orthoHeight = 1.0f;
+		float orthoWidth = orthoHeight * aspectRatio;
+		glm::mat4 ortho = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -5.0f, 5.0f);
+		glUniformMatrix4fv(guiShader->getUniformLoc("viewport"), 1, GL_FALSE, glm::value_ptr(ortho));
 
-	if (targetBlock != nullptr) targetBlock->highlighted = true;
-
-	m_world->Render(shader);
-
-	if (targetBlock != nullptr) targetBlock->highlighted = false;
-
-	// render GUI
-	glDepthRange(0, 0.01);
-	guiShader->activate();
-	float aspectRatio = size.x / size.y;
-	float orthoHeight = 1.0f;
-	float orthoWidth = orthoHeight * aspectRatio;
-	glm::mat4 ortho = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -5.0f, 5.0f);
-	glUniformMatrix4fv(guiShader->getUniformLoc("viewport"), 1, GL_FALSE, glm::value_ptr(ortho));
-
-	m_crosshair->Render(guiShader);
-
-	std::stringstream newTitle;
-	newTitle << "Minecraft Clone\n";
-	newTitle << "https://github.com/YusufYaser/Minecraft-Clone\n\n";
-	static double lastFpsUpdated = 0;
-	static int lastFps = 0;
-	if (currentTime - lastFpsUpdated > .25) {
-		lastFps = round(1 / delta);
-		lastFpsUpdated = currentTime;
-	}
-	newTitle << "FPS: " << lastFps << " (" << delta << ")" << "\n";
-
-	newTitle << "Screen Resolution: " << size.x << "x" << size.y << "\n";
-
-	newTitle << "Position: " << round(m_player->pos.x * 100) / 100;
-	newTitle << ", " << round(m_player->pos.y * 100) / 100;
-	newTitle << ", " << round(m_player->pos.z * 100) / 100 << "\n\n";
-
-	newTitle << "Chunks Loaded: " << m_world->chunksLoaded() - m_world->chunkLoadQueueCount() << "\n";
-	newTitle << "Chunks Load Queue Count: " << m_world->chunkLoadQueueCount() << "\n\n";
-
-	newTitle << "World Seed: " << m_world->getSeed() << "\n\n";
-
-	if (targetBlock != nullptr) {
-		newTitle << "=== Target Block ===\n";
-		newTitle << " Block ID: " << (int)targetBlock->getType() << "\n";
-		newTitle << " Block Type: " << targetBlock->getName() << "\n";
-		glm::vec3 bPos = targetBlock->getPos();
-		newTitle << " Block Position: " << round(bPos.x * 100) / 100;
-		newTitle << ", " << round(bPos.y * 100) / 100;
-		newTitle << ", " << round(bPos.z * 100) / 100 << "\n";
-		newTitle << "==================\n";
+		m_crosshair->render(guiShader);
 	}
 
-	gltSetText(m_debugText, newTitle.str().c_str());
-	gltBeginDraw();
-	gltColor(1.0f, 1.0f, 1.0f, 1.0f);
-	gltDrawText2D(m_debugText, 0, 0, 1.0f);
-	gltEndDraw();
+	DebugText::render();
 
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();
-}
-
-GameWindow* Game::getGameWindow()
-{
-	return m_gameWindow;
-}
-
-GLFWwindow* Game::getGlfwWindow()
-{
-	return getGameWindow()->getGlfwWindow();
-}
-
-World* Game::getWorld()
-{
-	return m_world;
-}
-
-Player* Game::getPlayer()
-{
-	return m_player;
-}
-
-float Game::getSimDelta()
-{
-	return m_delta > .5f ? .5f : m_delta;
-}
-
-float Game::getDelta()
-{
-	return m_delta;
-}
-
-int Game::getRenderDistance()
-{
-	return m_renderDistance;
-}
-
-void Game::setRenderDistance(int newRenderDistance)
-{
-	m_renderDistance = newRenderDistance;
-}
-
-bool Game::successfullyLoaded()
-{
-	return m_successfullyLoaded;
 }

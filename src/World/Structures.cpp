@@ -86,8 +86,7 @@ Structure::Structure(STRUCTURE_TYPE type, StructureConfig& config, std::function
 	m_pivot = config.pivot;
 }
 
-BLOCK_TYPE Structure::getBlock(glm::ivec3 pos)
-{
+BLOCK_TYPE Structure::getBlock(glm::ivec3 pos) {
 	glm::ivec2 sPos = {
 		(pos.x >= 0) ? pos.x / m_size.x : (pos.x - m_size.x + 1) / m_size.x,
 		(pos.z >= 0) ? pos.z / m_size.z : (pos.z - m_size.z + 1) / m_size.z
@@ -107,8 +106,7 @@ BLOCK_TYPE Structure::getBlock(glm::ivec3 pos)
 	return m_getBlock(sPos, vPos);
 }
 
-bool Structure::isInXZ(glm::ivec2 pos)
-{
+bool Structure::isInXZ(glm::ivec2 pos) {
 	glm::ivec2 sPos = {
 		(pos.x >= 0) ? pos.x / m_size.x : (pos.x - m_size.x + 1) / m_size.x,
 		(pos.y >= 0) ? pos.y / m_size.z : (pos.y - m_size.z + 1) / m_size.z
@@ -118,8 +116,7 @@ bool Structure::isInXZ(glm::ivec2 pos)
 	return world->random(sPos, 4u * (int)m_type) <= m_probability;
 }
 
-int Structure::getBase(glm::ivec2 pos)
-{
+int Structure::getBase(glm::ivec2 pos) {
 	glm::ivec2 sPos = {
 		(pos.x >= 0) ? pos.x / m_size.x : (pos.x - m_size.x + 1) / m_size.x,
 		(pos.y >= 0) ? pos.y / m_size.z : (pos.y - m_size.z + 1) / m_size.z

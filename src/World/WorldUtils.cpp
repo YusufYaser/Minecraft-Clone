@@ -25,10 +25,12 @@ glm::ivec2 getPosChunk(const glm::ivec3& pos) {
     return glm::ivec2(chunkX, chunkZ);
 }
 
-int World::getHeight(glm::ivec2 pos)
-{
+int World::getHeight(glm::ivec2 pos) {
     if (generator == Generator::Flat) {
         return 5;
+    }
+    if (generator == Generator::Void) {
+        return 0;
     }
 
     const double random = perlin.octave2D_01((pos.x * 0.025), (pos.y * 0.025), 4);
@@ -36,8 +38,7 @@ int World::getHeight(glm::ivec2 pos)
     return height;
 }
 
-double World::random(glm::ivec2 pos, int otherSeed)
-{
+double World::random(glm::ivec2 pos, int otherSeed) {
     std::uniform_real_distribution<> dist(0.0, 1.0);
     std::uint32_t hash = seed;
     hash ^= pos.x + 0x9e3779b9 + (hash << 6) + (hash >> 2);

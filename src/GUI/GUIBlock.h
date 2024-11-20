@@ -8,7 +8,7 @@ public:
 	GUIBlock(BLOCK_TYPE type = BLOCK_TYPE::STONE);
 	~GUIBlock();
 
-	void Render(Shader* shader);
+	void render(Shader* shader);
 	void setBlock(BLOCK_TYPE type);
 
 	glm::vec2 position;

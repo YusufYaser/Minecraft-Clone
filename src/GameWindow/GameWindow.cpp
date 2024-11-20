@@ -2,15 +2,13 @@
 #include "GameWindow.h"
 #include "../Logging.h"
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
 
-GameWindow::GameWindow(int width, int height, const char* title)
-{
+GameWindow::GameWindow(int width, int height, const char* title) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
@@ -31,25 +29,28 @@ GameWindow::GameWindow(int width, int height, const char* title)
 
 	gladLoadGL(glfwGetProcAddress);
 
-	glfwGetFramebufferSize(glfwWindow, &width, &height);
 	glViewport(0, 0, width, height);
 
 	glfwSetKeyCallback(glfwWindow, key_callback);
 }
 
-GameWindow::~GameWindow()
-{
+GameWindow::~GameWindow() {
 	glfwDestroyWindow(glfwWindow);
 }
 
-GLFWwindow* GameWindow::getGlfwWindow()
-{
-	return glfwWindow;
+void GameWindow::update() {
+	static glm::vec2 oldSize = glm::vec2();
+	glm::vec2 size = getSize();
+	if (size.x != oldSize.y || size.y != oldSize.y) {
+		glViewport(0, 0, size.x, size.y);
+	}
+	oldSize = size;
 }
 
-glm::vec2 GameWindow::getSize()
-{
+glm::vec2 GameWindow::getSize() {
 	int width, height;
 	glfwGetWindowSize(getGlfwWindow(), &width, &height);
+	if (width == 0) width = 1;
+	if (height == 0) height = 1;
 	return glm::vec2(width, height);
 }

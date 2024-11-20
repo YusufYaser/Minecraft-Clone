@@ -10,32 +10,30 @@
 #include <glm/glm.hpp>
 #include <sstream>
 #include "../World/Structures.h"
-
-#define GLT_IMPLEMENTATION
-#define GLT_MANUAL_VIEWPORT
-#include <gltext/gltext.h>
+#include "../World/Utils.h"
+#include "../GUI/DebugText.h"
 
 class Game {
 public:
 	Game();
 	~Game();
-	static Game* getInstance();
+	static Game* getInstance() { return _instance; };
 
 	void update(float delta);
 
-	GameWindow* getGameWindow();
-	GLFWwindow* getGlfwWindow();
-	World* getWorld();
-	Player* getPlayer();
+	GameWindow* getGameWindow() { return m_gameWindow; };
+	GLFWwindow* getGlfwWindow() { return m_gameWindow->getGlfwWindow(); };
+	World* getWorld() { return m_world; };
+	Player* getPlayer() { return m_player; };
 
-	float getSimDelta();
+	float getSimDelta() { return m_delta > .5f ? .5f : m_delta;  };
 	// You should probably use getSimDelta() instead
-	float getDelta();
+	float getDelta() { return m_delta; };
 
-	int getRenderDistance();
-	void setRenderDistance(int newRenderDistance);
+	int getRenderDistance() { return m_renderDistance; };
+	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };
 
-	bool successfullyLoaded();
+	bool successfullyLoaded() { return m_successfullyLoaded; };
 
 private:
 	static Game* _instance;
@@ -52,6 +50,4 @@ private:
 
 	Shader* shader;
 	Shader* guiShader;
-
-	GLTtext* m_debugText;
 };

@@ -17,7 +17,8 @@
 
 enum class Generator : uint8_t {
 	Default = 0,
-	Flat
+	Flat,
+	Void
 };
 
 struct WorldSettings {
@@ -31,7 +32,7 @@ public:
 	World(WorldSettings& settings);
 	~World();
 
-	void Render(Shader* shader);
+	void render(Shader* shader);
 
 	Block* getBlock(glm::ivec3 pos);
 	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);

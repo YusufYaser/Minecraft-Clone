@@ -1,11 +1,9 @@
 #include "World.h"
 #include "Utils.h"
 
-void World::chunkLoaderFunc()
-{
+void World::chunkLoaderFunc() {
     while (true) {
         if (unloading.load()) break;
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
         if (chunkLoadQueue.size() == 0) continue;
         chunkLoadQueueMutex.lock();
@@ -14,7 +12,17 @@ void World::chunkLoaderFunc()
         chunkLoadQueueMutex.unlock();
 
         std::size_t chunkCh = hashPos(pos);
+        chunksMutex.lock();
         Chunk* chunk = chunks[chunkCh];
+        chunksMutex.unlock();
+
+        if (generator == Generator::Void) {
+            if (pos.x == 0 && pos.y == 0) {
+                setBlock({ 0, 0, 0 }, BLOCK_TYPE::STONE);
+            }
+            chunk->loaded = true;
+            continue;
+        }
 
         for (int x = pos.x * 16; x < 16 + pos.x * 16; x++) {
             for (int z = pos.y * 16; z < 16 + pos.y * 16; z++) {
@@ -63,8 +71,7 @@ void World::chunkLoaderFunc()
     }
 }
 
-void World::chunkUnloaderFunc()
-{
+void World::chunkUnloaderFunc() {
     while (true) {
         if (unloading.load()) break;
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -83,8 +90,7 @@ void World::chunkUnloaderFunc()
     }
 }
 
-void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded)
-{
+void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
     std::size_t chunkCh = hashPos(pos);
 
     if (chunks.find(chunkCh) == chunks.end())
@@ -109,16 +115,14 @@ void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded)
     chunkLoadQueueMutex.unlock();
 }
 
-int World::chunksLoaded()
-{
+int World::chunksLoaded() {
     chunksMutex.lock();
     int size = chunks.size();
     chunksMutex.unlock();
     return size;
 }
 
-int World::chunkLoadQueueCount()
-{
+int World::chunkLoadQueueCount() {
     chunkLoadQueueMutex.lock();
     int size = chunkLoadQueue.size();
     chunkLoadQueueMutex.unlock();

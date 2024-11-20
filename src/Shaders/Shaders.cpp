@@ -1,8 +1,7 @@
 #include "Shaders.h"
 #include "../Logging.h"
 
-Shader::Shader(const char* vertexSource, const char* fragmentSource)
-{
+Shader::Shader(const char* vertexSource, const char* fragmentSource) {
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSource, 0);
 	glCompileShader(vertexShader);
@@ -57,21 +56,14 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource)
 	m_successfullyLoaded = true;
 }
 
-Shader::~Shader()
-{
+Shader::~Shader() {
 	glDeleteProgram(m_id);
 }
 
-void Shader::activate()
-{
+void Shader::activate() {
 	glUseProgram(m_id);
 }
 
-GLuint Shader::getUniformLoc(const GLchar *name)
-{
+GLuint Shader::getUniformLoc(const GLchar *name) {
 	return glGetUniformLocation(m_id, name);
-}
-
-bool Shader::successfullyLoaded() {
-	return m_successfullyLoaded;
 }

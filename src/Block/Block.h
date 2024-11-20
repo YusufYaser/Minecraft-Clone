@@ -30,6 +30,7 @@ enum class BLOCK_FACE : uint8_t {
 
 glm::ivec3 getBlockFaceDirection(BLOCK_FACE face);
 const char* getTextureName(BLOCK_TYPE type);
+bool blockTypeHasCollision(BLOCK_TYPE type);
 bool isBlockTypeTransparent(BLOCK_TYPE type);
 
 class Block {
@@ -37,11 +38,11 @@ public:
 	Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces = 0);
 
 	void Render(Shader* shader, bool bindTexture = true);
-	const char* getName();
-	glm::ivec3 getPos();
-	BLOCK_TYPE getType();
-	bool hasCollision();
-	bool hasTransparency();
+	const char* getName() { return getTextureName(type); };
+	glm::ivec3 getPos() { return pos;  };
+	BLOCK_TYPE getType() { return type; };
+	bool hasCollision() { return blockTypeHasCollision(type); };
+	bool hasTransparency() { return isBlockTypeTransparent(type); };
 
 	bool highlighted = false;
 	uint8_t hiddenFaces;

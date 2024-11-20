@@ -14,7 +14,7 @@
 
 class Player {
 public:
-	Player(glm::vec3 pos);
+	Player();
 
 	glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -29,7 +29,7 @@ public:
 	void checkInputs(GLFWwindow* window, float delta);
 
 	void getTargetBlock(Block** block, BLOCK_FACE* face = nullptr);
-	glm::vec3 getCameraPos();
+	glm::vec3 getCameraPos() { return pos + up; };
 
 	glm::mat4 getProjection();
 	glm::mat4 getView();

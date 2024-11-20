@@ -28,9 +28,7 @@ glm::ivec3 getBlockFaceDirection(BLOCK_FACE face) {
 	}
 }
 
-const char* getTextureName(BLOCK_TYPE type)
-{
-
+const char* getTextureName(BLOCK_TYPE type) {
 	switch (type) {
 	case BLOCK_TYPE::AIR:
 		return "air";
@@ -58,8 +56,17 @@ const char* getTextureName(BLOCK_TYPE type)
 	}
 }
 
-bool isBlockTypeTransparent(BLOCK_TYPE type)
-{
+bool blockTypeHasCollision(BLOCK_TYPE type) {
+	switch (type) {
+	case BLOCK_TYPE::WATER:
+		return false;
+
+	default:
+		return true;
+	}
+}
+
+bool isBlockTypeTransparent(BLOCK_TYPE type) {
 	switch (type) {
 	case BLOCK_TYPE::WATER:
 	case BLOCK_TYPE::OAK_LEAVES:
@@ -70,15 +77,13 @@ bool isBlockTypeTransparent(BLOCK_TYPE type)
 	}
 }
 
-Block::Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces)
-{
+Block::Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces) {
 	Block::type = type;
 	Block::pos = pos;
 	Block::hiddenFaces = hiddenFaces;
 }
 
-void Block::Render(Shader* shader, bool bindTexture)
-{
+void Block::Render(Shader* shader, bool bindTexture) {
 	if (hiddenFaces == 63) return;
 
 	GLuint VBO, EBO, VAO;
@@ -156,35 +161,4 @@ void Block::Render(Shader* shader, bool bindTexture)
 	if (highlighted) {
 		glUniform1i(shader->getUniformLoc("highlighted"), 0);
 	}
-}
-
-const char* Block::getName()
-{
-	return getTextureName(type);
-}
-
-glm::ivec3 Block::getPos()
-{
-	return pos;
-}
-
-BLOCK_TYPE Block::getType()
-{
-	return type;
-}
-
-bool Block::hasCollision()
-{
-	switch (type) {
-	case BLOCK_TYPE::WATER:
-		return false;
-
-	default:
-		return true;
-	}
-}
-
-bool Block::hasTransparency()
-{
-	return isBlockTypeTransparent(type);
 }

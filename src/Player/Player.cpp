@@ -1,9 +1,9 @@
 #include "Player.h"
 #include "../Game/Game.h" 
 
-Player::Player(glm::vec3 pos)
+Player::Player()
 {
-    Player::pos = pos;
+    Player::pos = glm::ivec3();
     Player::world = Game::getInstance()->getWorld();
     Player::originalPos = glm::vec3();
 }
@@ -203,8 +203,7 @@ void Player::checkInputs(GLFWwindow* window, float delta) {
     }
 }
 
-void Player::getTargetBlock(Block** block, BLOCK_FACE* face)
-{
+void Player::getTargetBlock(Block** block, BLOCK_FACE* face) {
     glm::vec3 oldBlockPos;
     glm::vec3 cameraPos = getCameraPos();
     for (float i = 0; i < reachDistance; i += .01f) {
@@ -239,13 +238,7 @@ void Player::getTargetBlock(Block** block, BLOCK_FACE* face)
     *block = nullptr;
 }
 
-glm::vec3 Player::getCameraPos()
-{
-    return pos + up;
-}
-
-glm::mat4 Player::getProjection()
-{
+glm::mat4 Player::getProjection() {
     static bool wasRunning = false;
     static double toggledRunning;
     double currentTime = glfwGetTime();
@@ -277,7 +270,6 @@ glm::mat4 Player::getProjection()
     return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, 1000.0f);
 }
 
-glm::mat4 Player::getView()
-{
+glm::mat4 Player::getView() {
     return glm::lookAt(getCameraPos(), getCameraPos() + orientation, up);
 }

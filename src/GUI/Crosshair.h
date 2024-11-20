@@ -11,7 +11,7 @@ public:
 	Crosshair();
 	~Crosshair();
 
-	void Render(Shader* shader);
+	void render(Shader* shader);
 
 private:
 	GLuint VAO, VBO, EBO;

@@ -8,7 +8,9 @@ public:
 	GameWindow(int width, int height, const char* title);
 	~GameWindow();
 
-	GLFWwindow* getGlfwWindow();
+	void update();
+
+	GLFWwindow* getGlfwWindow() { return glfwWindow; };
 
 	glm::vec2 getSize();
 
