@@ -13,9 +13,13 @@
 #include "../World/Utils.h"
 #include "../GUI/DebugText.h"
 
+struct GameSettings {
+	int renderDistance = 6;
+};
+
 class Game {
 public:
-	Game();
+	Game(GameSettings& settings);
 	~Game();
 	static Game* getInstance() { return _instance; };
 
@@ -44,7 +48,7 @@ private:
 	Crosshair* m_crosshair;
 
 	float m_delta = 1.0f;
-	int m_renderDistance = 6;
+	int m_renderDistance;
 
 	bool m_successfullyLoaded = false;
 

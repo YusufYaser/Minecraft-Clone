@@ -64,9 +64,24 @@ void World::render(Shader* shader) {
     glm::ivec2 chunksToLoad[CHUNKS_TO_LOAD_SIZE];
     int chunksToLoadc = 0;
 
+    float cosHalfFOV = std::cos(glm::radians(190.0f / 2.0f));
+
+    glm::ivec2 playerChunk = getPosChunk(player->pos);
+
     for (int x = -(renderDistance / 2) + (pos.x / 16); x < (renderDistance / 2) + (pos.x / 16); x++) {
         for (int y = -(renderDistance / 2) + (pos.z / 16); y < (renderDistance / 2) + (pos.z / 16); y++) {
             glm::ivec2 cPos = glm::ivec2(x, y);
+
+            if (glm::length(glm::vec2(cPos - playerChunk)) > 1) {
+                glm::vec3 chunkCenter = glm::vec3(x * 16 + 8, 0.0f, y * 16 + 8);    
+                glm::vec3 playerPos3D = pos;
+
+                glm::vec3 toChunk = glm::normalize(chunkCenter - playerPos3D);
+                glm::vec3 viewDir = glm::normalize(player->orientation);
+
+                if (glm::dot(toChunk, viewDir) < cosHalfFOV) continue;
+            }
+
             std::size_t chunkCh = hashPos(cPos);
             chunksMutex.lock();
             std::unordered_map<std::size_t, Chunk*>::iterator it = chunks.find(chunkCh);

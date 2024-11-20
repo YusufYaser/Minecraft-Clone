@@ -3,10 +3,6 @@
 #include "Game/Game.h"
 #include <csignal>
 
-void glfw_error_callback(int error, const char* description) {
-	std::cerr << "GLFW | Error | " << description << std::endl;
-}
-
 bool ctrlC = false;
 
 void signalHandler(int signal) {
@@ -18,59 +14,40 @@ void signalHandler(int signal) {
 int main(int argc, char* argv[]) {
 	std::signal(SIGINT, signalHandler);
 
-	int renderDistance = 0;
+	GameSettings settings;
 
 	for (int i = 1; i < argc; ++i) {
 		std::string arg = argv[i];
 		if (arg == "--render-distance") {
-			if (i + 1 < argc) {
-				std::string value = argv[i + 1];
-				if (renderDistance != 0) {
-					error("Two or more render distances were specified");
-					return 1;
-				}
-				try {
-					renderDistance = std::stoi(value);
-				}
-				catch (std::invalid_argument&) {
-					error("The render distance must be a number");
-					return 1;
-				}
-				i++;
-				print("Using render distance:", renderDistance);
-				continue;
-			}
-			else {
+			if (i + 1 >= argc) {
 				error("No render distance specified in --render-distance");
 				return 1;
 			}
+
+			std::string value = argv[i + 1];
+			try {
+				settings.renderDistance = std::stoi(value);
+			}
+			catch (std::invalid_argument&) {
+				error("The render distance must be a number");
+				return 1;
+			}
+			i++;
+			print("Using render distance:", settings.renderDistance);
+			continue;
+		} else {
+			error("Invalid launch parameter:", arg);
+			return 1;
 		}
 	}
 
-	print("");
-	print("Minecraft Clone");
-	print("");
-	print("GitHub:", UNDERLINE "https://github.com/YusufYaser/Minecraft-Clone");
-	print("");
-
-	print("Initializing GLFW");
-
-	glfwSetErrorCallback(glfw_error_callback);
-
-	if (!glfwInit()) {
-		error("Failed to initialize GLFW");
-		return 1;
-	}
-
-	print("Initialized GLFW");
-
-	print("Starting game");
-	Game* game = new Game();
+	Game* game = new Game(settings);
 	if (!game->successfullyLoaded()) {
 		error("Failed to start game");
+		delete game;
+		game = nullptr;
 		return 1;
 	}
-	game->setRenderDistance(renderDistance == 0 ? 6 : renderDistance);
 
 	double prevTime = glfwGetTime();
 
@@ -88,8 +65,5 @@ int main(int argc, char* argv[]) {
 
 	delete game;
 	game = nullptr;
-
-	print("Terminating GLFW");
-	glfwTerminate();
 	return 0;
 }

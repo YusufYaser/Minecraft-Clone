@@ -3,12 +3,29 @@
 
 Game* Game::_instance = nullptr;
 
-Game::Game() {
+Game::Game(GameSettings& settings) {
 	if (_instance != nullptr) {
 		error("You cannot initialize 2 game instances");
 		return;
 	}
 	_instance = this;
+
+	print("");
+	print("Minecraft Clone");
+	print("");
+	print("GitHub:", UNDERLINE "https://github.com/YusufYaser/Minecraft-Clone");
+	print("");
+
+	print("Initializing GLFW");
+
+	if (!glfwInit()) {
+		error("Failed to initialize GLFW");
+		return;
+	}
+
+	print("Initialized GLFW");
+
+	m_renderDistance = settings.renderDistance;
 
 	m_gameWindow = new GameWindow(854, 480, "Minecraft Clone");
 	if (m_gameWindow->getGlfwWindow() == NULL) {
@@ -33,7 +50,7 @@ Game::Game() {
 	shader->activate();
 	glUniform1i(shader->getUniformLoc("tex0"), 0);
 	guiShader->activate();
-	glUniform1i(shader->getUniformLoc("tex0"), 0);
+	glUniform1i(guiShader->getUniformLoc("tex0"), 0);
 	print("Loaded textures");
 
 	// load structures
@@ -103,6 +120,9 @@ Game::~Game() {
 	guiShader = nullptr;
 
 	DebugText::cleanup();
+
+	print("Terminating GLFW");
+	glfwTerminate();
 	
 	_instance = nullptr;
 }

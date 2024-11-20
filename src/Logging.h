@@ -17,14 +17,14 @@
 })()
 
 #define print(...)\
-(std::cout << BOLD << BRIGHT_BLUE << "Info "\
-            BRIGHT_GREEN << "(" << BASENAME_NO_EXT(FILENAME) << ")"\
-            << BLUE << " -> " << RESET, printArgs(__VA_ARGS__), std::cout << RESET);
+(std::cout << BOLD BRIGHT_BLUE "Info "\
+            BRIGHT_GREEN "(" << BASENAME_NO_EXT(FILENAME) << ")"\
+            BLUE " -> " RESET, printArgs(__VA_ARGS__), std::cout << RESET);
 
 #define error(...)\
-(std::cout << BOLD << BRIGHT_RED << "Err  "\
-            BRIGHT_GREEN << "(" << BASENAME_NO_EXT(FILENAME) << ")"\
-            << RED << " -> " << RESET, printArgs(__VA_ARGS__), std::cout << RESET);
+(std::cout << BOLD BRIGHT_RED "Err  "\
+            BRIGHT_GREEN "(" << BASENAME_NO_EXT(FILENAME) << ")"\
+            RED " -> " RESET, printArgs(__VA_ARGS__), std::cout << RESET);
 
 template<typename T>
 void printArgs(T&& arg) {
