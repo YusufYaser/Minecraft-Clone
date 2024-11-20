@@ -1,12 +1,22 @@
 #include <iostream>
 #include "Logging.h"
 #include "Game/Game.h"
+#include <csignal>
 
 void glfw_error_callback(int error, const char* description) {
 	std::cerr << "GLFW | Error | " << description << std::endl;
 }
 
+bool ctrlC = false;
+
+void signalHandler(int signal) {
+	if (signal == SIGINT) {
+		ctrlC = true;
+	}
+}
+
 int main(int argc, char* argv[]) {
+	std::signal(SIGINT, signalHandler);
 
 	int renderDistance = 0;
 
@@ -16,7 +26,7 @@ int main(int argc, char* argv[]) {
 			if (i + 1 < argc) {
 				std::string value = argv[i + 1];
 				if (renderDistance != 0) {
-					error("Two or more seeds were specified");
+					error("Two or more render distances were specified");
 					return 1;
 				}
 				try {
@@ -64,7 +74,7 @@ int main(int argc, char* argv[]) {
 
 	double prevTime = glfwGetTime();
 
-	while (!glfwWindowShouldClose(game->getGameWindow()->getGlfwWindow()))
+	while (!glfwWindowShouldClose(game->getGameWindow()->getGlfwWindow()) && !ctrlC)
 	{
 		double currentTime = glfwGetTime();
 		float delta = float(currentTime - prevTime);
