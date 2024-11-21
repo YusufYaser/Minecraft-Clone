@@ -2,6 +2,9 @@
 #include "Logging.h"
 #include "Game/Game.h"
 #include <csignal>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 bool ctrlC = false;
 
@@ -12,6 +15,17 @@ void signalHandler(int signal) {
 }
 
 int main(int argc, char* argv[]) {
+	#ifdef _WIN32
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hOut != INVALID_HANDLE_VALUE) {
+		DWORD dwMode = 0;
+		if (GetConsoleMode(hOut, &dwMode)) {
+			dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+			SetConsoleMode(hOut, dwMode);
+		}
+	}
+	#endif
+
 	std::signal(SIGINT, signalHandler);
 
 	GameSettings settings;
