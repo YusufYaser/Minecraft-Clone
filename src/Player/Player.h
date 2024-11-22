@@ -26,7 +26,6 @@ public:
 	BLOCK_TYPE selectedBlock = BLOCK_TYPE::STONE;
 
 	void update(float delta);
-	void checkInputs(GLFWwindow* window, float delta);
 
 	void getTargetBlock(Block** block, BLOCK_FACE* face = nullptr);
 	glm::vec3 getCameraPos() { return pos + up; };
@@ -36,11 +35,10 @@ public:
 
 private:
 	bool wasHidden = false;
-	bool brokeBlock = false;
-	bool placedBlock = false;
-	glm::vec2 originalPos;
 	World* world;
 
 	float jumpSpeed = 0.0f;
 	float fallSpeed = 0.0f;
+
+	void checkInputs(float delta);
 };

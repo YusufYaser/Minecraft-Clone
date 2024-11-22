@@ -89,6 +89,7 @@ Game::Game(GameSettings& settings) {
 	m_player->pos = { .0f, m_world->getHeight({ 0, 0 }), .0f };
 
 	m_crosshair = new Crosshair();
+	m_keyHandler = new KeyHandler();
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -101,8 +102,8 @@ Game::Game(GameSettings& settings) {
 }
 
 Game::~Game() {
-	delete m_gameWindow;
-	m_gameWindow = nullptr;
+	delete m_keyHandler;
+	m_keyHandler = nullptr;
 
 	delete m_player;
 	m_player = nullptr;
@@ -119,6 +120,9 @@ Game::~Game() {
 	delete guiShader;
 	guiShader = nullptr;
 
+	delete m_gameWindow;
+	m_gameWindow = nullptr;
+
 	DebugText::cleanup();
 
 	print("Terminating GLFW");
@@ -130,7 +134,32 @@ Game::~Game() {
 void Game::update(float delta) {
 	m_delta = delta;
 
+	m_keyHandler->update();
+
+	if (m_keyHandler->keyClicked(GLFW_KEY_ESCAPE)) {
+		m_gamePaused = !m_gamePaused;
+
+		if (!m_gamePaused) {
+			glm::ivec2 size = m_gameWindow->getSize();
+
+			glfwSetCursorPos(getGlfwWindow(), size.x / 2, size.y / 2);
+		}
+	}
+
+	if (glfwGetWindowAttrib(getGlfwWindow(), GLFW_FOCUSED) == GLFW_FALSE) {
+		m_gamePaused = true;
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
+
+	glfwSetInputMode(getGlfwWindow(), GLFW_CURSOR, m_gamePaused ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+
 	m_gameWindow->update();
+
+	if (!m_gamePaused) {
+		if (m_world != nullptr && m_player != nullptr) {
+			m_player->update(getSimDelta());
+		}
+	}
 
 	glClearColor(.3f, .3f, 1.0f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -139,11 +168,6 @@ void Game::update(float delta) {
 	glm::vec2 size = m_gameWindow->getSize();
 
 	if (m_world != nullptr) {
-		if (m_player != nullptr) {
-			m_player->checkInputs(getGlfwWindow(), getSimDelta());
-			m_player->update(getSimDelta());
-		}
-
 		m_world->render(shader);
 
 		glDepthRange(0, 0.01);

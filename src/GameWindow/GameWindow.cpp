@@ -2,12 +2,6 @@
 #include "GameWindow.h"
 #include "../Logging.h"
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	}
-}
-
 GameWindow::GameWindow(int width, int height, const char* title) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -30,8 +24,6 @@ GameWindow::GameWindow(int width, int height, const char* title) {
 	gladLoadGL(glfwGetProcAddress);
 
 	glViewport(0, 0, width, height);
-
-	glfwSetKeyCallback(glfwWindow, key_callback);
 }
 
 GameWindow::~GameWindow() {

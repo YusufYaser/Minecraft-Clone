@@ -23,7 +23,11 @@ void DebugText::render() {
 	World* world = game->getWorld();
 
 	std::stringstream text;
-	text << "Minecraft Clone\n";
+	text << "Minecraft Clone";
+	if (game->gamePaused()) {
+		text << " (Paused)";
+	}
+	text << "\n";
 	text << "https://github.com/YusufYaser/Minecraft-Clone\n\n";
 	static double lastFpsUpdated = 0;
 	static int lastFps = 0;

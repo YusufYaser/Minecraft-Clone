@@ -12,6 +12,7 @@
 #include "../World/Structures.h"
 #include "../World/Utils.h"
 #include "../GUI/DebugText.h"
+#include "../KeyHandler/KeyHandler.h"
 
 struct GameSettings {
 	int renderDistance = 6;
@@ -29,10 +30,12 @@ public:
 	GLFWwindow* getGlfwWindow() { return m_gameWindow->getGlfwWindow(); };
 	World* getWorld() { return m_world; };
 	Player* getPlayer() { return m_player; };
+	KeyHandler* getKeyHandler() { return m_keyHandler; };
 
-	float getSimDelta() { return m_delta > .5f ? .5f : m_delta;  };
+	float getSimDelta() { return std::min(m_delta, .5f);  };
 	// You should probably use getSimDelta() instead
 	float getDelta() { return m_delta; };
+	bool gamePaused() { return m_gamePaused; };
 
 	int getRenderDistance() { return m_renderDistance; };
 	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };
@@ -43,12 +46,15 @@ private:
 	static Game* _instance;
 	GameWindow* m_gameWindow;
 
+	KeyHandler* m_keyHandler;
 	Player* m_player;
 	World* m_world;
 	Crosshair* m_crosshair;
 
 	float m_delta = 1.0f;
 	int m_renderDistance;
+
+	bool m_gamePaused = false;
 
 	bool m_successfullyLoaded = false;
 
