@@ -21,7 +21,7 @@ public:
 
 	glm::vec3 pos;
 	float speed = PLAYER_SPEED;
-	float reachDistance = 10.0f;
+	float reachDistance = 7.0f;
 
 	BLOCK_TYPE selectedBlock = BLOCK_TYPE::STONE;
 

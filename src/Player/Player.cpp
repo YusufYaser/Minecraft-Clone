@@ -65,6 +65,8 @@ void Player::checkInputs(float delta) {
         }
     }
 
+    bool moving = false;
+
     if (keyHandler->keyHeld(GLFW_KEY_W)) {
         glm::vec3 change = (speed * delta) * glm::normalize(orientation2);
         glm::ivec3 newIPos = glm::ivec3(
@@ -74,6 +76,7 @@ void Player::checkInputs(float delta) {
         );
         Block* block = world->getBlock(newIPos);
         if (block == nullptr || !block->hasCollision()) pos += change;
+        moving = true;
     }
     if (keyHandler->keyHeld(GLFW_KEY_S)) {
         glm::vec3 change = (-speed * delta) * glm::normalize(orientation2);
@@ -84,6 +87,7 @@ void Player::checkInputs(float delta) {
         );
         Block* block = world->getBlock(newIPos);
         if (block == nullptr || !block->hasCollision()) pos += change;
+        moving = true;
     }
     if (keyHandler->keyHeld(GLFW_KEY_A)) {
         glm::vec3 change = (-speed * delta) * glm::normalize(glm::cross(orientation2, up));
@@ -94,6 +98,7 @@ void Player::checkInputs(float delta) {
         );
         Block* block = world->getBlock(newIPos);
         if (block == nullptr || !block->hasCollision()) pos += change;
+        moving = true;
     }
     if (keyHandler->keyHeld(GLFW_KEY_D)) {
         glm::vec3 change = (speed * delta) * glm::normalize(glm::cross(orientation2, up));
@@ -104,14 +109,16 @@ void Player::checkInputs(float delta) {
         );
         Block* block = world->getBlock(newIPos);
         if (block == nullptr || !block->hasCollision()) pos += change;
+        moving = true;
     }
     if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
         if (fallSpeed == 0.0f && jumpSpeed == 0.0f) jumpSpeed = 5.5f;
     }
 
-    if (keyHandler->keyHeld(GLFW_KEY_LEFT_CONTROL)) {
+    if (keyHandler->keyHeld(GLFW_KEY_LEFT_CONTROL) && moving) {
         speed = PLAYER_RUN_SPEED;
-    } else {
+    }
+    if (!moving) {
         speed = PLAYER_SPEED;
     }
 
@@ -237,15 +244,15 @@ glm::mat4 Player::getProjection() {
     float FOV = 45.0f;
     if (isRunning) {
         if (currentTime - toggledRunning > .1f) {
-            FOV += 5.0f * speed / PLAYER_SPEED;
+            FOV += 7.5f * speed / PLAYER_SPEED;
         }
         else {
-            FOV += (currentTime - toggledRunning) * (5.0f * speed / PLAYER_SPEED) * 10.0f;
+            FOV += (currentTime - toggledRunning) * (7.5f * speed / PLAYER_SPEED) * 10.0f;
         }
     }
     else if (currentTime - toggledRunning < .1f) {
-        FOV += 5.0f * PLAYER_RUN_SPEED / PLAYER_SPEED;
-        FOV -= (currentTime - toggledRunning) * (5.0f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
+        FOV += 7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED;
+        FOV -= (currentTime - toggledRunning) * (7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
     }
 
     return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, 1000.0f);
