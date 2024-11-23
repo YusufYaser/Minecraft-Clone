@@ -1,17 +1,15 @@
 #include "DebugText.h"
 #include "../Game/Game.h"
 
-GLTtext* DebugText::m_debugText;
+Text* DebugText::m_debugText;
 
 void DebugText::initialize() {
-	gltInit();
-	m_debugText = gltCreateText();
+	m_debugText = new Text();
 }
 
 void DebugText::cleanup() {
-
-	gltDeleteText(m_debugText);
-	gltTerminate();
+	delete m_debugText;
+	m_debugText = nullptr;
 }
 
 void DebugText::render() {
@@ -50,6 +48,7 @@ void DebugText::render() {
 	}
 
 	if (world != nullptr) {
+		text << "Render Distance: " << game->getRenderDistance() << "\n";
 		text << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
 		text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n\n";
 
@@ -72,9 +71,6 @@ void DebugText::render() {
 		}
 	}
 
-	gltSetText(m_debugText, text.str().c_str());
-	gltBeginDraw();
-	gltColor(1.0f, 1.0f, 1.0f, 1.0f);
-	gltDrawText2D(m_debugText, 0, 0, 1.0f);
-	gltEndDraw();
+	m_debugText->setText(text.str().c_str());
+	m_debugText->render();
 }

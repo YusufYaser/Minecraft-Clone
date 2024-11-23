@@ -1,8 +1,6 @@
 #pragma once
 
-#include <glad/gl.h>
-#define GLT_IMPLEMENTATION
-#include <gltext/gltext.h>
+#include "Text.h"
 
 class DebugText {
 public:
@@ -11,5 +9,5 @@ public:
 	static void render();
 
 private:
-	static GLTtext* m_debugText;
+	static Text* m_debugText;
 };

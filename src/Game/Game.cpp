@@ -85,11 +85,15 @@ Game::Game(GameSettings& settings) {
 	print("Created world");
 
 	// initialize other stuff
+	gltInit();
+
 	m_player = new Player();
 	m_player->pos = { .0f, m_world->getHeight({ 0, 0 }), .0f };
 
 	m_crosshair = new Crosshair();
 	m_keyHandler = new KeyHandler();
+
+	m_pauseMenu = new PauseMenu();
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -127,6 +131,7 @@ Game::~Game() {
 
 	print("Terminating GLFW");
 	glfwTerminate();
+	gltTerminate();
 	
 	_instance = nullptr;
 }
@@ -135,6 +140,10 @@ void Game::update(float delta) {
 	m_delta = delta;
 
 	m_keyHandler->update();
+
+	if (m_keyHandler->keyClicked(GLFW_KEY_F3)) {
+		m_debugTextVisible = !m_debugTextVisible;
+	}
 
 	if (m_keyHandler->keyClicked(GLFW_KEY_ESCAPE)) {
 		m_gamePaused = !m_gamePaused;
@@ -178,10 +187,14 @@ void Game::update(float delta) {
 		glm::mat4 ortho = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -5.0f, 5.0f);
 		glUniformMatrix4fv(guiShader->getUniformLoc("viewport"), 1, GL_FALSE, glm::value_ptr(ortho));
 
-		m_crosshair->render(guiShader);
+		if (!m_gamePaused) m_crosshair->render(guiShader);
 	}
 
-	DebugText::render();
+	if (m_gamePaused) {
+		m_pauseMenu->render();
+	}
+
+	if (m_debugTextVisible) DebugText::render();
 
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();

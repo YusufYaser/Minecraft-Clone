@@ -12,7 +12,10 @@
 #include "../World/Structures.h"
 #include "../World/Utils.h"
 #include "../GUI/DebugText.h"
+#include "../GUI/PauseMenu.h"
 #include "../KeyHandler/KeyHandler.h"
+#define GLT_IMPORTS
+#include <gltext/gltext.h>
 
 struct GameSettings {
 	int renderDistance = 6;
@@ -60,4 +63,12 @@ private:
 
 	Shader* shader;
 	Shader* guiShader;
+
+	// gui
+	PauseMenu* m_pauseMenu;
+	#ifdef _DEBUG
+	bool m_debugTextVisible = true;
+	#else
+	bool m_debugTextVisible = false;
+	#endif
 };
