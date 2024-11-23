@@ -7,6 +7,7 @@ out vec4 FragColor;
 
 uniform sampler2D tex0;
 uniform bool highlighted;
+uniform bool gamePaused;
 
 void main() {
     FragColor = texture(tex0, texCoord);
@@ -15,6 +16,10 @@ void main() {
        texCoord.y < .95f && texCoord.y > .05f)) {
 
         FragColor *= vec4(.25f, .25f, .25f, 1.0f);
+    }
+
+    if (gamePaused) {
+        FragColor *= vec4(.5f, .5f, .5f, 1.0f);
     }
 }
 

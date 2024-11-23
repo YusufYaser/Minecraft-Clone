@@ -170,7 +170,13 @@ void Game::update(float delta) {
 		}
 	}
 
-	glClearColor(.3f, .3f, 1.0f, 1);
+	shader->activate();
+	glUniform1i(shader->getUniformLoc("gamePaused"), m_gamePaused);
+	if (m_gamePaused) {
+		glClearColor(.3f * .5f, .3f * .5f, 1.0f * .5f, 1);
+	} else {
+		glClearColor(.3f, .3f, 1.0f, 1);
+	}
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDepthRange(0.01, 1.0);
 
