@@ -68,8 +68,8 @@ void World::render(Shader* shader) {
 
     glm::ivec2 playerChunk = getPosChunk(player->pos);
 
-    for (int x = -(renderDistance / 2) + (pos.x / 16); x < (renderDistance / 2) + (pos.x / 16); x++) {
-        for (int y = -(renderDistance / 2) + (pos.z / 16); y < (renderDistance / 2) + (pos.z / 16); y++) {
+    for (int x = -(renderDistance / 2) + static_cast<int>(round(pos.x / 16)); x < (renderDistance / 2) + static_cast<int>(round(pos.x / 16)); x++) {
+        for (int y = -(renderDistance / 2) + static_cast<int>(round(pos.z / 16)); y < (renderDistance / 2) + static_cast<int>(round(pos.z / 16)); y++) {
             glm::ivec2 cPos = glm::ivec2(x, y);
 
             if (glm::length(glm::vec2(cPos - playerChunk)) > 1) {

@@ -115,16 +115,16 @@ void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
     chunkLoadQueueMutex.unlock();
 }
 
-int World::chunksLoaded() {
+size_t World::chunksLoaded() {
     chunksMutex.lock();
-    int size = chunks.size();
+    size_t size = chunks.size();
     chunksMutex.unlock();
     return size;
 }
 
-int World::chunkLoadQueueCount() {
+size_t World::chunkLoadQueueCount() {
     chunkLoadQueueMutex.lock();
-    int size = chunkLoadQueue.size();
+    size_t size = chunkLoadQueue.size();
     chunkLoadQueueMutex.unlock();
     return size;
 }

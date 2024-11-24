@@ -31,8 +31,8 @@ GameWindow::~GameWindow() {
 }
 
 void GameWindow::update() {
-	static glm::vec2 oldSize = glm::vec2();
-	glm::vec2 size = getSize();
+	static glm::ivec2 oldSize = glm::ivec2();
+	glm::ivec2 size = getSize();
 	if (size.x != oldSize.y || size.y != oldSize.y) {
 		glViewport(0, 0, size.x, size.y);
 	}

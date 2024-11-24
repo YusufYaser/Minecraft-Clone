@@ -41,8 +41,8 @@ public:
 
 	void loadChunk(glm::ivec2 pos, bool permanentlyLoaded = false);
 
-	int chunksLoaded();
-	int chunkLoadQueueCount();
+	size_t chunksLoaded();
+	size_t chunkLoadQueueCount();
 
 	int getHeight(glm::ivec2 pos);
 	double random(glm::ivec2 pos, int seed = 0);

@@ -244,12 +244,12 @@ glm::mat4 Player::getProjection() {
             FOV += 7.5f * speed / PLAYER_SPEED;
         }
         else {
-            FOV += (currentTime - toggledRunning) * (7.5f * speed / PLAYER_SPEED) * 10.0f;
+            FOV += static_cast<float>(currentTime - toggledRunning) * (7.5f * speed / PLAYER_SPEED) * 10.0f;
         }
     }
     else if (currentTime - toggledRunning < .1f) {
         FOV += 7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED;
-        FOV -= (currentTime - toggledRunning) * (7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
+        FOV -= static_cast<float>(currentTime - toggledRunning) * (7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
     }
 
     return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, 1000.0f);

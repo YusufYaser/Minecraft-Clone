@@ -1,10 +1,10 @@
 #include <iostream>
 #include "Logging.h"
-#include "Game/Game.h"
 #include <csignal>
 #ifdef _WIN32
 #include <Windows.h>
 #endif
+#include "Game/Game.h"
 
 bool ctrlC = false;
 

@@ -48,24 +48,24 @@ void Structure::initialize() {
 		{
 			std::uniform_real_distribution<> dist(2.0, 4.0);
 			std::mt19937 rng(0 ^ posHash);
-			depth = round(dist(rng));
+			depth = static_cast<int>(round(dist(rng)));
 		}
 		{
 			std::uniform_real_distribution<> dist(4.0, 12.0);
 			std::mt19937 rng(0 ^ posHash);
-			sizeX = round(dist(rng));
+			sizeX = static_cast<int>(round(dist(rng)));
 		}
 		{
 			std::uniform_real_distribution<> dist(4.0, 12.0);
 			std::mt19937 rng(0 ^ posHash);
-			sizeY = round(dist(rng));
+			sizeY = static_cast<int>(round(dist(rng)));
 		}
 
 		float distFromCenterX = abs(vPos.x - sizeX / 2.0f);
 		float distFromCenterY = abs(vPos.z - sizeY / 2.0f);
 		float normalizedDist = sqrt((distFromCenterX * distFromCenterX) + (distFromCenterY * distFromCenterY)) / (sizeX / 2.0f);
 
-		int adjustedDepth = round(depth * (normalizedDist));
+		int adjustedDepth = static_cast<int>(round(depth * (normalizedDist)));
 
 		if (vPos.y == adjustedDepth) return BLOCK_TYPE::GRASS;
 		if (vPos.y < adjustedDepth) return BLOCK_TYPE::NONE;

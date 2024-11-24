@@ -298,7 +298,7 @@ extern "C" {
 		int strLength = 0;
 
 		if (string)
-			strLength = strlen(string);
+			strLength = static_cast<int>(strlen(string));
 
 		if (strLength)
 		{
