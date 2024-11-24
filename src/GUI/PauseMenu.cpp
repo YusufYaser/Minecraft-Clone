@@ -12,9 +12,9 @@ PauseMenu::PauseMenu() {
 	resume->setText("Resume");
 	resume->setPosition({ .5f, 0, .5f, 0 });
 
-	quit = new Button();
-	quit->setText("Quit Game");
-	quit->setPosition({ .5f, 0, .5f, 50 });
+	mainMenu = new Button();
+	mainMenu->setText("Main Menu");
+	mainMenu->setPosition({ .5f, 0, .5f, 50 });
 }
 
 PauseMenu::~PauseMenu() {
@@ -23,18 +23,21 @@ PauseMenu::~PauseMenu() {
 
 	delete resume;
 	resume = nullptr;
+
+	delete mainMenu;
+	mainMenu = nullptr;
 }
 
 void PauseMenu::render() {
 	resume->render();
-	quit->render();
+	mainMenu->render();
 	title->render();
 
 	if (resume->isClicked()) {
 		Game::getInstance()->setGamePaused(false);
 	}
 
-	if (quit->isClicked()) {
-		Game::getInstance()->quit();
+	if (mainMenu->isClicked()) {
+		Game::getInstance()->unloadWorld();
 	}
 }

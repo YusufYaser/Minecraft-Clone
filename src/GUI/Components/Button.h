@@ -13,6 +13,7 @@ public:
 	bool isClicked();
 
 	void setText(const char* content);
+	void setEnabled(bool enabled) { m_enabled = enabled; };
 
 	void setPosition(glm::vec4 pos) override;
 	void setSize(glm::vec4 size) override;
@@ -22,4 +23,6 @@ public:
 private:
 	Text* m_text;
 	Image* m_image;
+
+	bool m_enabled;
 };

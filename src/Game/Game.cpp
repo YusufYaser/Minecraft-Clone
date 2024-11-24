@@ -58,37 +58,8 @@ Game::Game(GameSettings& settings) {
 	Structure::initialize();
 	print("Loaded structures");
 
-	// create world
-	print("Creating world");
-	siv::PerlinNoise::seed_type seed = 0;
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(
-		std::numeric_limits<siv::PerlinNoise::seed_type>::min(),
-		std::numeric_limits<siv::PerlinNoise::seed_type>::max()
-	);
-
-	seed = dis(gen);
-	print("World Seed:", seed);
-	WorldSettings worldSettings;
-	worldSettings.seed = seed;
-	m_world = new World(worldSettings);
-	for (int x = -2; x < 2; x++) {
-		for (int y = -2; y < 2; y++) {
-			m_world->loadChunk(glm::ivec2(x, y), true);
-		}
-	}
-
-	print("Waiting for spawn chunks");
-	while (m_world->chunkLoadQueueCount() != 0) {}
-	print("Loaded spawn chunks");
-	print("Created world");
-
 	// initialize other stuff
 	gltInit();
-
-	m_player = new Player();
-	m_player->pos = { .0f, m_world->getHeight({ 0, 0 }), .0f };
 
 	m_crosshair = new Image(getTexture("crosshair"));
 	m_crosshair->setPosition({ .5f, 0, .5f, 0 });
@@ -97,6 +68,7 @@ Game::Game(GameSettings& settings) {
 	m_keyHandler = new KeyHandler();
 
 	m_pauseMenu = new PauseMenu();
+	m_mainMenu = new MainMenu();
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -147,7 +119,7 @@ void Game::quit() {
 }
 
 bool Game::shouldQuit() {
-	return m_shouldQuit || glfwWindowShouldClose(getGlfwWindow());
+	return (m_shouldQuit || glfwWindowShouldClose(getGlfwWindow())) && !m_loadingWorld;
 }
 
 void Game::update(float delta) {
@@ -169,6 +141,8 @@ void Game::update(float delta) {
 		}
 	}
 
+	if (m_world == nullptr) m_gamePaused = true;
+
 	if (glfwGetWindowAttrib(getGlfwWindow(), GLFW_FOCUSED) == GLFW_FALSE) {
 		m_gamePaused = true;
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -187,7 +161,11 @@ void Game::update(float delta) {
 	shader->activate();
 	glUniform1i(shader->getUniformLoc("gamePaused"), m_gamePaused);
 	if (m_gamePaused) {
-		glClearColor(.3f * .5f, .3f * .5f, 1.0f * .5f, 1);
+		if (m_player != nullptr) {
+			glClearColor(.3f * .5f, .3f * .5f, 1.0f * .5f, 1);
+		} else {
+			glClearColor(0, .25f, 0, 1);
+		}
 	} else {
 		glClearColor(.3f, .3f, 1.0f, 1);
 	}
@@ -206,7 +184,11 @@ void Game::update(float delta) {
 	if (!m_gamePaused) m_crosshair->render();
 
 	if (m_gamePaused) {
-		m_pauseMenu->render();
+		if (m_player != nullptr) {
+			m_pauseMenu->render();
+		} else {
+			m_mainMenu->render();
+		}
 	}
 
 	if (m_debugTextVisible) DebugText::render();
@@ -221,4 +203,55 @@ void Game::setGamePaused(bool paused) {
 	glm::ivec2 size = getGameWindow()->getSize();
 
 	glfwSetCursorPos(getGlfwWindow(), size.x / 2, size.y / 2);
+}
+
+void Game::loadWorld() {
+	if (m_loadingWorld) return;
+	m_loadingWorld = true;
+
+	print("Creating world");
+	siv::PerlinNoise::seed_type seed = 0;
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(
+		std::numeric_limits<siv::PerlinNoise::seed_type>::min(),
+		std::numeric_limits<siv::PerlinNoise::seed_type>::max()
+	);
+
+	seed = dis(gen);
+	print("World Seed:", seed);
+	
+	std::thread t = std::thread([this](siv::PerlinNoise::seed_type seed) {
+		WorldSettings worldSettings;
+		worldSettings.seed = seed;
+
+		m_world = new World(worldSettings);
+		for (int x = -2; x < 2; x++) {
+			for (int y = -2; y < 2; y++) {
+				m_world->loadChunk(glm::ivec2(x, y), true);
+			}
+		}
+
+		print("Waiting for spawn chunks");
+		while (m_world->chunkLoadQueueCount() != 0) {}
+		print("Loaded spawn chunks");
+		print("Created world");
+
+		m_player = new Player();
+		m_player->pos = { .0f, m_world->getHeight({ 0, 0 }), .0f };
+
+		m_gamePaused = false;
+		m_loadingWorld = false;
+	}, seed);
+
+	t.detach();
+
+}
+
+void Game::unloadWorld() {
+	delete m_world;
+	m_world = nullptr;
+
+	delete m_player;
+	m_player = nullptr;
 }

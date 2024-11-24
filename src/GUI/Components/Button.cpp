@@ -20,6 +20,8 @@ Button::Button() {
 	m_image->setSize({ 0, 256, 0, 32 });
 
 	m_size = { 0, 256, 0, 32 };
+
+	m_enabled = true;
 }
 
 Button::~Button() {
@@ -31,6 +33,8 @@ Button::~Button() {
 }
 
 bool Button::isHovered() {
+	if (!m_enabled) return false;
+
 	GameWindow* gameWindow = Game::getInstance()->getGameWindow();
 	double posX, posY;
 	glfwGetCursorPos(gameWindow->getGlfwWindow(), &posX, &posY);
@@ -77,6 +81,11 @@ void Button::render() {
 		m_image->setColor({ .5f, .5f, .5f, 1.0f });
 	} else {
 		m_image->setColor(glm::vec4(1.0f));
+	}
+	if (m_enabled) {
+		m_text->setColor(glm::vec4(1.0f));
+	} else {
+		m_text->setColor({ .75f, .75f, .75f, 1.0f });
 	}
 
 	m_image->render();

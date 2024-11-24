@@ -13,6 +13,7 @@
 #include "../World/Utils.h"
 #include "../GUI/DebugText.h"
 #include "../GUI/PauseMenu.h"
+#include "../GUI/MainMenu.h"
 #include "../KeyHandler/KeyHandler.h"
 #include <gltext/gltext.h>
 
@@ -49,6 +50,10 @@ public:
 	int getRenderDistance() { return m_renderDistance; };
 	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };
 
+	void loadWorld();
+	void unloadWorld();
+	bool loadingWorld() { return m_loadingWorld;  };
+
 	bool successfullyLoaded() { return m_successfullyLoaded; };
 
 private:
@@ -67,6 +72,7 @@ private:
 
 	bool m_gamePaused = false;
 
+	bool m_loadingWorld = false;
 	bool m_successfullyLoaded = false;
 
 	Shader* shader;
@@ -74,6 +80,7 @@ private:
 
 	// gui
 	PauseMenu* m_pauseMenu;
+	MainMenu* m_mainMenu;
 	#ifdef _DEBUG
 	bool m_debugTextVisible = true;
 	#else

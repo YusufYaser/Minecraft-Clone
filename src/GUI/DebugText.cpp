@@ -25,8 +25,7 @@ void DebugText::render() {
 	if (game->gamePaused()) {
 		text << " (Paused)";
 	}
-	text << "\n";
-	text << "https://github.com/YusufYaser/Minecraft-Clone\n\n";
+	text << "\n\n";
 	static double lastFpsUpdated = 0;
 	static int lastFps = 0;
 	if (currentTime - lastFpsUpdated > .25) {

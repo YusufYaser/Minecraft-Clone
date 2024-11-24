@@ -3,15 +3,16 @@
 #include "./Components/Text.h"
 #include "./Components/Button.h"
 
-class PauseMenu {
+class MainMenu {
 public:
-	PauseMenu();
-	~PauseMenu();
+	MainMenu();
+	~MainMenu();
 
 	void render();
 
 private:
 	Text* title;
-	Button* resume;
-	Button* mainMenu;
+	Button* newWorld;
+	Button* quit;
+	Text* credits;
 };
