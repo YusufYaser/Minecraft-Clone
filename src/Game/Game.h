@@ -3,7 +3,7 @@
 #include "../World/World.h"
 #include "../Player/Player.h"
 #include "../Shaders/Shaders.h"
-#include "../GUI/Crosshair.h"
+#include "../GUI/Components/Image.h"
 #include "../GameWindow/GameWindow.h"
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -14,7 +14,6 @@
 #include "../GUI/DebugText.h"
 #include "../GUI/PauseMenu.h"
 #include "../KeyHandler/KeyHandler.h"
-#define GLT_IMPORTS
 #include <gltext/gltext.h>
 
 struct GameSettings {
@@ -27,6 +26,9 @@ public:
 	~Game();
 	static Game* getInstance() { return _instance; };
 
+	void quit();
+	bool shouldQuit();
+
 	void update(float delta);
 
 	GameWindow* getGameWindow() { return m_gameWindow; };
@@ -35,10 +37,14 @@ public:
 	Player* getPlayer() { return m_player; };
 	KeyHandler* getKeyHandler() { return m_keyHandler; };
 
+	Shader* getGuiShader() { return guiShader; };
+
 	float getSimDelta() { return std::min(m_delta, .5f);  };
 	// You should probably use getSimDelta() instead
 	float getDelta() { return m_delta; };
+
 	bool gamePaused() { return m_gamePaused; };
+	void setGamePaused(bool paused);
 
 	int getRenderDistance() { return m_renderDistance; };
 	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };
@@ -48,11 +54,13 @@ public:
 private:
 	static Game* _instance;
 	GameWindow* m_gameWindow;
+	
+	bool m_shouldQuit = false;
 
 	KeyHandler* m_keyHandler;
 	Player* m_player;
 	World* m_world;
-	Crosshair* m_crosshair;
+	Image* m_crosshair;
 
 	float m_delta = 1.0f;
 	int m_renderDistance;

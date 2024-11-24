@@ -27,9 +27,6 @@
     <ClCompile Include="libraries\include\glad\gl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\Crosshair.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Shaders\Shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,9 +37,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\World\World.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\GUIBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Player\Player.cpp">
@@ -66,13 +60,22 @@
     <ClCompile Include="src\KeyHandler\KeyHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\Text.cpp">
+    <ClCompile Include="src\GUI\Components\Text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\gltext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GUI\PauseMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\Components\Button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\Components\GUIComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\Components\Image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,9 +92,6 @@
     <ClInclude Include="src\Block\CubeVertices.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Crosshair.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Shaders\Shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -102,9 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="libraries\include\PerlinNoise\PerlinNoise.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\GUIBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Player\Player.h">
@@ -134,10 +131,19 @@
     <ClInclude Include="src\KeyHandler\KeyHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Text.h">
+    <ClInclude Include="src\GUI\Components\Text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\PauseMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\Components\Button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\Components\Image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\Components\GUIComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -90,7 +90,10 @@ Game::Game(GameSettings& settings) {
 	m_player = new Player();
 	m_player->pos = { .0f, m_world->getHeight({ 0, 0 }), .0f };
 
-	m_crosshair = new Crosshair();
+	m_crosshair = new Image(getTexture("crosshair"));
+	m_crosshair->setPosition({ .5f, 0, .5f, 0 });
+	m_crosshair->setSize({ 0, 16, 0, 16 });
+
 	m_keyHandler = new KeyHandler();
 
 	m_pauseMenu = new PauseMenu();
@@ -127,6 +130,9 @@ Game::~Game() {
 	delete m_gameWindow;
 	m_gameWindow = nullptr;
 
+	delete m_pauseMenu;
+	m_pauseMenu = nullptr;
+
 	DebugText::cleanup();
 
 	print("Terminating GLFW");
@@ -134,6 +140,14 @@ Game::~Game() {
 	gltTerminate();
 	
 	_instance = nullptr;
+}
+
+void Game::quit() {
+	m_shouldQuit = true;
+}
+
+bool Game::shouldQuit() {
+	return m_shouldQuit || glfwWindowShouldClose(getGlfwWindow());
 }
 
 void Game::update(float delta) {
@@ -184,17 +198,12 @@ void Game::update(float delta) {
 
 	if (m_world != nullptr) {
 		m_world->render(shader);
-
-		glDepthRange(0, 0.01);
-		guiShader->activate();
-		float aspectRatio = size.x / size.y;
-		float orthoHeight = 1.0f;
-		float orthoWidth = orthoHeight * aspectRatio;
-		glm::mat4 ortho = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -5.0f, 5.0f);
-		glUniformMatrix4fv(guiShader->getUniformLoc("viewport"), 1, GL_FALSE, glm::value_ptr(ortho));
-
-		if (!m_gamePaused) m_crosshair->render(guiShader);
 	}
+
+	glDepthRange(0, 0.01);
+	guiShader->activate();
+
+	if (!m_gamePaused) m_crosshair->render();
 
 	if (m_gamePaused) {
 		m_pauseMenu->render();
@@ -204,4 +213,12 @@ void Game::update(float delta) {
 
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();
+}
+
+void Game::setGamePaused(bool paused) {
+	m_gamePaused = paused;
+
+	glm::ivec2 size = getGameWindow()->getSize();
+
+	glfwSetCursorPos(getGlfwWindow(), size.x / 2, size.y / 2);
 }

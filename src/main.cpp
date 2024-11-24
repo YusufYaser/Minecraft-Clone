@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 
 	double prevTime = glfwGetTime();
 
-	while (!glfwWindowShouldClose(game->getGameWindow()->getGlfwWindow()) && !ctrlC)
+	while (!game->shouldQuit() && !ctrlC)
 	{
 		double currentTime = glfwGetTime();
 		float delta = float(currentTime - prevTime);

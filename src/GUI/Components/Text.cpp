@@ -1,11 +1,11 @@
 #include "Text.h"
-#include "../Game/Game.h"
+#include "../../Game/Game.h"
 
 Text::Text() {
 	m_text = gltCreateText();
 	m_scale = 1.0f;
 	m_color = glm::vec4(1.0f);
-	m_pos = glm::vec4();
+	m_centered = false;
 }
 
 Text::~Text() {
@@ -19,7 +19,7 @@ void Text::setText(const char* content) {
 void Text::render() {
 	glm::ivec2 size = Game::getInstance()->getGameWindow()->getSize();
 
-	gltBeginDraw();//
+	gltBeginDraw();
 
 	gltColor(m_color.x, m_color.y, m_color.z, m_color.w);
 	glm::ivec2 pos = {

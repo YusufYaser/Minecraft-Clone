@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Text.h"
+#include "./Components/Text.h"
 
 class DebugText {
 public:

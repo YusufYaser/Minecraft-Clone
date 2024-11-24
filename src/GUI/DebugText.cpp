@@ -30,7 +30,7 @@ void DebugText::render() {
 	static double lastFpsUpdated = 0;
 	static int lastFps = 0;
 	if (currentTime - lastFpsUpdated > .25) {
-		lastFps = round(1 / delta);
+		lastFps = round(1.0f / delta);
 		lastFpsUpdated = currentTime;
 	}
 	text << "FPS: " << lastFps << " (" << delta << ")" << "\n";

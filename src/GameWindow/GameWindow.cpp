@@ -44,5 +44,5 @@ glm::vec2 GameWindow::getSize() {
 	glfwGetWindowSize(getGlfwWindow(), &width, &height);
 	if (width == 0) width = 1;
 	if (height == 0) height = 1;
-	return glm::vec2(width, height);
+	return glm::vec2(width + width % 2, height + height % 2);
 }

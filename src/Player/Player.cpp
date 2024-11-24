@@ -160,16 +160,13 @@ void Player::checkInputs(float delta) {
     double posX, posY;
     glfwGetCursorPos(window, &posX, &posY);
 
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
-
     if (!wasHidden) {
         wasHidden = true;
     }
 
     glm::ivec2 size = Game::getInstance()->getGameWindow()->getSize();
-    float rotX = 100.0f * (float)(posY - size.y / 2) / height;
-    float rotY = 100.0f * (float)(posX - size.x / 2) / width;
+    float rotX = 100.0f * (float)(posY - size.y / 2) / size.y;
+    float rotY = 100.0f * (float)(posX - size.x / 2) / size.x;
 
     float pitch = glm::degrees(glm::asin(glm::dot(orientation, up)));
 
