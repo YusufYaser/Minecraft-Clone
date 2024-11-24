@@ -26,9 +26,15 @@ void Player::update(float delta)
             pos.y = belowBlock->getPos().y + 1.0f;
         }
     } else if (jumpSpeed != 0.0f) {
-        pos += (jumpSpeed * delta) * up;
-        jumpSpeed -= 15.0f * delta;
-        if (jumpSpeed <= 0.0f) {
+        Block* aboveBlock = world->getBlock(glm::vec3(iPos.x, pos.y + 1.8, iPos.z) + (jumpSpeed * delta) * up);
+        if (aboveBlock == nullptr) {
+            pos += (jumpSpeed * delta) * up;
+            jumpSpeed -= 15.0f * delta;
+            if (jumpSpeed <= 0.0f) {
+                jumpSpeed = 0.0f;
+                fallSpeed = 15.0f * delta;
+            }
+        } else {
             jumpSpeed = 0.0f;
             fallSpeed = 15.0f * delta;
         }
@@ -67,52 +73,45 @@ void Player::checkInputs(float delta) {
 
     bool moving = false;
 
+    glm::vec3 change = glm::vec3();
+
     if (keyHandler->keyHeld(GLFW_KEY_W)) {
-        glm::vec3 change = (speed * delta) * glm::normalize(orientation2);
-        glm::ivec3 newIPos = glm::ivec3(
-            round(pos.x + change.x),
-            round(pos.y + change.y),
-            round(pos.z + change.z)
-        );
-        Block* block = world->getBlock(newIPos);
-        if (block == nullptr || !block->hasCollision()) pos += change;
+        change += (speed * delta) * glm::normalize(orientation2);
         moving = true;
     }
     if (keyHandler->keyHeld(GLFW_KEY_S)) {
-        glm::vec3 change = (-speed * delta) * glm::normalize(orientation2);
-        glm::ivec3 newIPos = glm::ivec3(
-            round(pos.x + change.x),
-            round(pos.y + change.y),
-            round(pos.z + change.z)
-        );
-        Block* block = world->getBlock(newIPos);
-        if (block == nullptr || !block->hasCollision()) pos += change;
+        change += (-speed * delta) * glm::normalize(orientation2);
         moving = true;
     }
     if (keyHandler->keyHeld(GLFW_KEY_A)) {
-        glm::vec3 change = (-speed * delta) * glm::normalize(glm::cross(orientation2, up));
-        glm::ivec3 newIPos = glm::ivec3(
-            round(pos.x + change.x),
-            round(pos.y + change.y),
-            round(pos.z + change.z)
-        );
-        Block* block = world->getBlock(newIPos);
-        if (block == nullptr || !block->hasCollision()) pos += change;
+        change += (-speed * delta) * glm::normalize(glm::cross(orientation2, up));
         moving = true;
     }
     if (keyHandler->keyHeld(GLFW_KEY_D)) {
-        glm::vec3 change = (speed * delta) * glm::normalize(glm::cross(orientation2, up));
-        glm::ivec3 newIPos = glm::ivec3(
-            round(pos.x + change.x),
-            round(pos.y + change.y),
-            round(pos.z + change.z)
-        );
-        Block* block = world->getBlock(newIPos);
-        if (block == nullptr || !block->hasCollision()) pos += change;
+        change += (speed * delta) * glm::normalize(glm::cross(orientation2, up));
         moving = true;
     }
     if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
         if (fallSpeed == 0.0f && jumpSpeed == 0.0f) jumpSpeed = 5.5f;
+    }
+
+    if (moving) {
+        Block* block;
+        for (int i = 0; i <= 1; i++) {
+            block = world->getBlock({
+                round(pos.x + change.x + (change.x > 0 ? .15f : -.15f)),
+                round(pos.y + i),
+                round(pos.z)
+                });
+            if (block != nullptr) change.x = 0;
+            block = world->getBlock({
+                round(pos.x),
+                round(pos.y + i),
+                round(pos.z + change.z + (change.z > 0 ? .15f : -.15f))
+                });
+            if (block != nullptr) change.z = 0;
+        }
+        pos += change;
     }
 
     if (keyHandler->keyHeld(GLFW_KEY_LEFT_CONTROL) && moving) {
