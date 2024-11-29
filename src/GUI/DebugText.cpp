@@ -48,6 +48,7 @@ void DebugText::render() {
 
 	if (world != nullptr) {
 		text << "Render Distance: " << game->getRenderDistance() << "\n";
+		text << "Chunks Rendered: " << world->chunksRendered() << "\n";
 		text << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
 		text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n\n";
 

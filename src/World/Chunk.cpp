@@ -32,10 +32,22 @@ void World::chunkLoaderFunc() {
                 for (int y = 0; y < height; y++) {
                     if (unloading.load()) break;
                     BLOCK_TYPE type = BLOCK_TYPE::STONE;
-                    if (y == height - 1) type = BLOCK_TYPE::GRASS;
-                    else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
+                    if (y == 0) {
+                        type = BLOCK_TYPE::BEDROCK;
+                    } else if (height > 6) {
+                        if (y == height - 1) type = BLOCK_TYPE::GRASS;
+                        else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
+                    } else {
+                        if (y == height - 1) type = BLOCK_TYPE::SAND;
+                        else type = BLOCK_TYPE::STONE;
+                    }
 
                     setBlock(glm::ivec3(x, y, z), type);
+                }
+                if (height <= 6) {
+                    for (int y = height; y < 6; y++) {
+                        setBlock(glm::ivec3(x, y, z), BLOCK_TYPE::WATER);
+                    }
                 }
 
                 int MAX_STRUCTURE_HEIGHT = 0;

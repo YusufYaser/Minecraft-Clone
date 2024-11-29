@@ -34,46 +34,6 @@ void Structure::initialize() {
 		});
 	structures[(int)STRUCTURE_TYPE::TREE] = tree;
 
-	print("Initializing lake");
-	StructureConfig lakeConfig;
-	lakeConfig.priority = 1;
-	lakeConfig.probability = .05f;
-	lakeConfig.size = { 15, 3, 15 };
-	lakeConfig.pivot = { 7, 3, 7 };
-	Structure* lake = new Structure(STRUCTURE_TYPE::LAKE, lakeConfig, [](glm::ivec2 sPos, glm::ivec3 vPos) {
-		int depth, sizeX, sizeY;
-		std::uint32_t posHash = 0;
-		posHash ^= sPos.x + 0x9e3779b9 + (posHash << 6) + (posHash >> 2);
-		posHash ^= sPos.y + 0x9e3779b9 + (posHash << 6) + (posHash >> 2);
-		{
-			std::uniform_real_distribution<> dist(2.0, 4.0);
-			std::mt19937 rng(0 ^ posHash);
-			depth = static_cast<int>(round(dist(rng)));
-		}
-		{
-			std::uniform_real_distribution<> dist(4.0, 12.0);
-			std::mt19937 rng(0 ^ posHash);
-			sizeX = static_cast<int>(round(dist(rng)));
-		}
-		{
-			std::uniform_real_distribution<> dist(4.0, 12.0);
-			std::mt19937 rng(0 ^ posHash);
-			sizeY = static_cast<int>(round(dist(rng)));
-		}
-
-		float distFromCenterX = abs(vPos.x - sizeX / 2.0f);
-		float distFromCenterY = abs(vPos.z - sizeY / 2.0f);
-		float normalizedDist = sqrt((distFromCenterX * distFromCenterX) + (distFromCenterY * distFromCenterY)) / (sizeX / 2.0f);
-
-		int adjustedDepth = static_cast<int>(round(depth * (normalizedDist)));
-
-		if (vPos.y == adjustedDepth) return BLOCK_TYPE::GRASS;
-		if (vPos.y < adjustedDepth) return BLOCK_TYPE::NONE;
-
-		return BLOCK_TYPE::WATER;
-		});
-	structures[(int)STRUCTURE_TYPE::LAKE] = lake;
-
 	initialized = true;
 }
 
@@ -107,11 +67,14 @@ BLOCK_TYPE Structure::getBlock(glm::ivec3 pos) {
 }
 
 bool Structure::isInXZ(glm::ivec2 pos) {
+	if (getBase(pos) <= 6) return false;
+
 	glm::ivec2 sPos = {
 		(pos.x >= 0) ? pos.x / m_size.x : (pos.x - m_size.x + 1) / m_size.x,
 		(pos.y >= 0) ? pos.y / m_size.z : (pos.y - m_size.z + 1) / m_size.z
 	};
 	World* world = Game::getInstance()->getWorld();
+
 
 	return world->random(sPos, 4u * (int)m_type) <= m_probability;
 }

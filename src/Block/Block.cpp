@@ -51,6 +51,12 @@ const char* getTextureName(BLOCK_TYPE type) {
 	case BLOCK_TYPE::WATER:
 		return "water";
 
+	case BLOCK_TYPE::BEDROCK:
+		return "bedrock";
+
+	case BLOCK_TYPE::SAND:
+		return "sand";
+
 	default:
 		return "invalid";
 	}

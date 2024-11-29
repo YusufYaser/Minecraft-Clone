@@ -44,6 +44,8 @@ World::~World()
 }
 
 void World::render(Shader* shader) {
+    m_chunksRendered = false;
+
     Player* player = Game::getInstance()->getPlayer();
     if (player == nullptr) return;
 
@@ -100,6 +102,9 @@ void World::render(Shader* shader) {
             if (!chunk->loaded) continue;
 
             if (!chunk->renderingGroupsMutex.try_lock()) continue;
+
+            m_chunksRendered++;
+
             for (auto& [type, blocks] : chunk->renderingGroups) {
                 if (type == BLOCK_TYPE::NONE || type == BLOCK_TYPE::AIR) continue;
                 if (isBlockTypeTransparent(type)) { // TODO: do something better than this

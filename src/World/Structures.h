@@ -4,11 +4,10 @@
 #include "stdint.h"
 
 enum class STRUCTURE_TYPE : uint8_t {
-	TREE = 0,
-	LAKE
+	TREE = 0
 };
 
-#define STRUCTURES_COUNT 2
+#define STRUCTURES_COUNT 1
 
 struct StructureConfig {
 	int priority = 0;

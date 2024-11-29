@@ -164,7 +164,7 @@ void Player::checkInputs(float delta) {
 
     float pitch = glm::degrees(glm::asin(glm::dot(orientation, up)));
 
-    float maxPitch = 89.0f;
+    float maxPitch = 89.9f;
     if ((pitch - rotX) > maxPitch) {
         rotX = pitch - maxPitch;
     }

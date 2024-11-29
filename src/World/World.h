@@ -24,7 +24,7 @@ enum class Generator : uint8_t {
 struct WorldSettings {
 	siv::PerlinNoise::seed_type seed;
 	Generator generator = Generator::Default;
-	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE, STRUCTURE_TYPE::LAKE };
+	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE };
 };
 
 class World {
@@ -43,6 +43,7 @@ public:
 
 	size_t chunksLoaded();
 	size_t chunkLoadQueueCount();
+	int chunksRendered() { return m_chunksRendered; };
 
 	int getHeight(glm::ivec2 pos);
 	double random(glm::ivec2 pos, int seed = 0);
@@ -93,4 +94,6 @@ private:
 	std::mutex chunkLoadQueueMutex;
 
 	siv::PerlinNoise perlin;
+
+	int m_chunksRendered;
 };
