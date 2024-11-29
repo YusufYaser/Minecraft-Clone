@@ -27,7 +27,7 @@ void Player::update(float delta)
         }
     } else if (jumpSpeed != 0.0f) {
         Block* aboveBlock = world->getBlock(glm::vec3(iPos.x, pos.y + 1.8, iPos.z) + (jumpSpeed * delta) * up);
-        if (aboveBlock == nullptr) {
+        if (aboveBlock == nullptr || !aboveBlock->hasCollision()) {
             pos += (jumpSpeed * delta) * up;
             jumpSpeed -= 15.0f * delta;
             if (jumpSpeed <= 0.0f) {
@@ -98,13 +98,13 @@ void Player::checkInputs(float delta) {
                 round(pos.y + i),
                 round(pos.z)
                 });
-            if (block != nullptr) change.x = 0;
+            if (block != nullptr && block->hasCollision()) change.x = 0;
             block = world->getBlock({
                 round(pos.x),
                 round(pos.y + i),
                 round(pos.z + change.z + (change.z > 0 ? .15f : -.15f))
                 });
-            if (block != nullptr) change.z = 0;
+            if (block != nullptr && block->hasCollision()) change.z = 0;
         }
         pos += change;
     }
