@@ -68,6 +68,8 @@ void World::render(Shader* shader) {
 
     glm::ivec2 playerChunk = getPosChunk(player->pos);
 
+    std::unordered_map<Chunk*, std::vector<BLOCK_TYPE>> queued;
+
     for (int x = -(renderDistance / 2) + static_cast<int>(round(pos.x / 16)); x < (renderDistance / 2) + static_cast<int>(round(pos.x / 16)); x++) {
         for (int y = -(renderDistance / 2) + static_cast<int>(round(pos.z / 16)); y < (renderDistance / 2) + static_cast<int>(round(pos.z / 16)); y++) {
             glm::ivec2 cPos = glm::ivec2(x, y);
@@ -98,11 +100,10 @@ void World::render(Shader* shader) {
             if (!chunk->loaded) continue;
 
             if (!chunk->renderingGroupsMutex.try_lock()) continue;
-            std::vector<BLOCK_TYPE> queued;
             for (auto& [type, blocks] : chunk->renderingGroups) {
                 if (type == BLOCK_TYPE::NONE || type == BLOCK_TYPE::AIR) continue;
                 if (isBlockTypeTransparent(type)) { // TODO: do something better than this
-                    queued.push_back(type);
+                    queued[chunk].push_back(type);
                     continue;
                 }
                 glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
@@ -112,17 +113,20 @@ void World::render(Shader* shader) {
                     block->Render(shader, false);
                 }
             }
-            for (auto& type : queued) {
-                auto& blocks = chunk->renderingGroups[type];
-                glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
-
-                for (auto& block : blocks) {
-                    if (block == nullptr) continue;
-                    block->Render(shader, false);
-                }
-            }
             chunk->lastRendered = time(nullptr);
             chunk->renderingGroupsMutex.unlock();
+        }
+    }
+
+    for (auto& [chunk, types] : queued) {
+        for (auto& type : types) {
+            auto& blocks = chunk->renderingGroups[type];
+            glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
+
+            for (auto& block : blocks) {
+                if (block == nullptr) continue;
+                block->Render(shader, false);
+            }
         }
     }
 
