@@ -1,9 +1,10 @@
 #include "Image.h"
 #include "../../Game/Game.h"
 
-Image::Image(GLuint tex) {
+Image::Image(Texture* tex) {
 	m_tex = tex;
 	m_color = glm::vec4(1.0f);
+	m_size = { 0, tex->width, 0, tex->height };
 }
 
 void Image::render() {
@@ -55,7 +56,7 @@ void Image::render() {
 	glUniform2fv(guiShader->getUniformLoc("guiSize"), 1, glm::value_ptr(getGuiSize()));
 	glUniform4fv(guiShader->getUniformLoc("guiColor"), 1, glm::value_ptr(m_color));
 
-	glBindTexture(GL_TEXTURE_2D, m_tex);
+	glBindTexture(GL_TEXTURE_2D, m_tex->id);
 	glBindVertexArray(VAO);
 
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);

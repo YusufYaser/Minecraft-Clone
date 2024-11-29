@@ -71,31 +71,26 @@ void Player::checkInputs(float delta) {
         }
     }
 
-    bool moving = false;
-
     glm::vec3 change = glm::vec3();
 
     if (keyHandler->keyHeld(GLFW_KEY_W)) {
-        change += (speed * delta) * glm::normalize(orientation2);
-        moving = true;
+        change += glm::normalize(orientation2);
     }
     if (keyHandler->keyHeld(GLFW_KEY_S)) {
-        change += (-speed * delta) * glm::normalize(orientation2);
-        moving = true;
+        change += -glm::normalize(orientation2);
     }
     if (keyHandler->keyHeld(GLFW_KEY_A)) {
-        change += (-speed * delta) * glm::normalize(glm::cross(orientation2, up));
-        moving = true;
+        change += -glm::normalize(glm::cross(orientation2, up));
     }
     if (keyHandler->keyHeld(GLFW_KEY_D)) {
-        change += (speed * delta) * glm::normalize(glm::cross(orientation2, up));
-        moving = true;
+        change += glm::normalize(glm::cross(orientation2, up));
     }
     if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
         if (fallSpeed == 0.0f && jumpSpeed == 0.0f) jumpSpeed = 5.5f;
     }
 
-    if (moving) {
+    if (change != glm::vec3(0, 0, 0)) {
+        change = glm::normalize(change) * delta * speed;
         Block* block;
         for (int i = 0; i <= 1; i++) {
             block = world->getBlock({
@@ -114,10 +109,10 @@ void Player::checkInputs(float delta) {
         pos += change;
     }
 
-    if (keyHandler->keyHeld(GLFW_KEY_LEFT_CONTROL) && moving) {
+    if (keyHandler->keyHeld(GLFW_KEY_LEFT_CONTROL) && change != glm::vec3(0, 0, 0)) {
         speed = PLAYER_RUN_SPEED;
     }
-    if (!moving) {
+    if (change == glm::vec3(0, 0, 0)) {
         speed = PLAYER_SPEED;
     }
 

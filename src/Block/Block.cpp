@@ -153,7 +153,7 @@ void Block::Render(Shader* shader, bool bindTexture) {
 		glUniform1i(shader->getUniformLoc("highlighted"), 1);
 	}
 
-	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName()));
+	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName())->id);
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, faceCount * 6, GL_UNSIGNED_INT, 0);

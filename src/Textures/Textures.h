@@ -7,5 +7,11 @@
 #include <map>
 #include <string>
 
+struct Texture {
+	GLuint id;
+	int height;
+	int width;
+};
+
 void initializeTextures();
-GLuint getTexture(std::string name);
+Texture* getTexture(std::string name);

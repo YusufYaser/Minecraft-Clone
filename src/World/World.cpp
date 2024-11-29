@@ -100,11 +100,12 @@ void World::render(Shader* shader) {
             if (!chunk->renderingGroupsMutex.try_lock()) continue;
             std::vector<BLOCK_TYPE> queued;
             for (auto& [type, blocks] : chunk->renderingGroups) {
+                if (type == BLOCK_TYPE::NONE || type == BLOCK_TYPE::AIR) continue;
                 if (isBlockTypeTransparent(type)) { // TODO: do something better than this
                     queued.push_back(type);
                     continue;
                 }
-                glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type)));
+                glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
 
                 for (auto& block : blocks) {
                     if (block == nullptr) continue;
@@ -113,7 +114,7 @@ void World::render(Shader* shader) {
             }
             for (auto& type : queued) {
                 auto& blocks = chunk->renderingGroups[type];
-                glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type)));
+                glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
 
                 for (auto& block : blocks) {
                     if (block == nullptr) continue;

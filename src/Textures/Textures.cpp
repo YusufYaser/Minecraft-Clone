@@ -2,7 +2,7 @@
 
 using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 
-std::map<std::string, GLuint> textures;
+std::map<std::string, Texture*> textures;
 
 void initializeTextures() {
 	stbi_set_flip_vertically_on_load(true);
@@ -35,10 +35,15 @@ void initializeTextures() {
 
 		std::string name = dirEntry.path().stem().string();
 
-		textures[name] = ID;
+		Texture* tex = new Texture();
+		tex->id = ID;
+		tex->height = height;
+		tex->width = width;
+
+		textures[name] = tex;
 	}
 }
 
-GLuint getTexture(std::string name) {
+Texture* getTexture(std::string name) {
 	return textures[name];
 }
