@@ -35,6 +35,7 @@ void DebugText::render() {
 	text << "FPS: " << lastFps << " (" << delta << ")" << "\n";
 
 	text << "Screen Resolution: " << size.x << "x" << size.y << "\n";
+	text << "GPU: " << game->getGpu() << "\n\n";
 
 	if (player != nullptr) {
 		text << "Position: " << round(player->pos.x * 100) / 100;

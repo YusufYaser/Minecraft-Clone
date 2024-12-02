@@ -33,6 +33,8 @@ Game::Game(GameSettings& settings) {
 		return;
 	}
 
+	print("GPU:", getGpu());
+
 	// initialize shaders
 	print("Intializing shaders");
 	shader = new Shader(vertexShaderFile, fragmentShaderFile);
@@ -195,6 +197,15 @@ void Game::update(float delta) {
 
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();
+}
+
+const GLubyte* Game::getGpu()
+{
+	static const GLubyte* gpu = nullptr;
+	if (gpu == nullptr) {
+		gpu = glGetString(GL_RENDERER);
+	}
+	return gpu;
 }
 
 void Game::setGamePaused(bool paused) {

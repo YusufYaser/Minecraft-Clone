@@ -38,6 +38,8 @@ public:
 	Player* getPlayer() { return m_player; };
 	KeyHandler* getKeyHandler() { return m_keyHandler; };
 
+	const GLubyte* getGpu();
+
 	Shader* getGuiShader() { return guiShader; };
 
 	float getSimDelta() { return std::min(m_delta, .5f);  };
