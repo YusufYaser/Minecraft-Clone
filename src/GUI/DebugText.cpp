@@ -28,11 +28,13 @@ void DebugText::render() {
 	text << "\n\n";
 	static double lastFpsUpdated = 0;
 	static int lastFps = 0;
+	static float lastDelta = 0;
 	if (currentTime - lastFpsUpdated > .25) {
 		lastFps = static_cast<int>(round(1 / delta));
+		lastDelta = delta;
 		lastFpsUpdated = currentTime;
 	}
-	text << "FPS: " << lastFps << " (" << delta << ")" << "\n";
+	text << "FPS: " << lastFps << " (" << lastDelta << ")" << "\n";
 
 	text << "Screen Resolution: " << size.x << "x" << size.y << "\n";
 	text << "GPU: " << game->getGpu() << "\n\n";

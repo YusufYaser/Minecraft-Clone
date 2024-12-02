@@ -124,8 +124,8 @@ bool Game::shouldQuit() {
 	return (m_shouldQuit || glfwWindowShouldClose(getGlfwWindow())) && !m_loadingWorld;
 }
 
-void Game::update(float delta) {
-	m_delta = delta;
+void Game::update() {
+	double startTime = glfwGetTime();
 
 	m_keyHandler->update();
 
@@ -144,11 +144,6 @@ void Game::update(float delta) {
 	}
 
 	if (m_world == nullptr) m_gamePaused = true;
-
-	if (glfwGetWindowAttrib(getGlfwWindow(), GLFW_FOCUSED) == GLFW_FALSE) {
-		m_gamePaused = true;
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	}
 
 	glfwSetInputMode(getGlfwWindow(), GLFW_CURSOR, m_gamePaused ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 
@@ -197,6 +192,19 @@ void Game::update(float delta) {
 
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();
+
+	double endTime = glfwGetTime();
+	double targetFps = 60;
+
+	if (glfwGetWindowAttrib(getGlfwWindow(), GLFW_FOCUSED) == GLFW_FALSE) {
+		m_gamePaused = true;
+		if (targetFps > 5) targetFps = 5;
+	}
+
+	// limit FPS
+	while (targetFps != 0 && glfwGetTime() - startTime < 1.0 / targetFps);
+
+	m_delta = static_cast<float>(glfwGetTime() - startTime);
 }
 
 const GLubyte* Game::getGpu()

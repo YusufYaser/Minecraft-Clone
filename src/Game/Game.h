@@ -30,7 +30,7 @@ public:
 	void quit();
 	bool shouldQuit();
 
-	void update(float delta);
+	void update();
 
 	GameWindow* getGameWindow() { return m_gameWindow; };
 	GLFWwindow* getGlfwWindow() { return m_gameWindow->getGlfwWindow(); };

@@ -63,15 +63,8 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	double prevTime = glfwGetTime();
-
-	while (!game->shouldQuit() && !ctrlC)
-	{
-		double currentTime = glfwGetTime();
-		float delta = float(currentTime - prevTime);
-		prevTime = currentTime;
-
-		game->update(delta);
+	while (!game->shouldQuit() && !ctrlC) {
+		game->update();
 	}
 	print("Stopping game");
 
