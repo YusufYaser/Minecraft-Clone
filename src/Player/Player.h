@@ -8,9 +8,10 @@
 #include "../Block/Block.h"
 #include "../World/World.h"
 #include <GLFW/glfw3.h>
+#include "../GUI/Components/Image.h"
 
-#define PLAYER_SPEED 5.0f
-#define PLAYER_RUN_SPEED 7.5f
+constexpr auto PLAYER_SPEED = 5.0f;
+constexpr auto PLAYER_RUN_SPEED = 7.5f;
 
 class Player {
 public:

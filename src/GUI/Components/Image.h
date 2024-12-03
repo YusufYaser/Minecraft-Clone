@@ -10,6 +10,7 @@ public:
 	Image(Texture* tex);
 
 	void setColor(glm::vec4 color) { m_color = color; };
+	void setTexture(Texture* tex) { m_tex = tex; };
 
 	void render() override;
 

@@ -72,6 +72,11 @@ Game::Game(GameSettings& settings) {
 	m_crosshair->setPosition({ .5f, 0, .5f, 0 });
 	m_crosshair->setSize({ 0, 16, 0, 16 });
 
+	m_collOverlay = new Image(getTexture("stone"));
+	m_collOverlay->setPosition({ .5f, 0, .5f, 0 });
+	m_collOverlay->setSize({ 1, 0, 1, 0 });
+	m_collOverlay->setColor({ .25f, .25f, .25f, 1.0f });
+
 	m_keyHandler = new KeyHandler();
 
 	m_pauseMenu = new PauseMenu();
@@ -99,6 +104,9 @@ Game::~Game() {
 
 	delete m_crosshair;
 	m_crosshair = nullptr;
+
+	delete m_collOverlay;
+	m_collOverlay = nullptr;
 
 	delete shader;
 	shader = nullptr;
@@ -154,12 +162,6 @@ void Game::update() {
 
 	m_gameWindow->update();
 
-	if (!m_gamePaused) {
-		if (m_world != nullptr && m_player != nullptr) {
-			m_player->update(getSimDelta());
-		}
-	}
-
 	shader->activate();
 	glUniform1i(shader->getUniformLoc("gamePaused"), m_gamePaused);
 	if (m_gamePaused) {
@@ -183,14 +185,32 @@ void Game::update() {
 	glDepthRange(0, 0.01);
 	guiShader->activate();
 
-	if (!m_gamePaused) m_crosshair->render();
-
 	if (m_gamePaused) {
 		if (m_player != nullptr) {
 			m_pauseMenu->render();
 		} else {
 			m_mainMenu->render();
 		}
+	} else {
+		if (m_world != nullptr && m_player != nullptr) {
+			m_player->update(getSimDelta());
+		}
+
+		if (m_player != nullptr) {
+			glm::ivec3 iPos = glm::ivec3(
+				round(m_player->pos.x),
+				round(m_player->pos.y),
+				round(m_player->pos.z)
+			);
+
+			Block* upBlock = m_world->getBlock(iPos + glm::ivec3(0, 1, 0));
+			if (upBlock != nullptr) {
+				m_collOverlay->setTexture(getTexture(upBlock->getName()));
+				m_collOverlay->render();
+			}
+		}
+
+		m_crosshair->render();
 	}
 
 	if (m_debugTextVisible) DebugText::render();

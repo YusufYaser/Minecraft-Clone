@@ -42,7 +42,7 @@ public:
 
 	Shader* getGuiShader() { return guiShader; };
 
-	float getSimDelta() { return std::min(m_delta, .5f);  };
+	float getSimDelta() { return std::min(m_delta, .5f); };
 	// You should probably use getSimDelta() instead
 	float getDelta() { return m_delta; };
 
@@ -54,20 +54,21 @@ public:
 
 	void loadWorld();
 	void unloadWorld();
-	bool loadingWorld() { return m_loadingWorld;  };
+	bool loadingWorld() { return m_loadingWorld; };
 
 	bool successfullyLoaded() { return m_successfullyLoaded; };
 
 private:
 	static Game* _instance;
 	GameWindow* m_gameWindow;
-	
+
 	bool m_shouldQuit = false;
 
 	KeyHandler* m_keyHandler;
 	Player* m_player;
 	World* m_world;
 	Image* m_crosshair;
+	Image* m_collOverlay;
 
 	float m_delta = 1.0f;
 	int m_renderDistance;
@@ -83,9 +84,9 @@ private:
 	// gui
 	PauseMenu* m_pauseMenu;
 	MainMenu* m_mainMenu;
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	bool m_debugTextVisible = true;
-	#else
+#else
 	bool m_debugTextVisible = false;
-	#endif
+#endif
 };
