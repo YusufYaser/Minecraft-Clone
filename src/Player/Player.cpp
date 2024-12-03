@@ -121,6 +121,8 @@ void Player::checkInputs(float delta) {
     if (keyHandler->keyHeld(GLFW_KEY_3)) selectedBlock = BLOCK_TYPE::DIRT;
     if (keyHandler->keyHeld(GLFW_KEY_4)) selectedBlock = BLOCK_TYPE::OAK_LOG;
     if (keyHandler->keyHeld(GLFW_KEY_5)) selectedBlock = BLOCK_TYPE::OAK_LEAVES;
+    if (keyHandler->keyHeld(GLFW_KEY_6)) selectedBlock = BLOCK_TYPE::BEDROCK;
+    if (keyHandler->keyHeld(GLFW_KEY_7)) selectedBlock = BLOCK_TYPE::SAND;
 
     if (keyHandler->mouseClicked(GLFW_MOUSE_BUTTON_LEFT)) {
         Block* target = nullptr;

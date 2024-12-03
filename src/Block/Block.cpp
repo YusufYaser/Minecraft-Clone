@@ -97,14 +97,12 @@ void Block::Render(Shader* shader, bool bindTexture) {
 
 	BlockStructureData data = blockStructures[hiddenFaces];
 
-	if (data.VBO != 0)
-	{
+	if (data.VBO != 0) {
 		VBO = data.VBO;
 		VAO = data.VAO;
 		EBO = data.EBO;
 		faceCount = data.faceCount;
-	}
-	else {
+	} else {
 		GLfloat* vertices = new GLfloat[6 * 5 * 4];
 		GLuint* indices = new GLuint[6 * 6];
 
@@ -152,7 +150,7 @@ void Block::Render(Shader* shader, bool bindTexture) {
 	}
 
 	if (faceCount == 0) return;
-	
+
 	glUniform3iv(shader->getUniformLoc("blockPos"), 1, glm::value_ptr(pos));
 
 	if (highlighted) {

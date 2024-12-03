@@ -40,11 +40,11 @@ public:
 	Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces = 0);
 
 	void Render(Shader* shader, bool bindTexture = true);
-	const char* getName() { return getTextureName(type); };
-	glm::ivec3 getPos() { return pos;  };
-	BLOCK_TYPE getType() { return type; };
-	bool hasCollision() { return blockTypeHasCollision(type); };
-	bool hasTransparency() { return isBlockTypeTransparent(type); };
+	const char* getName() const { return getTextureName(type); };
+	glm::ivec3 getPos() const { return pos; };
+	BLOCK_TYPE getType() const { return type; };
+	bool hasCollision() const { return blockTypeHasCollision(type); };
+	bool hasTransparency() const { return isBlockTypeTransparent(type); };
 
 	bool highlighted = false;
 	uint8_t hiddenFaces;

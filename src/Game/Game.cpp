@@ -27,7 +27,12 @@ Game::Game(GameSettings& settings) {
 
 	m_renderDistance = settings.renderDistance;
 
+#ifndef _DEBUG
 	m_gameWindow = new GameWindow(854, 480, "Minecraft Clone");
+#else
+	m_gameWindow = new GameWindow(854, 480, "Minecraft Clone | Debug Build");
+#endif
+
 	if (m_gameWindow->getGlfwWindow() == NULL) {
 		error("Failed to create game window");
 		return;
@@ -112,7 +117,7 @@ Game::~Game() {
 	print("Terminating GLFW");
 	glfwTerminate();
 	gltTerminate();
-	
+
 	_instance = nullptr;
 }
 
@@ -194,7 +199,11 @@ void Game::update() {
 	glfwPollEvents();
 
 	double endTime = glfwGetTime();
+#ifndef _DEBUG
 	double targetFps = 60;
+#else
+	double targetFps = 0;
+#endif
 
 	if (glfwGetWindowAttrib(getGlfwWindow(), GLFW_FOCUSED) == GLFW_FALSE) {
 		m_gamePaused = true;
@@ -207,8 +216,7 @@ void Game::update() {
 	m_delta = static_cast<float>(glfwGetTime() - startTime);
 }
 
-const GLubyte* Game::getGpu()
-{
+const GLubyte* Game::getGpu() {
 	static const GLubyte* gpu = nullptr;
 	if (gpu == nullptr) {
 		gpu = glGetString(GL_RENDERER);
@@ -239,7 +247,7 @@ void Game::loadWorld() {
 
 	seed = dis(gen);
 	print("World Seed:", seed);
-	
+
 	std::thread t = std::thread([this](siv::PerlinNoise::seed_type seed) {
 		WorldSettings worldSettings;
 		worldSettings.seed = seed;
@@ -261,7 +269,7 @@ void Game::loadWorld() {
 
 		m_gamePaused = false;
 		m_loadingWorld = false;
-	}, seed);
+		}, seed);
 
 	t.detach();
 
