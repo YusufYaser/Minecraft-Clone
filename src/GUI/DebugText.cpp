@@ -25,7 +25,7 @@ void DebugText::render() {
 	if (game->gamePaused()) {
 		text << " (Paused)";
 	}
-	text << "\n\n";
+	text << "\n";
 	static double lastFpsUpdated = 0;
 	static int lastFps = 0;
 	static float lastDelta = 0;
@@ -34,10 +34,12 @@ void DebugText::render() {
 		lastDelta = delta;
 		lastFpsUpdated = currentTime;
 	}
-	text << "FPS: " << lastFps << " (" << lastDelta << ")" << "\n";
+	text << "FPS: " << lastFps << " (" << lastDelta << ")" << "\n\n";
 
-	text << "Screen Resolution: " << size.x << "x" << size.y << "\n";
-	text << "GPU: " << game->getGpu() << "\n\n";
+	text << "Resolution: " << size.x << "x" << size.y << "\n";
+	const GPUInfo* gpu = game->getGpuInfo();
+	text << "GPU: " << gpu->renderer << " (" << gpu->vendor << ")" << "\n";
+	text << "Version: " << gpu->version << "\n\n";
 
 	if (player != nullptr) {
 		text << "Position: " << round(player->pos.x * 100) / 100;

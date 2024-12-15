@@ -21,6 +21,12 @@ struct GameSettings {
 	int renderDistance = 6;
 };
 
+struct GPUInfo {
+	const GLubyte* vendor;
+	const GLubyte* renderer;
+	const GLubyte* version;
+};
+
 class Game {
 public:
 	Game(GameSettings& settings);
@@ -38,7 +44,7 @@ public:
 	Player* getPlayer() { return m_player; };
 	KeyHandler* getKeyHandler() { return m_keyHandler; };
 
-	const GLubyte* getGpu();
+	const GPUInfo* getGpuInfo();
 
 	Shader* getGuiShader() { return guiShader; };
 

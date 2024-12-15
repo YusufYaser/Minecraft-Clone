@@ -38,7 +38,9 @@ Game::Game(GameSettings& settings) {
 		return;
 	}
 
-	print("GPU:", getGpu());
+	const GPUInfo* gpu = getGpuInfo();
+	print("Using GPU:", gpu->renderer);
+	print("OpenGL and Driver Version:", gpu->version);
 
 	// initialize shaders
 	print("Intializing shaders");
@@ -236,10 +238,13 @@ void Game::update() {
 	m_delta = static_cast<float>(glfwGetTime() - startTime);
 }
 
-const GLubyte* Game::getGpu() {
-	static const GLubyte* gpu = nullptr;
+const GPUInfo* Game::getGpuInfo() {
+	static GPUInfo* gpu = nullptr;
 	if (gpu == nullptr) {
-		gpu = glGetString(GL_RENDERER);
+		gpu = new GPUInfo();
+		gpu->vendor = glGetString(GL_VENDOR);
+		gpu->renderer = glGetString(GL_RENDERER);
+		gpu->version = glGetString(GL_VERSION);
 	}
 	return gpu;
 }
