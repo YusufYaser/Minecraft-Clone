@@ -2,8 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-class GameWindow
-{
+class GameWindow {
 public:
 	GameWindow(int width, int height, const char* title);
 	~GameWindow();
@@ -13,6 +12,7 @@ public:
 	GLFWwindow* getGlfwWindow() { return glfwWindow; };
 
 	glm::vec2 getSize();
+	bool isFocused();
 
 private:
 	GLFWwindow* glfwWindow;

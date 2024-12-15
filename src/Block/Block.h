@@ -54,7 +54,7 @@ private:
 	glm::ivec3 pos;
 
 	struct BlockStructureData {
-		GLuint VAO, VBO, EBO;
+		GLuint VAO;
 		uint8_t faceCount;
 	};
 

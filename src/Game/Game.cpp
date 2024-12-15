@@ -55,9 +55,9 @@ Game::Game(GameSettings& settings) {
 	initializeTextures();
 
 	shader->activate();
-	glUniform1i(shader->getUniformLoc("tex0"), 0);
+	shader->setUniform("tex0", 0);
 	guiShader->activate();
-	glUniform1i(guiShader->getUniformLoc("tex0"), 0);
+	guiShader->setUniform("tex0", 0);
 	print("Loaded textures");
 
 	// load structures
@@ -163,7 +163,7 @@ void Game::update() {
 	m_gameWindow->update();
 
 	shader->activate();
-	glUniform1i(shader->getUniformLoc("gamePaused"), m_gamePaused);
+	shader->setUniform("gamePaused", m_gamePaused);
 	if (m_gamePaused) {
 		if (m_player != nullptr) {
 			glClearColor(.3f * .5f, .3f * .5f, 1.0f * .5f, 1);
@@ -225,7 +225,7 @@ void Game::update() {
 	double targetFps = 0;
 #endif
 
-	if (glfwGetWindowAttrib(getGlfwWindow(), GLFW_FOCUSED) == GLFW_FALSE) {
+	if (!m_gameWindow->isFocused()) {
 		m_gamePaused = true;
 		if (targetFps > 5) targetFps = 5;
 	}

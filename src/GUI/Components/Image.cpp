@@ -51,10 +51,10 @@ void Image::render() {
 	}
 
 	guiShader->activate();
-	
-	glUniform2fv(guiShader->getUniformLoc("guiPos"), 1, glm::value_ptr(getGuiPos()));
-	glUniform2fv(guiShader->getUniformLoc("guiSize"), 1, glm::value_ptr(getGuiSize()));
-	glUniform4fv(guiShader->getUniformLoc("guiColor"), 1, glm::value_ptr(m_color));
+
+	guiShader->setUniform("guiPos", getGuiPos());
+	guiShader->setUniform("guiSize", getGuiSize());
+	guiShader->setUniform("guiColor", m_color);
 
 	glBindTexture(GL_TEXTURE_2D, m_tex->id);
 	glBindVertexArray(VAO);

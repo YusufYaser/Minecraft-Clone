@@ -42,7 +42,11 @@ void GameWindow::update() {
 glm::vec2 GameWindow::getSize() {
 	int width, height;
 	glfwGetWindowSize(getGlfwWindow(), &width, &height);
-	if (width == 0) width = 1;
-	if (height == 0) height = 1;
+	if (width == 0) width = 2;
+	if (height == 0) height = 2;
 	return glm::vec2(width + width % 2, height + height % 2);
+}
+
+bool GameWindow::isFocused() {
+	return glfwGetWindowAttrib(glfwWindow, GLFW_FOCUSED) == GLFW_TRUE;
 }

@@ -48,9 +48,9 @@ void World::render(Shader* shader) {
 	Player* player = Game::getInstance()->getPlayer();
 	if (player == nullptr) return;
 
-	shader->activate();
-	glUniformMatrix4fv(shader->getUniformLoc("view"), 1, GL_FALSE, glm::value_ptr(player->getView()));
-	glUniformMatrix4fv(shader->getUniformLoc("projection"), 1, GL_FALSE, glm::value_ptr(player->getProjection()));
+	shader->activate();;
+	shader->setUniform("view", player->getView());
+	shader->setUniform("projection", player->getProjection());
 
 	Block* targetBlock = nullptr;
 	player->getTargetBlock(&targetBlock);
@@ -59,8 +59,8 @@ void World::render(Shader* shader) {
 
 	glm::vec3 pos = player->getCameraPos();
 	int renderDistance = Game::getInstance()->getRenderDistance();
-	glUniform1i(shader->getUniformLoc("highlighted"), 0);
-	glUniform1i(shader->getUniformLoc("isLiquidTop"), false);
+	shader->setUniform("highlighted", false);
+	shader->setUniform("isLiquidTop", false);
 
 	const int CHUNKS_TO_LOAD_SIZE = 256;
 	glm::ivec2 chunksToLoad[CHUNKS_TO_LOAD_SIZE];
@@ -105,6 +105,7 @@ void World::render(Shader* shader) {
 			m_chunksRendered++;
 
 			for (auto& [type, blocks] : chunk->renderingGroups) {
+				double startTime = glfwGetTime();
 				if (type == BLOCK_TYPE::NONE || type == BLOCK_TYPE::AIR) continue;
 				if (isBlockTypeTransparent(type)) { // TODO: do something better than this
 					queued[chunk].push_back(type);
@@ -135,7 +136,7 @@ void World::render(Shader* shader) {
 						isLiquidTop = true;
 					}
 				}
-				glUniform1i(shader->getUniformLoc("isLiquidTop"), isLiquidTop);
+				shader->setUniform("isLiquidTop", isLiquidTop);
 				block->Render(shader, false);
 			}
 		}

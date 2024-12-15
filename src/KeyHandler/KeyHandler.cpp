@@ -2,62 +2,64 @@
 #include "../Game/Game.h"
 
 KeyHandler::KeyHandler() {
-    m_window = Game::getInstance()->getGlfwWindow();
+	m_gameWindow = Game::getInstance()->getGameWindow();
 }
 
 void KeyHandler::update() {
-    prevKeyboardStates = keyboardStatesToSet;
-    prevMouseStates = mouseStatesToSet;
+	prevKeyboardStates = keyboardStatesToSet;
+	prevMouseStates = mouseStatesToSet;
 }
 
 bool KeyHandler::keyHeld(int key) {
-    if (glfwGetWindowAttrib(m_window, GLFW_FOCUSED) == GLFW_FALSE) return false;
+	if (!m_gameWindow->isFocused()) return false;
 
-    return glfwGetKey(m_window, key) == GLFW_PRESS;
+	return glfwGetKey(m_gameWindow->getGlfwWindow(), key) == GLFW_PRESS;
 }
 
 bool KeyHandler::keyClicked(int key) {
-    bool held = keyHeld(key);
+	bool held = keyHeld(key);
 
-    if (!held) {
-        keyboardStatesToSet[key] = false;
-        return false;
-    }
+	if (!held) {
+		keyboardStatesToSet[key] = false;
+		return false;
+	}
 
-    // was held in previous frame
-    if (prevKeyboardStates[key] && held) return false;
+	// was held in previous frame
+	if (prevKeyboardStates[key] && held) return false;
 
-    keyboardStatesToSet[key] = true;
+	keyboardStatesToSet[key] = true;
 
-    return true;
+	return true;
 }
 
 bool KeyHandler::keyReleased(int key) {
-    // if it is not held and it was pressed in the previous frame
-    return !keyHeld(key) && prevKeyboardStates[key];
+	// if it is not held and it was pressed in the previous frame
+	return !keyHeld(key) && prevKeyboardStates[key];
 }
 
 bool KeyHandler::mouseHeld(int key) {
-    return glfwGetMouseButton(m_window, key) == GLFW_PRESS;
+	if (!m_gameWindow->isFocused()) return false;
+
+	return glfwGetMouseButton(m_gameWindow->getGlfwWindow(), key) == GLFW_PRESS;
 }
 
 bool KeyHandler::mouseClicked(int key) {
-    bool held = mouseHeld(key);
+	bool held = mouseHeld(key);
 
-    if (!held) {
-        mouseStatesToSet[key] = false;
-        return false;
-    }
+	if (!held) {
+		mouseStatesToSet[key] = false;
+		return false;
+	}
 
-    // was held in previous frame
-    if (prevMouseStates[key] && held) return false;
+	// was held in previous frame
+	if (prevMouseStates[key] && held) return false;
 
-    mouseStatesToSet[key] = true;
+	mouseStatesToSet[key] = true;
 
-    return true;
+	return true;
 }
 
 bool KeyHandler::mouseReleased(int key) {
-    // if it is not held and it was pressed in the previous frame
-    return !mouseHeld(key) && prevMouseStates[key];
+	// if it is not held and it was pressed in the previous frame
+	return !mouseHeld(key) && prevMouseStates[key];
 }

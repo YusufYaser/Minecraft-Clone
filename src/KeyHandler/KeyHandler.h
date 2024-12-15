@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 #include <unordered_map>
+#include "../GameWindow/GameWindow.h"
 
 class KeyHandler {
 public:
@@ -22,7 +23,7 @@ public:
 	bool mouseReleased(int key);
 
 private:
-	GLFWwindow* m_window;
+	GameWindow* m_gameWindow;
 
 	std::unordered_map<int, bool> keyboardStatesToSet;
 	std::unordered_map<int, bool> prevKeyboardStates;

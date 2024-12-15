@@ -1,17 +1,6 @@
 #include "Button.h"
 #include "../../Game/Game.h"
 
-GLfloat vertices[] = {
-	-0.5f, -0.5f, -1.0f,		0.0f, 0.0f,
-	 0.5f, -0.5f, -1.0f,		1.0f, 0.0f,
-	 0.5f,  0.5f, -1.0f,		1.0f, 1.0f,
-	 -0.5f,  0.5f, -1.0f,		0.0f, 1.0f,
-};
-
-GLuint indices[] = {
-	0, 1, 2, 0, 2, 3
-};
-
 Button::Button() {
 	m_text = new Text();
 	m_text->setCentered(true);
@@ -52,7 +41,7 @@ bool Button::isHovered() {
 	return (
 		posS.x >= guiPos.x - guiSize.x / 2 && posS.x <= guiPos.x + guiSize.x / 2 &&
 		posS.y >= guiPos.y - guiSize.y / 2 && posS.y <= guiPos.y + guiSize.y / 2
-	);
+		);
 }
 
 bool Button::isClicked() {

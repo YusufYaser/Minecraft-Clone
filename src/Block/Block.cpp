@@ -92,17 +92,17 @@ Block::Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces) {
 void Block::Render(Shader* shader, bool bindTexture) {
 	if (hiddenFaces == 63) return;
 
-	GLuint VBO, EBO, VAO;
+	GLuint VAO;
 	uint8_t faceCount = 0;
 
 	BlockStructureData data = blockStructures[hiddenFaces];
 
-	if (data.VBO != 0) {
-		VBO = data.VBO;
+	if (data.VAO != 0) {
 		VAO = data.VAO;
-		EBO = data.EBO;
 		faceCount = data.faceCount;
 	} else {
+		GLuint VBO, EBO;
+
 		GLfloat* vertices = new GLfloat[6 * 5 * 4];
 		GLuint* indices = new GLuint[6 * 6];
 
@@ -142,19 +142,17 @@ void Block::Render(Shader* shader, bool bindTexture) {
 		delete[] vertices;
 		delete[] indices;
 
-		data.VBO = VBO;
 		data.VAO = VAO;
-		data.EBO = EBO;
 		data.faceCount = faceCount;
 		blockStructures[hiddenFaces] = data;
 	}
 
 	if (faceCount == 0) return;
 
-	glUniform3iv(shader->getUniformLoc("blockPos"), 1, glm::value_ptr(pos));
+	shader->setUniform("blockPos", pos);
 
 	if (highlighted) {
-		glUniform1i(shader->getUniformLoc("highlighted"), 1);
+		shader->setUniform("highlighted", true);
 	}
 
 	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName())->id);
@@ -163,6 +161,6 @@ void Block::Render(Shader* shader, bool bindTexture) {
 	glDrawElements(GL_TRIANGLES, faceCount * 6, GL_UNSIGNED_INT, 0);
 
 	if (highlighted) {
-		glUniform1i(shader->getUniformLoc("highlighted"), 0);
+		shader->setUniform("highlighted", false);
 	}
 }
