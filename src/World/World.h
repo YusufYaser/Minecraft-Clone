@@ -22,7 +22,7 @@ enum class Generator : uint8_t {
 };
 
 struct WorldSettings {
-	siv::PerlinNoise::seed_type seed;
+	siv::PerlinNoise::seed_type seed = 0u;
 	Generator generator = Generator::Default;
 	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE };
 };
@@ -45,6 +45,7 @@ public:
 	size_t chunkLoadQueueCount();
 	int chunksRendered() { return m_chunksRendered; };
 
+	// Get the height at a position from the world generator
 	int getHeight(glm::ivec2 pos);
 	double random(glm::ivec2 pos, int seed = 0);
 
@@ -57,11 +58,11 @@ private:
 	std::vector<Structure*> structures;
 
 	struct Chunk {
-		bool loaded;
-		bool permanentlyLoaded;
+		bool loaded = false;
+		bool permanentlyLoaded = false;
 		std::mutex blocksMutex;
 		std::mutex renderingGroupsMutex;
-		time_t lastRendered;
+		time_t lastRendered = 0;
 		std::unordered_map<std::size_t, Block*> blocks;
 		std::unordered_map<BLOCK_TYPE, std::vector<Block*>> renderingGroups;
 
@@ -95,5 +96,5 @@ private:
 
 	siv::PerlinNoise perlin;
 
-	int m_chunksRendered;
+	int m_chunksRendered = 0;
 };

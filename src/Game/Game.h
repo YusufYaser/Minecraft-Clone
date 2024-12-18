@@ -46,50 +46,50 @@ public:
 
 	const GPUInfo* getGpuInfo();
 
-	Shader* getGuiShader() { return guiShader; };
+	Shader* getGuiShader() const { return guiShader; };
 
-	float getSimDelta() { return std::min(m_delta, .5f); };
+	float getSimDelta() const { return std::min(m_delta, .5f); };
 	// You should probably use getSimDelta() instead
-	float getDelta() { return m_delta; };
+	float getDelta() const { return m_delta; };
 
-	bool gamePaused() { return m_gamePaused; };
+	bool gamePaused() const { return m_gamePaused; };
 	void setGamePaused(bool paused);
 
-	int getRenderDistance() { return m_renderDistance; };
+	int getRenderDistance() const { return m_renderDistance; };
 	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };
 
 	void loadWorld();
 	void unloadWorld();
-	bool loadingWorld() { return m_loadingWorld; };
+	bool loadingWorld() const { return m_loadingWorld; };
 
-	bool successfullyLoaded() { return m_successfullyLoaded; };
+	bool successfullyLoaded() const { return m_successfullyLoaded; };
 
 private:
 	static Game* _instance;
-	GameWindow* m_gameWindow;
+	GameWindow* m_gameWindow = nullptr;
 
 	bool m_shouldQuit = false;
 
-	KeyHandler* m_keyHandler;
-	Player* m_player;
-	World* m_world;
-	Image* m_crosshair;
-	Image* m_collOverlay;
+	KeyHandler* m_keyHandler = nullptr;
+	Player* m_player = nullptr;
+	World* m_world = nullptr;
+	Image* m_crosshair = nullptr;
+	Image* m_collOverlay = nullptr;
 
 	float m_delta = 1.0f;
-	int m_renderDistance;
+	int m_renderDistance = 6;
 
 	bool m_gamePaused = false;
 
 	bool m_loadingWorld = false;
 	bool m_successfullyLoaded = false;
 
-	Shader* shader;
-	Shader* guiShader;
+	Shader* shader = nullptr;
+	Shader* guiShader = nullptr;
 
 	// gui
-	PauseMenu* m_pauseMenu;
-	MainMenu* m_mainMenu;
+	PauseMenu* m_pauseMenu = nullptr;
+	MainMenu* m_mainMenu = nullptr;
 #ifdef _DEBUG
 	bool m_debugTextVisible = true;
 #else

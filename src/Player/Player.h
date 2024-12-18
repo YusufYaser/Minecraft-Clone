@@ -29,10 +29,10 @@ public:
 	void update(float delta);
 
 	void getTargetBlock(Block** block, BLOCK_FACE* face = nullptr);
-	glm::vec3 getCameraPos() { return pos + up; };
+	glm::vec3 getCameraPos() const { return pos + up; };
 
-	glm::mat4 getProjection();
-	glm::mat4 getView();
+	glm::mat4 getProjection() const;
+	glm::mat4 getView() const;
 
 private:
 	bool wasHidden = false;

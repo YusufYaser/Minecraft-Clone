@@ -15,5 +15,5 @@ public:
 	bool isFocused();
 
 private:
-	GLFWwindow* glfwWindow;
+	GLFWwindow* glfwWindow = nullptr;
 };

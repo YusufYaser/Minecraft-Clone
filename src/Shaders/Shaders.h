@@ -18,7 +18,7 @@ public:
 	bool successfullyLoaded() { return m_successfullyLoaded; };
 
 private:
-	GLuint m_id;
+	GLuint m_id = 0;
 
 	std::unordered_map<const GLchar*, GLuint> m_uniformLocs;
 

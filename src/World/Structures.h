@@ -36,11 +36,11 @@ public:
 private:
 	static bool initialized;
 
-	float m_probability;
-	int m_priority;
+	float m_probability = 0;
+	int m_priority = 0;
 	glm::ivec3 m_size;
 	glm::ivec3 m_pivot;
-	std::function<BLOCK_TYPE (glm::ivec2, glm::ivec3)> m_getBlock;
+	std::function<BLOCK_TYPE(glm::ivec2, glm::ivec3)> m_getBlock;
 	STRUCTURE_TYPE m_type;
 
 	static Structure* structures[STRUCTURES_COUNT];

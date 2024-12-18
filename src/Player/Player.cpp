@@ -184,7 +184,7 @@ void Player::checkInputs(float delta) {
 }
 
 void Player::getTargetBlock(Block** block, BLOCK_FACE* face) {
-	glm::vec3 oldBlockPos;
+	glm::vec3 oldBlockPos = glm::vec3();
 	glm::vec3 cameraPos = getCameraPos();
 	for (float i = 0; i < reachDistance; i += .01f) {
 		glm::vec3 blockPosNoCeil = cameraPos + i * orientation;
@@ -218,7 +218,7 @@ void Player::getTargetBlock(Block** block, BLOCK_FACE* face) {
 	*block = nullptr;
 }
 
-glm::mat4 Player::getProjection() {
+glm::mat4 Player::getProjection() const {
 	static bool wasRunning = false;
 	static double toggledRunning;
 	double currentTime = glfwGetTime();
@@ -247,6 +247,6 @@ glm::mat4 Player::getProjection() {
 	return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, 1000.0f);
 }
 
-glm::mat4 Player::getView() {
+glm::mat4 Player::getView() const {
 	return glm::lookAt(getCameraPos(), getCameraPos() + orientation, up);
 }
