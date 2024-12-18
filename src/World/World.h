@@ -24,7 +24,7 @@ enum class Generator : uint8_t {
 struct WorldSettings {
 	siv::PerlinNoise::seed_type seed = 0u;
 	Generator generator = Generator::Default;
-	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE };
+	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE, STRUCTURE_TYPE::HOUSE };
 };
 
 class World {

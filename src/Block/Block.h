@@ -16,7 +16,8 @@ enum class BLOCK_TYPE : uint8_t {
 	OAK_LEAVES,
 	WATER,
 	BEDROCK,
-	SAND
+	SAND,
+	OAK_PLANKS
 };
 
 const int BLOCK_TYPE_COUNT = 6;

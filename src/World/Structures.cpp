@@ -34,6 +34,45 @@ void Structure::initialize() {
 		});
 	structures[(int)STRUCTURE_TYPE::TREE] = tree;
 
+	print("Initializing house");
+	StructureConfig houseConfig;
+	houseConfig.priority = 1;
+	houseConfig.probability = .01f;
+	houseConfig.size = { 7, 7, 7 };
+	houseConfig.pivot = { 2, 1, 2 };
+	Structure* house = new Structure(STRUCTURE_TYPE::HOUSE, houseConfig, [](glm::ivec2 sPos, glm::ivec3 vPos) {
+		// floor
+		if (vPos.y == 0 && vPos.x > 1 && vPos.x < 6 && vPos.z > 1 && vPos.z < 6) return BLOCK_TYPE::OAK_PLANKS;
+
+		if (vPos.y < 3) {
+			// make walls
+			if ((vPos.x == 1 || vPos.x == 5) && vPos.z != 0 && vPos.z != 6) return BLOCK_TYPE::OAK_PLANKS;
+			if ((vPos.z == 1 || vPos.z == 5) && vPos.x != 0 && vPos.x != 6) {
+				// door
+				if (vPos.x == 3 && vPos.z == 1 && (vPos.y == 1 || vPos.y == 2)) return BLOCK_TYPE::AIR;
+
+				return BLOCK_TYPE::OAK_PLANKS;
+			}
+
+			// house interior (air)
+			if (vPos.x > 1 && vPos.x < 5 && vPos.z > 1 && vPos.z < 5) return BLOCK_TYPE::AIR;
+		} else {
+			int y = vPos.y - 3;
+			// top part
+			if (vPos.x == y || vPos.x == 6 - y) return BLOCK_TYPE::OAK_LOG;
+			if (vPos.x == y || vPos.x == 6 - y) return BLOCK_TYPE::OAK_LOG;
+
+			if (vPos.x > y && vPos.x < 6 - y) {
+				if (vPos.z == 1 || vPos.z == 5) return BLOCK_TYPE::OAK_PLANKS;
+				// top part interior (air)
+				if (vPos.z > 1 && vPos.z < 5) return BLOCK_TYPE::AIR;
+			}
+		}
+
+		return BLOCK_TYPE::NONE;
+		});
+	structures[(int)STRUCTURE_TYPE::HOUSE] = house;
+
 	initialized = true;
 }
 
@@ -67,7 +106,7 @@ BLOCK_TYPE Structure::getBlock(glm::ivec3 pos) {
 }
 
 bool Structure::isInXZ(glm::ivec2 pos) {
-	if (getBase(pos) <= 6) return false;
+	if (getBase(pos) + m_pivot.y <= 6) return false;
 
 	glm::ivec2 sPos = {
 		(pos.x >= 0) ? pos.x / m_size.x : (pos.x - m_size.x + 1) / m_size.x,
@@ -90,5 +129,5 @@ int Structure::getBase(glm::ivec2 pos) {
 	return world->getHeight({
 		(sPos.x * m_size.x) + m_pivot.x,
 		(sPos.y * m_size.z) + m_pivot.z
-	}) - m_pivot.y;
+		}) - m_pivot.y;
 }

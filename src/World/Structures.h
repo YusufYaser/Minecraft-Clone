@@ -4,7 +4,8 @@
 #include "stdint.h"
 
 enum class STRUCTURE_TYPE : uint8_t {
-	TREE = 0
+	TREE = 0,
+	HOUSE
 };
 
 #define STRUCTURES_COUNT 1
