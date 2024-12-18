@@ -58,7 +58,7 @@ public:
 	int getRenderDistance() const { return m_renderDistance; };
 	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };
 
-	void loadWorld();
+	void loadWorld(WorldSettings& settings);
 	void unloadWorld();
 	bool loadingWorld() const { return m_loadingWorld; };
 

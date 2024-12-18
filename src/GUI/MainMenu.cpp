@@ -12,9 +12,14 @@ MainMenu::MainMenu() {
 	newWorld->setText("New World");
 	newWorld->setPosition({ .5f, 0, .5f, 0 });
 
+	worldType = new Button();
+	worldType->setText("World Type: Default");
+	worldType->setPosition({ .5f, 0, .5f, 50 });
+	generator = Generator::Default;
+
 	quit = new Button();
 	quit->setText("Quit Game");
-	quit->setPosition({ .5f, 0, .5f, 50 });
+	quit->setPosition({ .5f, 0, .5f, 100 });
 
 	credits = new Text();
 	credits->setText("Minecraft Clone - github.com/YusufYaser/Minecraft-Clone");
@@ -41,19 +46,44 @@ void MainMenu::render() {
 		} else {
 			newWorld->setText("Loading World");
 		}
-		newWorld->setEnabled(false);
 	} else {
 		newWorld->setText("New World");
-		newWorld->setEnabled(true);
 	}
 
+	newWorld->setEnabled(!game->loadingWorld());
+	worldType->setEnabled(!game->loadingWorld());
+
 	newWorld->render();
+	worldType->render();
 	quit->render();
 	title->render();
 	credits->render();
 
 	if (newWorld->isClicked()) {
-		game->loadWorld();
+		WorldSettings settings;
+		settings.generator = generator;
+		game->loadWorld(settings);
+	}
+
+	if (worldType->isClicked()) {
+		generator = Generator(int(generator) + 1);
+		if (int(generator) >= 3) generator = Generator(0);
+
+		const char* name = "Invalid";
+		switch (generator) {
+		case Generator::Default:
+			name = "Default";
+			break;
+		case Generator::Flat:
+			name = "Flat";
+			break;
+		case Generator::Void:
+			name = "Void";
+			break;
+		}
+
+		std::string worldTypeText = "World Type: " + std::string(name);
+		worldType->setText(worldTypeText.c_str());
 	}
 
 	if (quit->isClicked()) {

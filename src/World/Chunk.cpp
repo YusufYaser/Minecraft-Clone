@@ -18,7 +18,7 @@ void World::chunkLoaderFunc() {
 
 		if (generator == Generator::Void) {
 			if (pos.x == 0 && pos.y == 0) {
-				setBlock({ 0, 0, 0 }, BLOCK_TYPE::STONE);
+				setBlock({ 0, 0, 0 }, BLOCK_TYPE::BEDROCK);
 			}
 			chunk->loaded = true;
 			continue;

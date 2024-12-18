@@ -257,27 +257,27 @@ void Game::setGamePaused(bool paused) {
 	glfwSetCursorPos(getGlfwWindow(), size.x / 2, size.y / 2);
 }
 
-void Game::loadWorld() {
+void Game::loadWorld(WorldSettings& settings) {
 	if (m_loadingWorld) return;
 	m_loadingWorld = true;
 
 	print("Creating world");
-	siv::PerlinNoise::seed_type seed = 0;
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(
-		std::numeric_limits<siv::PerlinNoise::seed_type>::min(),
-		std::numeric_limits<siv::PerlinNoise::seed_type>::max()
-	);
 
-	seed = dis(gen);
-	print("World Seed:", seed);
+	if (settings.seed == 0) {
+		siv::PerlinNoise::seed_type seed = 0;
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(
+			std::numeric_limits<siv::PerlinNoise::seed_type>::min(),
+			std::numeric_limits<siv::PerlinNoise::seed_type>::max()
+		);
 
-	std::thread t = std::thread([this](siv::PerlinNoise::seed_type seed) {
-		WorldSettings worldSettings;
-		worldSettings.seed = seed;
+		settings.seed = dis(gen);
+	}
+	print("World Seed:", settings.seed);
 
-		m_world = new World(worldSettings);
+	std::thread t = std::thread([this](WorldSettings settings) {
+		m_world = new World(settings);
 		for (int x = -2; x < 2; x++) {
 			for (int y = -2; y < 2; y++) {
 				m_world->loadChunk(glm::ivec2(x, y), true);
@@ -294,7 +294,7 @@ void Game::loadWorld() {
 
 		m_gamePaused = false;
 		m_loadingWorld = false;
-		}, seed);
+		}, settings);
 
 	t.detach();
 
