@@ -49,7 +49,10 @@ public:
 	Shader* getShader() const { return shader; };
 	Shader* getGuiShader() const { return guiShader; };
 
-	float getSimDelta() const { return std::min(m_delta, .5f); };
+	// If the game is paused, zero is returned
+	// If the game is running under 10 FPS, this function will return the time delta for 10 FPS.
+	// Otherwise, this function returns the real time delta
+	float getSimDelta() const { return !m_gamePaused ? std::min(m_delta, 1.0f / 10) : 0; };
 	// You should probably use getSimDelta() instead
 	float getDelta() const { return m_delta; };
 
