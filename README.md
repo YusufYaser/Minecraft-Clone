@@ -6,9 +6,9 @@ This is my own Minecraft Clone and also my first game engine created using OpenG
 - 🌍 Infinite World Generation
 - 🏢 Structures Generation
 - 💡 Lighting System
+- 🕑 World Tick System
 
 ## Planned Features
 - 💾 World Saving
-- 🕑 World Tick System
 - 🪨 Cave System
 - ❤️ Survival Gamemode

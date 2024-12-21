@@ -32,7 +32,7 @@ public:
 	World(WorldSettings& settings);
 	~World();
 
-	void render(Shader* shader);
+	void render();
 
 	Block* getBlock(glm::ivec3 pos);
 	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
@@ -49,13 +49,16 @@ public:
 	int getHeight(glm::ivec2 pos);
 	double random(glm::ivec2 pos, int seed = 0);
 
+	int getTick() const { return m_tick.load(); }
 	int getTime();
+
 	float getAmbientLight();
+
 
 private:
 	std::atomic<bool> unloading;
 
-	int m_time;
+	std::atomic<int> m_tick;
 
 	siv::PerlinNoise::seed_type seed;
 	Generator generator;
@@ -96,6 +99,8 @@ private:
 	void chunkLoaderFunc();
 	std::thread chunkUnloader;
 	void chunkUnloaderFunc();
+	std::thread tickThread;
+	void tick();
 	std::vector<glm::ivec2> chunkLoadQueue;
 	std::mutex chunkLoadQueueMutex;
 

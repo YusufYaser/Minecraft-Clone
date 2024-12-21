@@ -187,7 +187,7 @@ void Game::update() {
 	glm::vec2 size = m_gameWindow->getSize();
 
 	if (m_world != nullptr) {
-		m_world->render(shader);
+		m_world->render();
 	}
 
 	glDepthRange(0, 0.01);

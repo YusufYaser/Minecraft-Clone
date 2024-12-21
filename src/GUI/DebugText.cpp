@@ -21,11 +21,11 @@ void DebugText::render() {
 	World* world = game->getWorld();
 
 	std::stringstream text;
-	text << "Minecraft Clone - " << game->getBuild() << " ";
+	text << "Minecraft Clone";
 	if (game->gamePaused()) {
 		text << " (Paused)";
 	}
-	text << "\n";
+	text << "\nBuild: " << game->getBuild() << "\n";
 	static double lastFpsUpdated = 0;
 	static int lastFps = 0;
 	static float lastDelta = 0;
@@ -57,7 +57,8 @@ void DebugText::render() {
 		text << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
 		text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n\n";
 
-		text << "World Time: " << world->getTime() << "\n";
+		text << "World Time: " << world->getTime();
+		text << " (Day " << floor(world->getTime() / 24000.0f) << ")\n";
 		text << "World Seed: " << world->getSeed() << "\n\n";
 	}
 
@@ -73,6 +74,7 @@ void DebugText::render() {
 			text << " Block Position: " << round(bPos.x * 100) / 100;
 			text << ", " << round(bPos.y * 100) / 100;
 			text << ", " << round(bPos.z * 100) / 100 << "\n";
+			text << " Ambient Light: " << world->getAmbientLight() << "\n";
 			text << "==================\n";
 		}
 	}

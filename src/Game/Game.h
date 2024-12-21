@@ -46,6 +46,7 @@ public:
 
 	const GPUInfo* getGpuInfo();
 
+	Shader* getShader() const { return shader; };
 	Shader* getGuiShader() const { return guiShader; };
 
 	float getSimDelta() const { return std::min(m_delta, .5f); };

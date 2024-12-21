@@ -26,10 +26,36 @@ World::World(WorldSettings& settings) {
 	chunkUnloader = std::thread([this]() {
 		chunkUnloaderFunc();
 		});
+
+	tickThread = std::thread([this]() {
+		Game* game = Game::getInstance();
+
+		double lastTick = glfwGetTime();
+		double delta = 0;
+
+		while (!unloading) {
+			double currentTime = glfwGetTime();
+
+			if (game->gamePaused()) {
+				// maintain the tick delta until the game gets unpaused
+				lastTick = currentTime - delta;
+				continue;
+			}
+
+			delta = currentTime - lastTick;
+
+			if (delta >= 1.0 / 20) {
+				tick();
+				lastTick = currentTime;
+			}
+		}
+		});
 }
 
 World::~World() {
 	unloading.store(true);
+	print("Waiting for world tick thread...");
+	tickThread.join();
 	print("Waiting for chunk loader thread...");
 	chunkLoader.join();
 	print("Waiting for chunk unloader thread...");
@@ -42,11 +68,13 @@ World::~World() {
 	}
 }
 
-void World::render(Shader* shader) {
+void World::render() {
 	m_chunksRendered = false;
 
 	Player* player = Game::getInstance()->getPlayer();
 	if (player == nullptr) return;
+
+	Shader* shader = Game::getInstance()->getShader();
 
 	shader->activate();;
 	shader->setUniform("view", player->getView());
@@ -170,14 +198,18 @@ void World::render(Shader* shader) {
 	if (targetBlock != nullptr) targetBlock->highlighted = false;
 }
 
+void World::tick() {
+	m_tick++;
+}
+
 float World::getAmbientLight() {
-	float light = (sin((getTime() / 1200.0f) * 3.14f / 2.0f) + 1.0f) / 2.0f;
+	const double halfPi = acos(0.0); // 3.14 / 2
+
+	float light = static_cast<float>((sin(((getTime() / 12000.0f) + 1) * halfPi) + 1.0f) / 2.0f);
 	light *= 1 - .1f;
 	return light + .1f;
 }
 
 int World::getTime() {
-	// For obvious reasons, this is not the best way to do it
-	// I'll be keeping it like that for now until I add a tick system
-	return glfwGetTime() * 10;
+	return getTick();
 }

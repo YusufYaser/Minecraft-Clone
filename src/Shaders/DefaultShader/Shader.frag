@@ -11,7 +11,7 @@ uniform bool highlighted;
 uniform bool gamePaused;
 uniform float ambientLight;
 
-const float BORDER_SIZE = .05f;
+const float BORDER_SIZE = .02f;
 
 void main() {
     FragColor = texture(tex0, texCoord);
@@ -28,9 +28,9 @@ void main() {
     if (face == 5) { // top face
         lightPercentage = 1.0f;
     } else if (face == 4) { // bottom face
-        lightPercentage = .25f;
+        lightPercentage = .3f;
     } else { // sides
-        lightPercentage = .5f;
+        lightPercentage = .75f;
     }
 
     FragColor *= vec4(vec3(ambientLight * lightPercentage), 1.0f);
@@ -39,5 +39,4 @@ void main() {
         FragColor *= vec4(.5f, .5f, .5f, 1.0f);
     }
 }
-
 )END"
