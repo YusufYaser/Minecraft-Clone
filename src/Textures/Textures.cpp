@@ -2,18 +2,23 @@
 
 using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 
-std::map<std::string, Texture*> textures;
+std::map<std::string, Texture*> textures = {};
 
 void initializeTextures() {
 	stbi_set_flip_vertically_on_load(true);
 
 	glActiveTexture(GL_TEXTURE0);
 
+	int c = 0;
 	for (const auto& dirEntry : recursive_directory_iterator("assets/textures")) {
 		if (dirEntry.is_directory()) continue;
 
 		int width, height, numCh;
 		unsigned char* data = stbi_load(dirEntry.path().string().c_str(), &width, &height, &numCh, 0);
+		if (!data) {
+			error("Failed to load texture: ", dirEntry.path().string());
+			continue;
+		}
 
 		GLuint ID;
 
@@ -41,7 +46,11 @@ void initializeTextures() {
 		tex->width = width;
 
 		textures[name] = tex;
+
+		c++;
 	}
+
+	print("Loaded", c, "textures");
 }
 
 Texture* getTexture(std::string name) {
