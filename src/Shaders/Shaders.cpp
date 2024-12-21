@@ -38,7 +38,7 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource) {
 	glAttachShader(m_id, fragmentShader);
 
 	glLinkProgram(m_id);
-	glGetProgramiv(fragmentShader, GL_LINK_STATUS, &shaderCompiled);
+	glGetProgramiv(m_id, GL_LINK_STATUS, &shaderCompiled);
 	if (shaderCompiled == false) {
 		error("Failed to link shader");
 		GLint logLength = 0;
