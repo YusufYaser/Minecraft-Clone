@@ -64,6 +64,8 @@ public:
 
 	bool successfullyLoaded() const { return m_successfullyLoaded; };
 
+	const char* getBuild();
+
 private:
 	static Game* _instance;
 	GameWindow* m_gameWindow = nullptr;

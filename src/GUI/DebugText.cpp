@@ -21,7 +21,7 @@ void DebugText::render() {
 	World* world = game->getWorld();
 
 	std::stringstream text;
-	text << "Minecraft Clone";
+	text << "Minecraft Clone - " << game->getBuild() << " ";
 	if (game->gamePaused()) {
 		text << " (Paused)";
 	}

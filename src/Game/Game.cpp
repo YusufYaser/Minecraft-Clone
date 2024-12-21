@@ -307,3 +307,46 @@ void Game::unloadWorld() {
 	delete m_player;
 	m_player = nullptr;
 }
+
+const char* Game::getBuild() {
+	static std::string build = "";
+	static bool gotBuildNumber = false;
+	if (gotBuildNumber) {
+		return build.c_str();
+	}
+
+	std::stringstream oss;
+
+	const char* date = __DATE__;
+	// year
+	oss << date[9] << date[10];
+	// month
+	if (date[0] == 'J' && date[1] == 'a')		oss << "01";
+	else if (date[0] == 'F')					oss << "02";
+	else if (date[0] == 'M' && date[2] == 'r')	oss << "03";
+	else if (date[0] == 'A' && date[1] == 'p')	oss << "04";
+	else if (date[0] == 'M' && date[2] == 'y')	oss << "05";
+	else if (date[0] == 'J' && date[2] == 'n')	oss << "06";
+	else if (date[0] == 'J' && date[2] == 'l')	oss << "07";
+	else if (date[0] == 'A' && date[1] == 'u')	oss << "08";
+	else if (date[0] == 'S')					oss << "09";
+	else if (date[0] == 'O')					oss << "10";
+	else if (date[0] == 'N')					oss << "11";
+	else if (date[0] == 'D')					oss << "12";
+	// day
+	oss << date[4] << date[5];
+
+#ifdef _DEBUG
+	oss << "D";
+	const char* time = __TIME__;
+	// hour
+	oss << time[0] << time[1];
+	// minute
+	oss << time[3] << time[4];
+#endif
+
+	build = oss.str();
+	gotBuildNumber = true;
+
+	return build.c_str();
+}
