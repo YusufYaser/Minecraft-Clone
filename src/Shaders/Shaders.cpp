@@ -84,8 +84,13 @@ void Shader::setUniform<GLuint>(const GLchar* name, const GLuint& val) {
 }
 
 template<>
-void Shader::setUniform<int>(const GLchar* name, const int& val) {
+void Shader::setUniform<GLint>(const GLchar* name, const int& val) {
 	glUniform1i(getUniformLoc(name), val);
+}
+
+template<>
+void Shader::setUniform<GLfloat>(const GLchar* name, const GLfloat& val) {
+	glUniform1f(getUniformLoc(name), val);
 }
 
 template<>

@@ -166,15 +166,21 @@ void Game::update() {
 
 	shader->activate();
 	shader->setUniform("gamePaused", m_gamePaused);
+	glm::vec3 clearColor = glm::vec3();
 	if (m_gamePaused) {
 		if (m_player != nullptr) {
-			glClearColor(.3f * .5f, .3f * .5f, 1.0f * .5f, 1);
+			clearColor = { .3f, .3f, 1.0f };
+			clearColor *= .5f;
 		} else {
-			glClearColor(0, .25f, 0, 1);
+			clearColor = { 0, .25f, 0 };
 		}
 	} else {
-		glClearColor(.3f, .3f, 1.0f, 1);
+		clearColor = { .3f, .3f, 1.0f };
 	}
+	if (m_world != nullptr && m_player != nullptr) {
+		clearColor *= m_world->getAmbientLight();
+	}
+	glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDepthRange(0.01, 1.0);
 
