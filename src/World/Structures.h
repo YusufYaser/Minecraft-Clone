@@ -3,12 +3,12 @@
 #include "../Block/Block.h"
 #include "stdint.h"
 
+#define STRUCTURES_COUNT 2
+
 enum class STRUCTURE_TYPE : uint8_t {
 	TREE = 0,
 	HOUSE
 };
-
-#define STRUCTURES_COUNT 1
 
 struct StructureConfig {
 	int priority = 0;
