@@ -28,7 +28,7 @@ void main() {
     if (face == 5) { // top face
         lightPercentage = 1.0f;
     } else if (face == 4) { // bottom face
-        lightPercentage = .3f;
+        lightPercentage = .5f;
     } else { // sides
         lightPercentage = .75f;
     }

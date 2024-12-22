@@ -90,10 +90,6 @@ void World::render() {
 	shader->setUniform("highlighted", false);
 	shader->setUniform("isLiquidTop", false);
 
-	const int CHUNKS_TO_LOAD_SIZE = 256;
-	glm::ivec2 chunksToLoad[CHUNKS_TO_LOAD_SIZE];
-	int chunksToLoadc = 0;
-
 	float cosHalfFOV = std::cos(glm::radians(190.0f / 2.0f));
 
 	glm::ivec2 playerChunk = getPosChunk(player->pos);
@@ -121,8 +117,7 @@ void World::render() {
 			std::unordered_map<std::size_t, Chunk*>::iterator it = chunks.find(chunkCh);
 			if (it == chunks.end()) {
 				chunksMutex.unlock();
-				if (chunksToLoadc >= CHUNKS_TO_LOAD_SIZE) continue;
-				chunksToLoad[chunksToLoadc++] = cPos;
+				loadChunk(cPos);
 				continue;
 			}
 			Chunk* chunk = it->second;
@@ -169,29 +164,6 @@ void World::render() {
 				shader->setUniform("isLiquidTop", isLiquidTop);
 				block->Render(shader, false);
 			}
-		}
-	}
-
-	if (chunksToLoadc < 2) { // sorting doesn't really matter in that case
-		for (int i = 0; i < chunksToLoadc; i++) {
-			loadChunk(chunksToLoad[i]);
-		}
-	} else {
-		auto sorter = [&pos](glm::ivec2 a, glm::ivec2 b) {
-			glm::ivec2 pos2 = { pos.x, pos.z };
-			glm::ivec2 aDiff = a - pos2;
-			int aDist = aDiff.x * aDiff.x + aDiff.y * aDiff.y;
-
-			glm::ivec2 bDiff = b - pos2;
-			int bDist = bDiff.x * bDiff.x + bDiff.y * bDiff.y;
-
-			return aDist < bDist;
-			};
-
-		std::sort(chunksToLoad, chunksToLoad + chunksToLoadc, sorter);
-
-		for (int i = 0; i < chunksToLoadc; i++) {
-			loadChunk(chunksToLoad[i]);
 		}
 	}
 
