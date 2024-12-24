@@ -28,9 +28,9 @@ Game::Game(GameSettings& settings) {
 	m_renderDistance = settings.renderDistance;
 
 #ifndef _DEBUG
-	m_gameWindow = new GameWindow(854, 480, "Minecraft Clone");
+	m_gameWindow = new GameWindow({ 854, 480 }, "Minecraft Clone");
 #else
-	m_gameWindow = new GameWindow(854, 480, "Minecraft Clone | Debug Build");
+	m_gameWindow = new GameWindow({ 854, 480 }, "Minecraft Clone | Debug Build");
 #endif
 
 	if (m_gameWindow->getGlfwWindow() == NULL) {
@@ -148,7 +148,7 @@ void Game::update() {
 		m_debugTextVisible = !m_debugTextVisible;
 	}
 
-	if (m_keyHandler->keyClicked(GLFW_KEY_ESCAPE)) {
+	if (m_keyHandler->keyClicked(GLFW_KEY_ESCAPE) && m_player != nullptr) {
 		m_gamePaused = !m_gamePaused;
 
 		if (!m_gamePaused) {
@@ -156,6 +156,11 @@ void Game::update() {
 
 			glfwSetCursorPos(getGlfwWindow(), size.x / 2, size.y / 2);
 		}
+	}
+
+	if (m_keyHandler->keyClicked(GLFW_KEY_F11) ||
+		(m_keyHandler->keyHeld(GLFW_KEY_RIGHT_ALT) && m_keyHandler->keyClicked(GLFW_KEY_ENTER))) {
+		m_gameWindow->setFullscreen(!m_gameWindow->isFullscreen());
 	}
 
 	if (m_world == nullptr) m_gamePaused = true;

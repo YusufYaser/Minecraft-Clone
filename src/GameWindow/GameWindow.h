@@ -4,7 +4,7 @@
 
 class GameWindow {
 public:
-	GameWindow(int width, int height, const char* title);
+	GameWindow(glm::ivec2 isize, const char* title);
 	~GameWindow();
 
 	void update();
@@ -14,6 +14,12 @@ public:
 	glm::vec2 getSize();
 	bool isFocused();
 
+	void setFullscreen(bool fullscreen);
+	bool isFullscreen() const { return m_fullscreen; }
+
 private:
 	GLFWwindow* glfwWindow = nullptr;
+	glm::ivec2 m_size;
+
+	bool m_fullscreen = false;
 };

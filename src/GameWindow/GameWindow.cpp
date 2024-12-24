@@ -2,28 +2,28 @@
 #include "GameWindow.h"
 #include "../Logging.h"
 
-GameWindow::GameWindow(int width, int height, const char* title) {
+GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
-	glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
+	m_size = isize;
+
+	glfwWindow = glfwCreateWindow(isize.x, isize.y, title, NULL, NULL);
 	if (!glfwWindow) {
 		return;
 	}
+
 	glfwMakeContextCurrent(glfwWindow);
 
 	int count;
 	GLFWmonitor** monitors = glfwGetMonitors(&count);
-	const GLFWvidmode* videoMode = glfwGetVideoMode(monitors[0]);
+	const GLFWvidmode* vm = glfwGetVideoMode(monitors[0]);
 
-	int mWidth = videoMode->width;
-	int mHeight = videoMode->height;
-
-	glfwSetWindowPos(glfwWindow, (mWidth - width) / 2, (mHeight - height) / 2);
+	glfwSetWindowPos(glfwWindow, (vm->width - m_size.x) / 2, (vm->height - m_size.y) / 2);
 
 	gladLoadGL(glfwGetProcAddress);
 
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, m_size.x, m_size.y);
 }
 
 GameWindow::~GameWindow() {
@@ -49,4 +49,19 @@ glm::vec2 GameWindow::getSize() {
 
 bool GameWindow::isFocused() {
 	return glfwGetWindowAttrib(glfwWindow, GLFW_FOCUSED) == GLFW_TRUE;
+}
+
+void GameWindow::setFullscreen(bool fullscreen) {
+	m_fullscreen = fullscreen;
+
+	int count;
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
+	const GLFWvidmode* vm = glfwGetVideoMode(monitors[0]);
+
+	glfwSetWindowMonitor(glfwWindow, fullscreen ? glfwGetPrimaryMonitor() : NULL, 0, 0, vm->width, vm->height, vm->refreshRate);
+
+	if (!fullscreen) {
+		glfwSetWindowPos(glfwWindow, (vm->width - m_size.x) / 2, (vm->height - m_size.y) / 2);
+		glfwSetWindowSize(glfwWindow, m_size.x, m_size.y);
+	}
 }
