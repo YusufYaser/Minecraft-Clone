@@ -26,13 +26,18 @@
             BRIGHT_GREEN "(" << BASENAME_NO_EXT(FILENAME) << ")"\
             RED " -> " RESET, printArgs(__VA_ARGS__), std::cout << RESET);
 
+#define warn(...)\
+(std::cout << BOLD BRIGHT_YELLOW "Warn "\
+            BRIGHT_GREEN "(" << BASENAME_NO_EXT(FILENAME) << ")"\
+            YELLOW " -> " RESET, printArgs(__VA_ARGS__), std::cout << RESET);
+
 template<typename T>
 void printArgs(T&& arg) {
-    std::cout << std::forward<T>(arg) << std::endl;
+	std::cout << std::forward<T>(arg) << std::endl;
 }
 
 template<typename T, typename... Args>
 void printArgs(T&& first, Args&&... args) {
-    std::cout << std::forward<T>(first) << " ";
-    printArgs(std::forward<Args>(args)...);
+	std::cout << std::forward<T>(first) << " ";
+	printArgs(std::forward<Args>(args)...);
 }
