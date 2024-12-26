@@ -25,5 +25,5 @@ void GUIComponent::setZIndex(int zIndex) {
 }
 
 bool GUIComponent::isRendered() {
-	return m_lastRenderFrame == Game::getInstance()->frameNum();
+	return m_lastRenderFrame == Game::getInstance()->getFrameNum();
 }

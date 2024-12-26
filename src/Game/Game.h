@@ -13,7 +13,7 @@
 #include "../World/Utils.h"
 #include "../GUI/DebugText.h"
 #include "../GUI/PauseMenu.h"
-#include "../GUI/MainMenu.h"
+#include "../GUI/MainMenu/MainMenu.h"
 #include "../KeyHandler/KeyHandler.h"
 #include <gltext/gltext.h>
 
@@ -55,7 +55,7 @@ public:
 	float getSimDelta() const { return !m_gamePaused ? std::min(m_delta, 1.0f / 10) : 0; };
 	// You should probably use getSimDelta() instead
 	float getDelta() const { return m_delta; };
-	int frameNum() const { return m_frameNum; }
+	int getFrameNum() const { return m_frameNum; }
 
 	bool gamePaused() const { return m_gamePaused; };
 	void setGamePaused(bool paused);

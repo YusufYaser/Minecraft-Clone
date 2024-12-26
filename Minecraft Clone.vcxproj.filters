@@ -78,10 +78,13 @@
     <ClCompile Include="src\GUI\Components\Image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\MainMenu.cpp">
+    <ClCompile Include="src\GUI\MainMenu\MainMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\World\WorldBlocks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\MainMenu\WorldSelector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,7 +155,10 @@
     <ClInclude Include="src\GUI\Components\GUIComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\MainMenu.h">
+    <ClInclude Include="src\GUI\MainMenu\MainMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\MainMenu\WorldSelector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

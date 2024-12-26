@@ -179,7 +179,8 @@
     <ClCompile Include="src\GUI\Components\GUIComponent.cpp" />
     <ClCompile Include="src\GUI\Components\Image.cpp" />
     <ClCompile Include="src\GUI\DebugText.cpp" />
-    <ClCompile Include="src\GUI\MainMenu.cpp" />
+    <ClCompile Include="src\GUI\MainMenu\MainMenu.cpp" />
+    <ClCompile Include="src\GUI\MainMenu\WorldSelector.cpp" />
     <ClCompile Include="src\GUI\PauseMenu.cpp" />
     <ClCompile Include="src\GUI\Components\Text.cpp" />
     <ClCompile Include="src\KeyHandler\KeyHandler.cpp" />
@@ -207,7 +208,8 @@
     <ClInclude Include="src\GUI\Components\GUIComponent.h" />
     <ClInclude Include="src\GUI\DebugText.h" />
     <ClInclude Include="src\GUI\Components\Image.h" />
-    <ClInclude Include="src\GUI\MainMenu.h" />
+    <ClInclude Include="src\GUI\MainMenu\MainMenu.h" />
+    <ClInclude Include="src\GUI\MainMenu\WorldSelector.h" />
     <ClInclude Include="src\GUI\PauseMenu.h" />
     <ClInclude Include="src\GUI\Components\Text.h" />
     <ClInclude Include="src\KeyHandler\KeyHandler.h" />
