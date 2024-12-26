@@ -141,6 +141,7 @@ bool Game::shouldQuit() {
 
 void Game::update() {
 	double startTime = glfwGetTime();
+	m_frameNum++;
 
 	m_keyHandler->update();
 

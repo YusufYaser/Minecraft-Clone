@@ -17,6 +17,8 @@ void Text::setText(const char* content) {
 }
 
 void Text::render() {
+	m_lastRenderFrame = Game::getInstance()->frameNum();
+
 	glm::ivec2 size = Game::getInstance()->getGameWindow()->getSize();
 
 	gltBeginDraw();

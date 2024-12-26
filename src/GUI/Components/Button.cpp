@@ -23,6 +23,7 @@ Button::~Button() {
 
 bool Button::isHovered() {
 	if (!m_enabled) return false;
+	if (!isRendered()) return false;
 
 	GameWindow* gameWindow = Game::getInstance()->getGameWindow();
 	double posX, posY;
@@ -66,6 +67,8 @@ void Button::setSize(glm::vec4 size) {
 }
 
 void Button::render() {
+	m_lastRenderFrame = Game::getInstance()->frameNum();
+
 	if (isHovered()) {
 		m_image->setColor({ .5f, .5f, .5f, 1.0f });
 	} else {

@@ -12,10 +12,14 @@ public:
 
 	virtual void render() { assert("No rendering function set to this GUI component"); };
 
+	bool isRendered();
+
 protected:
 	glm::vec4 m_pos = glm::vec4();
 	glm::vec4 m_size = glm::vec4(1.0f, 0.0f, 1.0f, 0.0f);
 
 	glm::vec2 getGuiPos();
 	glm::vec2 getGuiSize();
+
+	int m_lastRenderFrame = 0;
 };

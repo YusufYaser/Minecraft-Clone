@@ -55,6 +55,7 @@ public:
 	float getSimDelta() const { return !m_gamePaused ? std::min(m_delta, 1.0f / 10) : 0; };
 	// You should probably use getSimDelta() instead
 	float getDelta() const { return m_delta; };
+	int frameNum() const { return m_frameNum; }
 
 	bool gamePaused() const { return m_gamePaused; };
 	void setGamePaused(bool paused);
@@ -73,6 +74,8 @@ public:
 private:
 	static Game* _instance;
 	GameWindow* m_gameWindow = nullptr;
+
+	int m_frameNum = 0;
 
 	bool m_shouldQuit = false;
 
