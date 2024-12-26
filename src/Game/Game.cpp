@@ -3,6 +3,10 @@
 
 Game* Game::_instance = nullptr;
 
+void logGlfwError(int error_code, const char* desc) {
+	error("GLFW Error:", desc);
+}
+
 Game::Game(GameSettings& settings) {
 	if (_instance != nullptr) {
 		error("You cannot initialize 2 game instances");
@@ -22,6 +26,7 @@ Game::Game(GameSettings& settings) {
 		error("Failed to initialize GLFW");
 		return;
 	}
+	glfwSetErrorCallback(logGlfwError);
 
 	print("Initialized GLFW");
 
