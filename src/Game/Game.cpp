@@ -138,7 +138,7 @@ void Game::quit() {
 }
 
 bool Game::shouldQuit() {
-	return (m_shouldQuit || glfwWindowShouldClose(getGlfwWindow())) && !m_loadingWorld;
+	return m_shouldQuit || glfwWindowShouldClose(getGlfwWindow());
 }
 
 void Game::update() {
@@ -305,6 +305,7 @@ void Game::loadWorld(WorldSettings& settings) {
 
 		print("Waiting for spawn chunks");
 		while (m_world->chunkLoadQueueCount() != 0) {}
+		if (shouldQuit()) return;
 		print("Loaded spawn chunks");
 		print("Created world");
 
