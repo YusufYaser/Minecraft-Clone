@@ -124,6 +124,7 @@ void Player::checkInputs(float delta) {
 	if (keyHandler->keyHeld(GLFW_KEY_6)) selectedBlock = BLOCK_TYPE::BEDROCK;
 	if (keyHandler->keyHeld(GLFW_KEY_7)) selectedBlock = BLOCK_TYPE::SAND;
 	if (keyHandler->keyHeld(GLFW_KEY_8)) selectedBlock = BLOCK_TYPE::OAK_PLANKS;
+	if (keyHandler->keyHeld(GLFW_KEY_9)) selectedBlock = BLOCK_TYPE::WATER;
 
 	if (keyHandler->mouseClicked(GLFW_MOUSE_BUTTON_LEFT)) {
 		Block* target = nullptr;
@@ -149,7 +150,10 @@ void Player::checkInputs(float delta) {
 
 			if (target->getPos() + getBlockFaceDirection(face) != iPos &&
 				target->getPos() + getBlockFaceDirection(face) != iPos + glm::ivec3(up)) {
-				world->setBlock(target->getPos() + getBlockFaceDirection(face), selectedBlock, false);
+
+				Block* replacingBlock = world->getBlock(target->getPos() + getBlockFaceDirection(face));
+				world->setBlock(target->getPos() + getBlockFaceDirection(face), selectedBlock,
+					replacingBlock != nullptr && replacingBlock->getType() == BLOCK_TYPE::WATER);
 			}
 		}
 	}
