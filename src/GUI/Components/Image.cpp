@@ -56,6 +56,7 @@ void Image::render() {
 
 	guiShader->setUniform("guiPos", getGuiPos());
 	guiShader->setUniform("guiSize", getGuiSize());
+	guiShader->setUniform("guiZIndex", getGuiZIndex());
 	guiShader->setUniform("guiColor", m_color);
 
 	glBindTexture(GL_TEXTURE_2D, m_tex->id);

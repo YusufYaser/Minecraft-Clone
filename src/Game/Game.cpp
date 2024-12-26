@@ -73,11 +73,13 @@ Game::Game(GameSettings& settings) {
 	m_crosshair = new Image(getTexture("crosshair"));
 	m_crosshair->setPosition({ .5f, 0, .5f, 0 });
 	m_crosshair->setSize({ 0, 16, 0, 16 });
+	m_crosshair->setZIndex(999);
 
 	m_collOverlay = new Image(getTexture("stone"));
 	m_collOverlay->setPosition({ .5f, 0, .5f, 0 });
 	m_collOverlay->setSize({ 1, 0, 1, 0 });
 	m_collOverlay->setColor({ .25f, .25f, .25f, 1.0f });
+	m_collOverlay->setZIndex(0);
 
 	m_keyHandler = new KeyHandler();
 
@@ -199,6 +201,25 @@ void Game::update() {
 	glDepthRange(0, 0.01);
 	guiShader->activate();
 
+	if (m_player != nullptr) {
+		glm::ivec3 iPos = glm::ivec3(
+			round(m_player->pos.x),
+			round(m_player->pos.y),
+			round(m_player->pos.z)
+		);
+
+		Block* upBlock = m_world->getBlock(iPos + glm::ivec3(0, 1, 0));
+		if (upBlock != nullptr) {
+			m_collOverlay->setTexture(getTexture(upBlock->getName()));
+			if (!m_gamePaused) {
+				m_collOverlay->setColor({ .25f, .25f, .25f, 1.0f });
+			} else {
+				m_collOverlay->setColor({ .125f, .125f, .125f, 1.0f });
+			}
+			m_collOverlay->render();
+		}
+	}
+
 	if (m_gamePaused) {
 		if (m_player != nullptr) {
 			m_pauseMenu->render();
@@ -208,20 +229,6 @@ void Game::update() {
 	} else {
 		if (m_world != nullptr && m_player != nullptr) {
 			m_player->update(getSimDelta());
-		}
-
-		if (m_player != nullptr) {
-			glm::ivec3 iPos = glm::ivec3(
-				round(m_player->pos.x),
-				round(m_player->pos.y),
-				round(m_player->pos.z)
-			);
-
-			Block* upBlock = m_world->getBlock(iPos + glm::ivec3(0, 1, 0));
-			if (upBlock != nullptr) {
-				m_collOverlay->setTexture(getTexture(upBlock->getName()));
-				m_collOverlay->render();
-			}
 		}
 
 		m_crosshair->render();

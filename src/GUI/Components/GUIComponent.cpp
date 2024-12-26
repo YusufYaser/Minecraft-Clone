@@ -19,6 +19,11 @@ glm::vec2 GUIComponent::getGuiSize() {
 	};
 }
 
+void GUIComponent::setZIndex(int zIndex) {
+	assert(zIndex >= 0 && zIndex <= 1000);
+	m_zIndex = zIndex;
+}
+
 bool GUIComponent::isRendered() {
 	return m_lastRenderFrame == Game::getInstance()->frameNum();
 }
