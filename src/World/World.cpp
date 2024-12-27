@@ -61,12 +61,6 @@ World::~World() {
 	chunkLoader.join();
 	print("Waiting for chunk unloader thread...");
 	chunkUnloader.join();
-
-	print("Removing chunks");
-	for (auto& [ch, chunk] : chunks) {
-		// TODO: use chunk unloader instead
-		delete chunk;
-	}
 }
 
 WorldSaveData* World::createWorldSaveData() {

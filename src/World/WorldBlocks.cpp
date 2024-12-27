@@ -29,6 +29,8 @@ Block* World::getBlock(glm::ivec3 pos) {
 Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 	if (type == BLOCK_TYPE::NONE) return nullptr;
 
+	if (pos.y < 0 || pos.y >= 128) return nullptr;
+
 	std::size_t blockCh = hashPos(pos);
 	std::size_t chunkCh = hashPos(getPosChunk(pos));
 
@@ -62,6 +64,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 		delete chunk->blocks[blockCh];
 		chunk->blocks.erase(blockCh);
 		chunk->blocksMutex.unlock();
+		chunk->modified = true;
 	} else {
 		chunk->blocksMutex.unlock();
 		if (type == BLOCK_TYPE::AIR) return nullptr; // it was already air, nothing to change
@@ -109,6 +112,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 
 	setRenderingGroup(block);
 
+	chunk->modified = true;
 	return block;
 }
 

@@ -7,8 +7,8 @@ This is my own Minecraft Clone and also my first game engine created using OpenG
 - 🏢 Structures Generation
 - 💡 Lighting System
 - 🕑 World Tick System
+- 💾 World Saving
 
 ## Planned Features
-- 💾 World Saving
 - 🪨 Cave System
 - ❤️ Survival Gamemode

@@ -68,6 +68,7 @@ public:
 	void unloadWorld();
 	bool loadingWorld() const { return m_loadingWorld; };
 	void setLoadedWorldName(std::string name) { m_worldName = name; };
+	std::string getLoadedWorldName() const { return m_worldName; };
 
 	bool successfullyLoaded() const { return m_successfullyLoaded; };
 

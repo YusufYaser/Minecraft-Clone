@@ -1,7 +1,10 @@
 #include "World.h"
 #include "Utils.h"
+#include "../Game/Game.h"
 
 void World::chunkLoaderFunc() {
+	std::string name = Game::getInstance()->getLoadedWorldName();
+
 	while (true) {
 		if (unloading.load()) break;
 
@@ -15,6 +18,36 @@ void World::chunkLoaderFunc() {
 		chunksMutex.lock();
 		Chunk* chunk = chunks[chunkCh];
 		chunksMutex.unlock();
+
+		std::string path = "worlds/" + name + "/c" + std::to_string(chunkCh);
+		if (std::filesystem::exists(path)) {
+			std::ifstream chunkFile(path);
+			ChunkSaveData* saveData = new ChunkSaveData();
+			chunkFile.read(reinterpret_cast<char*>(saveData), sizeof(ChunkSaveData));
+			chunkFile.close();
+
+			for (int x = 0; x < 16; x++) {
+				for (int y = 0; y < 128; y++) {
+					for (int z = 0; z < 16; z++) {
+						if (saveData->blocks[x][y][z] == BLOCK_TYPE::AIR) continue;
+
+						glm::ivec3 bPos = {
+							x + (pos.x * 16),
+							y,
+							z + (pos.y * 16),
+						};
+
+						setBlock(bPos, saveData->blocks[x][y][z]);
+					}
+				}
+			}
+
+			delete saveData;
+
+			chunk->loaded = true;
+			chunk->modified = false;
+			continue;
+		}
 
 		if (generator == Generator::Void) {
 			if (pos.x == 0 && pos.y == 0) {
@@ -80,19 +113,49 @@ void World::chunkLoaderFunc() {
 		}
 
 		chunk->loaded = true;
+		chunk->modified = false;
 	}
 }
 
 void World::chunkUnloaderFunc() {
+	std::string name = Game::getInstance()->getLoadedWorldName();
+
 	while (true) {
-		if (unloading.load()) break;
+		if (unloading.load() && chunks.size() == 0) break;
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		time_t current = time(nullptr);
 		if (!chunksMutex.try_lock()) continue;
 	unloader_func_chunks_loop:
 		for (auto& [ch, chunk] : chunks) {
 			if (chunk == nullptr) continue;
-			if (chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 30) {
+			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 1)
+				|| unloading.load()) {
+				if (chunk->modified) {
+					try {
+						ChunkSaveData* saveData = new ChunkSaveData();
+						chunk->blocksMutex.lock();
+						for (auto& [ch, block] : chunk->blocks) {
+							glm::ivec3 rPos = block->getPos();
+							glm::ivec2 cPos = getPosChunk(rPos);
+							glm::ivec3 pos = {
+								rPos.x - (cPos.x * 16),
+								rPos.y,
+								rPos.z - (cPos.y * 16),
+							};
+							saveData->blocks[pos.x][pos.y][pos.z] = block->getType();
+						}
+						chunk->blocksMutex.unlock();
+
+						std::ofstream chunkFile("worlds/" + name + "/c" + std::to_string(ch));
+						chunkFile.write(reinterpret_cast<const char*>(saveData), sizeof(ChunkSaveData));
+						chunkFile.close();
+
+						delete saveData;
+					} catch (std::filesystem::filesystem_error e) {
+						error("FAILED TO SAVE CHUNK:", e.what());
+					}
+				}
+
 				delete chunks[ch];
 				chunks.erase(ch);
 				goto unloader_func_chunks_loop;

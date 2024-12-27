@@ -30,6 +30,10 @@ struct WorldSaveData {
 	float playerPos[3];
 };
 
+struct ChunkSaveData {
+	BLOCK_TYPE blocks[16][128][16];
+};
+
 struct WorldSettings {
 	siv::PerlinNoise::seed_type seed = 0u;
 	Generator generator = Generator::Default;
@@ -80,6 +84,7 @@ private:
 	struct Chunk {
 		bool loaded = false;
 		bool permanentlyLoaded = false;
+		bool modified = false;
 		std::mutex blocksMutex;
 		std::mutex renderingGroupsMutex;
 		time_t lastRendered = 0;
