@@ -26,10 +26,10 @@ void World::chunkLoaderFunc() {
 			chunkFile.read(reinterpret_cast<char*>(saveData), sizeof(ChunkSaveData));
 			chunkFile.close();
 
-			for (int x = 0; x < 16; x++) {
-				for (int y = 0; y < 128; y++) {
+			for (int y = 0; y < MAX_HEIGHT; y++) {
+				for (int x = 0; x < 16; x++) {
 					for (int z = 0; z < 16; z++) {
-						if (saveData->blocks[x][y][z] == BLOCK_TYPE::AIR) continue;
+						if (saveData->blocks[y][x][z] == BLOCK_TYPE::AIR) continue;
 
 						glm::ivec3 bPos = {
 							x + (pos.x * 16),
@@ -37,7 +37,7 @@ void World::chunkLoaderFunc() {
 							z + (pos.y * 16),
 						};
 
-						setBlock(bPos, saveData->blocks[x][y][z]);
+						setBlock(bPos, saveData->blocks[y][x][z]);
 					}
 				}
 			}
@@ -142,7 +142,7 @@ void World::chunkUnloaderFunc() {
 								rPos.y,
 								rPos.z - (cPos.y * 16),
 							};
-							saveData->blocks[pos.x][pos.y][pos.z] = block->getType();
+							saveData->blocks[pos.y][pos.x][pos.z] = block->getType();
 						}
 						chunk->blocksMutex.unlock();
 

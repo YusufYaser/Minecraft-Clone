@@ -30,8 +30,10 @@ struct WorldSaveData {
 	float playerPos[3];
 };
 
+#define MAX_HEIGHT 128
+
 struct ChunkSaveData {
-	BLOCK_TYPE blocks[16][128][16];
+	BLOCK_TYPE blocks[MAX_HEIGHT][16][16];
 };
 
 struct WorldSettings {
