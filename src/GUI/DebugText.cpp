@@ -57,6 +57,7 @@ void DebugText::render() {
 		text << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
 		text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n\n";
 
+		text << "World Name: " << game->getLoadedWorldName() << "\n";
 		text << "World Time: " << world->getTime();
 		text << " (Day " << floor(world->getTime() / 24000.0f) << ")\n";
 		text << "World Seed: " << world->getSeed() << "\n\n";
