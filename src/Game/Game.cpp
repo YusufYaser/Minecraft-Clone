@@ -102,6 +102,8 @@ Game::Game(GameSettings& settings) {
 }
 
 Game::~Game() {
+	if (m_world != nullptr) unloadWorld();
+
 	delete m_keyHandler;
 	m_keyHandler = nullptr;
 
