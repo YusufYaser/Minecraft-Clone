@@ -21,16 +21,28 @@ enum class Generator : uint8_t {
 	Void
 };
 
+struct WorldSaveData {
+	uint8_t version = 1;
+	int tick;
+	unsigned int seed;
+	Generator generator;
+	STRUCTURE_TYPE structures[STRUCTURES_COUNT];
+	float playerPos[3];
+};
+
 struct WorldSettings {
 	siv::PerlinNoise::seed_type seed = 0u;
 	Generator generator = Generator::Default;
 	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE, STRUCTURE_TYPE::HOUSE };
+	int initialTick = 0;
 };
 
 class World {
 public:
 	World(WorldSettings& settings);
 	~World();
+
+	WorldSaveData* createWorldSaveData();
 
 	void render();
 

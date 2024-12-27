@@ -3,6 +3,7 @@
 #include "../Components/Text.h"
 #include "../Components/Button.h"
 #include "../../World/World.h"
+#include <vector>
 
 class WorldSelector {
 public:
@@ -18,4 +19,11 @@ private:
 	Button* back;
 
 	bool m_isClosing = false;
+
+	struct WorldEntry {
+		std::string name;
+		Button* playButton;
+	};
+
+	std::vector<WorldEntry*> worlds;
 };

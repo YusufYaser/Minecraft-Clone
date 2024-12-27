@@ -23,6 +23,7 @@ public:
 
 	Structure(STRUCTURE_TYPE type, StructureConfig& settings, std::function<BLOCK_TYPE(glm::ivec2, glm::ivec3)> algorithm);
 
+	STRUCTURE_TYPE getType() { return m_type; };
 	float getProbability() { return m_probability; };
 	int getPriority() { return m_priority; };
 	BLOCK_TYPE getBlock(glm::ivec3 pos);

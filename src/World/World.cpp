@@ -6,6 +6,7 @@ World::World(WorldSettings& settings) {
 	World::seed = settings.seed;
 	World::perlin = siv::PerlinNoise{ seed };
 	World::generator = settings.generator;
+	m_tick = settings.initialTick;
 
 	int structureCount = 0;
 	for (STRUCTURE_TYPE structureType : settings.structures) {
@@ -66,6 +67,25 @@ World::~World() {
 		// TODO: use chunk unloader instead
 		delete chunk;
 	}
+}
+
+WorldSaveData* World::createWorldSaveData() {
+	WorldSaveData* data = new WorldSaveData();
+	data->version = 1;
+	data->tick = m_tick;
+	data->seed = seed;
+	data->generator = generator;
+	int i = 0;
+	for (auto& structure : structures) {
+		data->structures[i++] = structure->getType();
+	}
+
+	glm::vec3 pos = Game::getInstance()->getPlayer()->pos;
+	data->playerPos[0] = pos.x;
+	data->playerPos[1] = pos.y;
+	data->playerPos[2] = pos.z;
+
+	return data;
 }
 
 void World::render() {

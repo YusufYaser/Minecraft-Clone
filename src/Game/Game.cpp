@@ -281,7 +281,7 @@ void Game::setGamePaused(bool paused) {
 	glfwSetCursorPos(getGlfwWindow(), size.x / 2, size.y / 2);
 }
 
-void Game::loadWorld(WorldSettings& settings) {
+void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos) {
 	if (m_loadingWorld) return;
 	m_loadingWorld = true;
 
@@ -300,7 +300,7 @@ void Game::loadWorld(WorldSettings& settings) {
 	}
 	print("World Seed:", settings.seed);
 
-	std::thread t = std::thread([this](WorldSettings settings) {
+	std::thread t = std::thread([this](WorldSettings settings, glm::vec3 playerPos) {
 		m_world = new World(settings);
 		for (int x = -2; x < 2; x++) {
 			for (int y = -2; y < 2; y++) {
@@ -315,17 +315,35 @@ void Game::loadWorld(WorldSettings& settings) {
 		print("Created world");
 
 		m_player = new Player();
-		m_player->pos = { .0f, m_world->getHeight({ 0, 0 }), .0f };
+		if (playerPos.y == 0) {
+			playerPos.y = static_cast<float>(m_world->getHeight({ playerPos.x, playerPos.z }));
+		}
+		m_player->pos = playerPos;
 
-		m_gamePaused = false;
 		m_loadingWorld = false;
-		}, settings);
+		}, settings, playerPos);
 
 	t.detach();
 
 }
 
 void Game::unloadWorld() {
+	try {
+		print("Saving world data");
+		std::filesystem::create_directory("worlds");
+		std::filesystem::create_directory("worlds/" + m_worldName);
+
+		std::ofstream outFile("worlds/" + m_worldName + "/world.dat", std::ios::binary);
+		WorldSaveData* s = m_world->createWorldSaveData();
+		outFile.write(reinterpret_cast<const char*>(s), sizeof(WorldSaveData));
+		outFile.close();
+
+		delete s;
+		print("Saved world data");
+	} catch (std::filesystem::filesystem_error e) {
+		error("FAILED TO SAVE WORLD:", e.what());
+	}
+
 	delete m_world;
 	m_world = nullptr;
 

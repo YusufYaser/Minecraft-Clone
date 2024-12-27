@@ -16,6 +16,7 @@
 #include "../GUI/MainMenu/MainMenu.h"
 #include "../KeyHandler/KeyHandler.h"
 #include <gltext/gltext.h>
+#include <fstream>
 
 struct GameSettings {
 	int renderDistance = 6;
@@ -63,9 +64,10 @@ public:
 	int getRenderDistance() const { return m_renderDistance; };
 	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };
 
-	void loadWorld(WorldSettings& settings);
+	void loadWorld(WorldSettings& settings, glm::vec3 playerPos = { 0, 0, 0 });
 	void unloadWorld();
 	bool loadingWorld() const { return m_loadingWorld; };
+	void setLoadedWorldName(std::string name) { m_worldName = name; };
 
 	bool successfullyLoaded() const { return m_successfullyLoaded; };
 
@@ -78,6 +80,8 @@ private:
 	int m_frameNum = 0;
 
 	bool m_shouldQuit = false;
+
+	std::string m_worldName = "invalid";
 
 	KeyHandler* m_keyHandler = nullptr;
 	Player* m_player = nullptr;
