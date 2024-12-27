@@ -1,10 +1,24 @@
 #include "Game.h"
 #include "ShaderSources.h"
+#ifdef _WIN32
+#include <Windows.h>
+#undef max
+#undef min
+#endif
 
 Game* Game::_instance = nullptr;
 
 void logGlfwError(int error_code, const char* desc) {
 	error("GLFW Error:", desc);
+
+#ifdef _WIN32
+	switch (error_code) {
+	case GLFW_API_UNAVAILABLE:
+	case GLFW_VERSION_UNAVAILABLE:
+	case GLFW_PLATFORM_ERROR:
+		MessageBox(nullptr, L"Your computer doesn't support the game's OpenGL version, or doesn't support OpenGL at all.", L"Error", MB_OK | MB_ICONERROR);
+	}
+#endif
 }
 
 Game::Game(GameSettings& settings) {

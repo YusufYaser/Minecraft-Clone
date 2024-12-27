@@ -15,7 +15,7 @@ void signalHandler(int signal) {
 }
 
 int main(int argc, char* argv[]) {
-	#ifdef _WIN32
+#ifdef _WIN32
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (hOut != INVALID_HANDLE_VALUE) {
 		DWORD dwMode = 0;
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 			SetConsoleMode(hOut, dwMode);
 		}
 	}
-	#endif
+#endif
 
 	std::signal(SIGINT, signalHandler);
 
@@ -41,8 +41,7 @@ int main(int argc, char* argv[]) {
 			std::string value = argv[i + 1];
 			try {
 				settings.renderDistance = std::stoi(value);
-			}
-			catch (std::invalid_argument&) {
+			} catch (std::invalid_argument&) {
 				error("The render distance must be a number");
 				return 1;
 			}
@@ -58,6 +57,9 @@ int main(int argc, char* argv[]) {
 	Game* game = new Game(settings);
 	if (!game->successfullyLoaded()) {
 		error("Failed to start game");
+#ifdef _WIN32
+		MessageBox(nullptr, L"The game failed to start. Please check the game console for any errors.", L"Error", MB_OK | MB_ICONERROR);
+#endif
 		delete game;
 		game = nullptr;
 		return 1;
