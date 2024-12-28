@@ -28,6 +28,11 @@ int main(int argc, char* argv[]) {
 
 	std::signal(SIGINT, signalHandler);
 
+#ifdef _DEBUG
+	warn("Warning: You are running a debug build of the game");
+	warn("         Some stuff such as chunk loading will be slow.");
+#endif
+
 	GameSettings settings;
 
 	for (int i = 1; i < argc; ++i) {

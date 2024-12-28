@@ -20,6 +20,13 @@ MainMenu::MainMenu() {
 	credits->setText("Minecraft Clone - github.com/YusufYaser/Minecraft-Clone");
 	credits->setPosition({ 0, 0, 1.0f, -15 });
 	credits->setColor({ .75f, .75f, .75f, 1.0f });
+
+#ifdef _DEBUG
+	debug = new Text();
+	debug->setText("Debug Build");
+	debug->setPosition({ 1.0f, -95, 1.0f, -15 });
+	debug->setColor({ 1.0f, .2f, .2f, 1.0f });
+#endif
 }
 
 MainMenu::~MainMenu() {
@@ -34,6 +41,11 @@ MainMenu::~MainMenu() {
 
 	delete credits;
 	credits = nullptr;
+
+#ifdef _DEBUG
+	delete debug;
+	debug = nullptr;
+#endif
 }
 
 void MainMenu::render() {
@@ -55,6 +67,9 @@ void MainMenu::render() {
 	quit->render();
 	title->render();
 	credits->render();
+#ifdef _DEBUG
+	if (static_cast<int>(glfwGetTime()) & 1) debug->render();
+#endif
 
 	if (selectWorld->isClicked()) {
 		worldSelector = new WorldSelector();

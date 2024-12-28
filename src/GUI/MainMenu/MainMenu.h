@@ -17,6 +17,9 @@ private:
 	Button* selectWorld;
 	Button* quit;
 	Text* credits;
+#ifdef _DEBUG
+	Text* debug;
+#endif
 
 	WorldSelector* worldSelector;
 };
