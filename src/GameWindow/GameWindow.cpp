@@ -1,6 +1,7 @@
 #include <glad/gl.h>
 #include "GameWindow.h"
 #include "../Logging.h"
+#include <stb/stb_image.h>
 
 GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -24,6 +25,33 @@ GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 	gladLoadGL(glfwGetProcAddress);
 
 	glViewport(0, 0, m_size.x, m_size.y);
+
+	const char* img = "assets/textures/grass.png";
+
+	switch (time(0) % 5) {
+	case 2:
+		img = "assets/textures/stone.png";
+		break;
+	case 3:
+		img = "assets/textures/sand.png";
+		break;
+	case 4:
+		img = "assets/textures/oak_log.png";
+		break;
+	case 5:
+		img = "assets/textures/oak_planks.png";
+		break;
+	default:
+		break;
+	}
+
+	GLFWimage images[1];
+	images[0].pixels = stbi_load(img, &images[0].width, &images[0].height, 0, 4);
+	if (!images[0].pixels) {
+		return;
+	}
+	glfwSetWindowIcon(glfwWindow, 1, images);
+	stbi_image_free(images[0].pixels);
 }
 
 GameWindow::~GameWindow() {

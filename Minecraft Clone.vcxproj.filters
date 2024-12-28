@@ -177,4 +177,9 @@
     <None Include="src\Shaders\GUI\GUI.frag" />
     <None Include="src\Shaders\GUI\GUI.vert" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
 </Project>

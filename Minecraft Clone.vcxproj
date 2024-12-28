@@ -106,6 +106,7 @@
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libraries/lib/glfw3.lib</AdditionalDependencies>
+      <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -128,6 +129,7 @@
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libraries/lib/glfw3.lib</AdditionalDependencies>
+      <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,6 +148,7 @@
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libraries/lib/glfw3.lib</AdditionalDependencies>
+      <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -168,6 +171,7 @@
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libraries/lib/glfw3.lib</AdditionalDependencies>
+      <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -230,6 +234,9 @@
     <None Include="src\Shaders\DefaultShader\Shader.vert" />
     <None Include="src\Shaders\GUI\GUI.frag" />
     <None Include="src\Shaders\GUI\GUI.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
