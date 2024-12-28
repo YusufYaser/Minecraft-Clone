@@ -164,7 +164,9 @@ void World::render() {
 
 	for (auto& [chunk, types] : queued) {
 		for (auto& type : types) {
+			if (!chunk->renderingGroupsMutex.try_lock()) continue;
 			auto& blocks = chunk->renderingGroups[type];
+			chunk->renderingGroupsMutex.unlock();
 			glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
 
 			for (auto& block : blocks) {
