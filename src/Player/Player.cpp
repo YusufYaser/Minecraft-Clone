@@ -126,35 +126,44 @@ void Player::checkInputs(float delta) {
 	if (keyHandler->keyHeld(GLFW_KEY_8)) selectedBlock = BLOCK_TYPE::OAK_PLANKS;
 	if (keyHandler->keyHeld(GLFW_KEY_9)) selectedBlock = BLOCK_TYPE::WATER;
 
-	if (keyHandler->mouseClicked(GLFW_MOUSE_BUTTON_LEFT)) {
-		Block* target = nullptr;
-		BLOCK_FACE face;
-		getTargetBlock(&target, &face);
+	Block* targetBlock = nullptr;
+	BLOCK_FACE face;
+	getTargetBlock(&targetBlock, &face);
 
-		if (target != nullptr) {
-			world->setBlock(target->getPos(), BLOCK_TYPE::AIR);
+	if (targetBlock != nullptr) {
+		if (keyHandler->mouseClicked(GLFW_MOUSE_BUTTON_MIDDLE)) {
+			selectedBlock = targetBlock->getType();
 		}
-	}
 
-	if (keyHandler->mouseClicked(GLFW_MOUSE_BUTTON_RIGHT)) {
-		Block* target = nullptr;
-		BLOCK_FACE face;
-		getTargetBlock(&target, &face);
+		static double lastModified = 0;
+		double currentTime = glfwGetTime();
 
-		if (target != nullptr) {
+		if (keyHandler->mouseHeld(GLFW_MOUSE_BUTTON_RIGHT) && currentTime > lastModified + .2) {
 			glm::ivec3 iPos = glm::ivec3(
 				round(pos.x),
 				round(pos.y),
 				round(pos.z)
 			);
 
-			if (target->getPos() + getBlockFaceDirection(face) != iPos &&
-				target->getPos() + getBlockFaceDirection(face) != iPos + glm::ivec3(up)) {
+			if (targetBlock->getPos() + getBlockFaceDirection(face) != iPos &&
+				targetBlock->getPos() + getBlockFaceDirection(face) != iPos + glm::ivec3(up)) {
 
-				Block* replacingBlock = world->getBlock(target->getPos() + getBlockFaceDirection(face));
-				world->setBlock(target->getPos() + getBlockFaceDirection(face), selectedBlock,
+				Block* replacingBlock = world->getBlock(targetBlock->getPos() + getBlockFaceDirection(face));
+				world->setBlock(targetBlock->getPos() + getBlockFaceDirection(face), selectedBlock,
 					replacingBlock != nullptr && replacingBlock->getType() == BLOCK_TYPE::WATER);
+
+				lastModified = glfwGetTime();
 			}
+		}
+
+		if (keyHandler->mouseHeld(GLFW_MOUSE_BUTTON_LEFT) && currentTime > lastModified + .2) {
+			world->setBlock(targetBlock->getPos(), BLOCK_TYPE::AIR);
+			getTargetBlock(&targetBlock, &face);
+			lastModified = glfwGetTime();
+		}
+
+		if (!keyHandler->mouseHeld(GLFW_MOUSE_BUTTON_LEFT) && !keyHandler->mouseHeld(GLFW_MOUSE_BUTTON_RIGHT)) {
+			lastModified = 0;
 		}
 	}
 
