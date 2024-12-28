@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "ShaderSources.h"
 #ifdef _WIN32
+#undef APIENTRY
 #include <Windows.h>
 #undef max
 #undef min
@@ -271,6 +272,8 @@ void Game::update() {
 		m_gamePaused = true;
 		if (targetFps > 5) targetFps = 5;
 	}
+
+	m_realDelta = static_cast<float>(glfwGetTime() - startTime);
 
 	// limit FPS
 	while (targetFps != 0 && glfwGetTime() - startTime < 1.0 / targetFps);

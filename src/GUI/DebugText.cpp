@@ -28,13 +28,21 @@ void DebugText::render() {
 	text << "\nBuild: " << game->getBuild() << "\n";
 	static double lastFpsUpdated = 0;
 	static int lastFps = 0;
-	static float lastDelta = 0;
+	static float lastDelta1 = 0;
+	static float lastDelta2 = 0;
+	static float lastDelta3 = 0;
 	if (currentTime - lastFpsUpdated > .25) {
 		lastFps = static_cast<int>(round(1 / delta));
-		lastDelta = delta;
+		lastDelta1 = delta;
+		lastDelta2 = game->getSimDelta();
+		lastDelta3 = game->getRealDelta();
 		lastFpsUpdated = currentTime;
 	}
-	text << "FPS: " << lastFps << " (" << lastDelta << ")" << "\n\n";
+	text << "FPS: " << lastFps;
+	text << " (" << lastDelta1 << ")";
+	text << " (" << round(1 / lastDelta2) << ":" << round(lastDelta2 * 1000) / 1000 << ")";
+	text << " (" << round(1 / lastDelta3) << ":" << round(lastDelta3 * 1000) / 1000 << ")";
+	text << "\n\n";
 
 	text << "Resolution: " << size.x << "x" << size.y << "\n";
 	const GPUInfo* gpu = game->getGpuInfo();

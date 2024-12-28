@@ -2,6 +2,7 @@
 #include "Logging.h"
 #include <csignal>
 #ifdef _WIN32
+#undef APIENTRY
 #include <Windows.h>
 #endif
 #include "Game/Game.h"

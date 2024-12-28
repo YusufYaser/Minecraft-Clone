@@ -60,6 +60,9 @@ public:
 	float getSimDelta() const { return !m_gamePaused ? std::min(m_delta, 1.0f / 10) : 0; };
 	// You should probably use getSimDelta() instead
 	float getDelta() const { return m_delta; };
+	// Gets the delta time without putting into account the FPS limiter
+	// This shouldn't be used at all
+	float getRealDelta() const { return m_realDelta; };
 	int getFrameNum() const { return m_frameNum; }
 
 	bool gamePaused() const { return m_gamePaused; };
@@ -94,6 +97,7 @@ private:
 	Image* m_crosshair = nullptr;
 	Image* m_collOverlay = nullptr;
 
+	float m_realDelta = 1.0f;
 	float m_delta = 1.0f;
 	int m_renderDistance = 6;
 
