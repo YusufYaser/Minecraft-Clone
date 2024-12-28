@@ -19,6 +19,12 @@ void World::chunkLoaderFunc() {
 		Chunk* chunk = chunks[chunkCh];
 		chunksMutex.unlock();
 
+		if (time(0) - chunk->lastRendered > 10) {
+			delete chunk;
+			chunks.erase(chunkCh);
+			continue;
+		}
+
 		std::string path = "worlds/" + name + "/c" + std::to_string(chunkCh);
 		if (std::filesystem::exists(path)) {
 			std::ifstream chunkFile(path);
@@ -131,7 +137,7 @@ void World::chunkUnloaderFunc() {
 				chunks.erase(ch);
 				continue;
 			}
-			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 1)
+			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 10)
 				|| unloading.load()) {
 				if (chunk->modified) {
 					try {
@@ -171,8 +177,9 @@ void World::chunkUnloaderFunc() {
 
 void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
 	std::size_t chunkCh = hashPos(pos);
+	auto it = chunks.find(chunkCh);
 
-	if (chunks.find(chunkCh) == chunks.end()) {
+	if (it == chunks.end()) {
 		Chunk* chunk = new Chunk();
 		chunk->blocks = std::unordered_map<std::size_t, Block*>();
 		for (int i = 0; i < BLOCK_TYPE_COUNT; i++) {
@@ -184,6 +191,7 @@ void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
 		chunks[chunkCh] = chunk;
 		chunksMutex.unlock();
 	} else {
+		it->second->lastRendered = time(nullptr);
 		return; // already loaded
 	}
 
