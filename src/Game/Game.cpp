@@ -345,17 +345,19 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos) {
 
 void Game::unloadWorld() {
 	try {
-		print("Saving world data");
-		std::filesystem::create_directory("worlds");
-		std::filesystem::create_directory("worlds/" + m_worldName);
+		if (m_player != nullptr) {
+			print("Saving world data");
+			std::filesystem::create_directory("worlds");
+			std::filesystem::create_directory("worlds/" + m_worldName);
 
-		std::ofstream outFile("worlds/" + m_worldName + "/world.dat", std::ios::binary);
-		WorldSaveData* s = m_world->createWorldSaveData();
-		outFile.write(reinterpret_cast<const char*>(s), sizeof(WorldSaveData));
-		outFile.close();
+			std::ofstream outFile("worlds/" + m_worldName + "/world.dat", std::ios::binary);
+			WorldSaveData* s = m_world->createWorldSaveData();
+			outFile.write(reinterpret_cast<const char*>(s), sizeof(WorldSaveData));
+			outFile.close();
 
-		delete s;
-		print("Saved world data");
+			delete s;
+			print("Saved world data");
+		}
 	} catch (std::filesystem::filesystem_error e) {
 		error("FAILED TO SAVE WORLD:", e.what());
 	}
