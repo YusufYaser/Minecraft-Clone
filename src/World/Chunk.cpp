@@ -148,6 +148,7 @@ void World::chunkUnloaderFunc() {
 
 						std::ofstream chunkFile("worlds/" + name + "/c" + std::to_string(ch));
 						chunkFile.write(reinterpret_cast<const char*>(saveData), sizeof(ChunkSaveData));
+						chunk->modified = false;
 						chunkFile.close();
 
 						delete saveData;
