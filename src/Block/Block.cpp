@@ -92,7 +92,9 @@ Block::Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces) {
 	Block::hiddenFaces = hiddenFaces;
 }
 
-void Block::Render(Shader* shader, bool bindTexture) {
+void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTexture) {
+	uint8_t hiddenFaces = this->hiddenFaces | additionalHiddenFaces;
+
 	if (hiddenFaces == 63) return;
 
 	GLuint VAO;

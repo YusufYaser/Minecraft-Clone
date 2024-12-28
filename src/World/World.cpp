@@ -99,6 +99,7 @@ void World::render() {
 
 	if (targetBlock != nullptr) targetBlock->highlighted = true;
 
+	// Camera Position
 	glm::vec3 pos = player->getCameraPos();
 	int renderDistance = Game::getInstance()->getRenderDistance();
 	shader->setUniform("highlighted", false);
@@ -154,7 +155,30 @@ void World::render() {
 
 				for (auto& block : blocks) {
 					if (block == nullptr) continue;
-					block->Render(shader, false);
+					uint8_t hiddenFaces = 0;
+
+					if (block->getPos().x + .5f > pos.x) {
+						hiddenFaces |= 1 << (int)BLOCK_FACE::RIGHT;
+					}
+					if (block->getPos().x - .5f < pos.x) {
+						hiddenFaces |= 1 << (int)BLOCK_FACE::LEFT;
+					}
+
+					if (block->getPos().y + .5f > pos.y) {
+						hiddenFaces |= 1 << (int)BLOCK_FACE::TOP;
+					}
+					if (block->getPos().y - .5f < pos.y) {
+						hiddenFaces |= 1 << (int)BLOCK_FACE::BOTTOM;
+					}
+
+					if (block->getPos().z + .5f > pos.z) {
+						hiddenFaces |= 1 << (int)BLOCK_FACE::FRONT;
+					}
+					if (block->getPos().z - .5f < pos.z) {
+						hiddenFaces |= 1 << (int)BLOCK_FACE::BACK;
+					}
+
+					block->Render(shader, hiddenFaces, false);
 				}
 			}
 			chunk->lastRendered = time(nullptr);
@@ -178,7 +202,10 @@ void World::render() {
 					}
 				}
 				shader->setUniform("isLiquidTop", isLiquidTop);
-				block->Render(shader, false);
+
+				uint8_t hiddenFaces = 0;
+
+				block->Render(shader, hiddenFaces, false);
 			}
 		}
 	}

@@ -40,7 +40,7 @@ class Block {
 public:
 	Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces = 0);
 
-	void Render(Shader* shader, bool bindTexture = true);
+	void Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTexture = true);
 	const char* getName() const { return getTextureName(type); };
 	glm::ivec3 getPos() const { return pos; };
 	BLOCK_TYPE getType() const { return type; };

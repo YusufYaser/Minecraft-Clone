@@ -19,7 +19,7 @@
 #include <fstream>
 
 struct GameSettings {
-	int renderDistance = 6;
+	int renderDistance = 12;
 };
 
 struct GPUInfo {
