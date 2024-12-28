@@ -65,14 +65,25 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	while (!game->shouldQuit() && !ctrlC) {
-		game->update();
+#ifndef _DEBUG
+	try {
+#endif
+		while (!game->shouldQuit() && !ctrlC) {
+			game->update();
+		}
+		print("Stopping game");
+
+		print("Cleaning up");
+
+		delete game;
+		game = nullptr;
+#ifndef _DEBUG
+	} catch (...) {
+		error("The game has crashed!");
+#ifdef _WIN32
+		MessageBox(nullptr, L"The game has crashed. Please try restarting the game", L"Game Crashed", MB_OK | MB_ICONERROR);
+#endif
 	}
-	print("Stopping game");
-
-	print("Cleaning up");
-
-	delete game;
-	game = nullptr;
+#endif
 	return 0;
 }
