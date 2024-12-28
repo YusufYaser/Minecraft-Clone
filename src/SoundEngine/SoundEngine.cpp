@@ -71,14 +71,14 @@ void SoundEngine::registerSound(Sound& sound) {
 				esound->sounds[c][j] = msound;
 				loaded = true;
 			} else {
-				warn("Failed to load sound:", sound.fileNames[i]);
+				error("Failed to load sound:", sound.fileNames[i]);
 				break;
 			}
 		}
 		if (loaded != 0) c++;
 	}
 	if (c == 0) {
-		warn("No sounds loaded for", (int)sound.type);
+		error("No sounds loaded for", (int)sound.type);
 		delete esound;
 		return;
 	}
