@@ -34,7 +34,7 @@ int World::getHeight(glm::ivec2 pos) {
 	}
 
 	const double random = perlin.octave2D_01((pos.x * 0.025), (pos.y * 0.025), 4);
-	int height = static_cast<int>(round(random * 10 + 2));
+	int height = static_cast<int>(round(random * 10 + 30));
 	return height;
 }
 

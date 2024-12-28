@@ -127,7 +127,10 @@ void World::chunkUnloaderFunc() {
 		if (!chunksMutex.try_lock()) continue;
 	unloader_func_chunks_loop:
 		for (auto& [ch, chunk] : chunks) {
-			if (chunk == nullptr) continue;
+			if (chunk == nullptr) {
+				chunks.erase(ch);
+				continue;
+			}
 			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 1)
 				|| unloading.load()) {
 				if (chunk->modified) {

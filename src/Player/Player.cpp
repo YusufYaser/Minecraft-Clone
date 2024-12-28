@@ -64,10 +64,10 @@ void Player::checkInputs(float delta) {
 
 	if (keyHandler->keyHeld(GLFW_KEY_F3)) {
 		if (keyHandler->keyHeld(GLFW_KEY_R)) {
-			pos = { 0.0f, 30.0f, 0.0f };
+			pos = { 0.0f, 100.0f, 0.0f };
 		}
 		if (keyHandler->keyHeld(GLFW_KEY_T)) {
-			pos.y = 30.0f;
+			pos.y = 100.0f;
 		}
 	}
 
