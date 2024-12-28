@@ -184,10 +184,12 @@
     <ClCompile Include="src\GUI\PauseMenu.cpp" />
     <ClCompile Include="src\GUI\Components\Text.cpp" />
     <ClCompile Include="src\KeyHandler\KeyHandler.cpp" />
+    <ClCompile Include="src\miniaudio.cpp" />
     <ClCompile Include="src\Player\Player.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\GameWindow\GameWindow.cpp" />
     <ClCompile Include="src\Shaders\Shaders.cpp" />
+    <ClCompile Include="src\SoundEngine\SoundEngine.cpp" />
     <ClCompile Include="src\stb.cpp" />
     <ClCompile Include="src\Textures\Textures.cpp" />
     <ClCompile Include="src\World\Chunk.cpp" />
@@ -217,6 +219,7 @@
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\GameWindow\GameWindow.h" />
     <ClInclude Include="src\Shaders\Shaders.h" />
+    <ClInclude Include="src\SoundEngine\SoundEngine.h" />
     <ClInclude Include="src\Textures\Textures.h" />
     <ClInclude Include="src\World\Structures.h" />
     <ClInclude Include="src\World\Utils.h" />

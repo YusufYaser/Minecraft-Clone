@@ -17,6 +17,7 @@
 #include "../KeyHandler/KeyHandler.h"
 #include <gltext/gltext.h>
 #include <fstream>
+#include "../SoundEngine/SoundEngine.h"
 
 struct GameSettings {
 #ifndef _DEBUG
@@ -43,11 +44,12 @@ public:
 
 	void update();
 
-	GameWindow* getGameWindow() { return m_gameWindow; };
-	GLFWwindow* getGlfwWindow() { return m_gameWindow->getGlfwWindow(); };
-	World* getWorld() { return m_world; };
-	Player* getPlayer() { return m_player; };
-	KeyHandler* getKeyHandler() { return m_keyHandler; };
+	GameWindow* getGameWindow() const { return m_gameWindow; };
+	GLFWwindow* getGlfwWindow() const { return m_gameWindow->getGlfwWindow(); };
+	World* getWorld() const { return m_world; };
+	Player* getPlayer() const { return m_player; };
+	KeyHandler* getKeyHandler() const { return m_keyHandler; };
+	SoundEngine* getSoundEngine() const { return m_soundEngine; };
 
 	const GPUInfo* getGpuInfo();
 
@@ -96,6 +98,7 @@ private:
 	World* m_world = nullptr;
 	Image* m_crosshair = nullptr;
 	Image* m_collOverlay = nullptr;
+	SoundEngine* m_soundEngine = nullptr;
 
 	float m_realDelta = 1.0f;
 	float m_delta = 1.0f;

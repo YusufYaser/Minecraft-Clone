@@ -19,6 +19,7 @@ void DebugText::render() {
 	glm::ivec2 size = game->getGameWindow()->getSize();
 	Player* player = game->getPlayer();
 	World* world = game->getWorld();
+	SoundEngine* soundEngine = game->getSoundEngine();
 
 	std::stringstream text;
 	text << "Minecraft Clone";
@@ -48,6 +49,8 @@ void DebugText::render() {
 	const GPUInfo* gpu = game->getGpuInfo();
 	text << "GPU: " << gpu->renderer << " (" << gpu->vendor << ")" << "\n";
 	text << "Version: " << gpu->version << "\n\n";
+
+	text << "Sound Device: " << soundEngine->getSoundDeviceName() << "\n\n";
 
 	if (player != nullptr) {
 		text << "Position: " << round(player->pos.x * 100) / 100;

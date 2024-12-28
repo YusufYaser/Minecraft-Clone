@@ -46,7 +46,12 @@ bool Button::isHovered() {
 }
 
 bool Button::isClicked() {
-	return Game::getInstance()->getKeyHandler()->mouseClicked(GLFW_MOUSE_BUTTON_LEFT) && isHovered();
+	if (Game::getInstance()->getKeyHandler()->mouseClicked(GLFW_MOUSE_BUTTON_LEFT) && isHovered()) {
+		Game::getInstance()->getSoundEngine()->playSound(SOUND_TYPE::BUTTON);
+		return true;
+	}
+
+	return false;
 }
 
 void Button::setText(const char* content) {

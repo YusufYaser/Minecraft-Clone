@@ -82,6 +82,22 @@ Game::Game(GameSettings& settings) {
 	guiShader->setUniform("tex0", 0);
 	print("Loaded textures");
 
+	print("Initializing sound engine");
+	m_soundEngine = new SoundEngine();
+	if (m_soundEngine->isLoaded()) {
+		print("Initialized sound engine");
+
+		print("Loading sounds");
+		m_soundEngine->loadSounds();
+		print("Loaded sounds");
+	} else {
+		error("Failed to initialize sound engine");
+
+#ifdef _WIN32
+		MessageBox(nullptr, L"The game has failed to initialize the sound engine.\nThe game will start without any sounds.", L"Sound engine failed to initialize", MB_OK | MB_ICONWARNING);
+#endif
+	}
+
 	// load structures
 	print("Loading structures");
 	Structure::initialize();
@@ -133,6 +149,9 @@ Game::~Game() {
 
 	delete m_collOverlay;
 	m_collOverlay = nullptr;
+
+	delete m_soundEngine;
+	m_soundEngine = nullptr;
 
 	delete shader;
 	shader = nullptr;
