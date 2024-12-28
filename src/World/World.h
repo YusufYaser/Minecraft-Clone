@@ -22,10 +22,10 @@ enum class Generator : uint8_t {
 };
 
 struct WorldSaveData {
-	uint8_t version = 1;
 	int tick;
 	unsigned int seed;
 	Generator generator;
+	uint8_t structuresCount;
 	STRUCTURE_TYPE structures[STRUCTURES_COUNT];
 	float playerPos[3];
 };

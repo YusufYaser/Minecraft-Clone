@@ -108,17 +108,12 @@ void WorldSelector::render() {
 				dataFile.read(reinterpret_cast<char*>(data), sizeof(WorldSaveData));
 				dataFile.close();
 
-				if (data->version != 1) {
-					error("Incompatible world data version:", std::to_string(data->version));
-					continue;
-				}
-
 				WorldSettings settings;
 				settings.seed = data->seed;
 				settings.generator = data->generator;
 				settings.initialTick = data->tick;
 				settings.structures.clear();
-				for (int i = 0; i < STRUCTURES_COUNT; i++) {
+				for (int i = 0; i < data->structuresCount; i++) {
 					settings.structures.push_back(data->structures[i]);
 				}
 

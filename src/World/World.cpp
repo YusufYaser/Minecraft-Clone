@@ -65,7 +65,6 @@ World::~World() {
 
 WorldSaveData* World::createWorldSaveData() {
 	WorldSaveData* data = new WorldSaveData();
-	data->version = 1;
 	data->tick = m_tick;
 	data->seed = seed;
 	data->generator = generator;
@@ -73,6 +72,7 @@ WorldSaveData* World::createWorldSaveData() {
 	for (auto& structure : structures) {
 		data->structures[i++] = structure->getType();
 	}
+	data->structuresCount = i;
 
 	glm::vec3 pos = Game::getInstance()->getPlayer()->pos;
 	data->playerPos[0] = pos.x;
