@@ -18,41 +18,47 @@ WorldSelector::WorldSelector() {
 	back->setText("Back");
 	back->setPosition({ .5f, 0, 1, -75 });
 
-	int i = 0;
-	for (auto& dir : std::filesystem::directory_iterator("worlds")) {
-		std::string p = dir.path().string();
+	try {
+		std::filesystem::create_directory("worlds");
 
-		if (!dir.is_directory()) {
-			warn("Ignoring unknown file:", p);
-			continue;
-		}
+		int i = 0;
+		for (auto& dir : std::filesystem::directory_iterator("worlds")) {
+			std::string p = dir.path().string();
 
-		if (std::filesystem::exists(p + "/world.dat")) {
-			if (std::filesystem::file_size(p + "/world.dat") != sizeof(WorldSaveData)) {
-				warn("Ignoring world with invalid world data size:", p);
+			if (!dir.is_directory()) {
+				warn("Ignoring unknown file:", p);
 				continue;
 			}
 
-			WorldEntry* world = new WorldEntry();
-			world->name = dir.path().stem().string();
+			if (std::filesystem::exists(p + "/world.dat")) {
+				if (std::filesystem::file_size(p + "/world.dat") != sizeof(WorldSaveData)) {
+					warn("Ignoring world with invalid world data size:", p);
+					continue;
+				}
+
+				WorldEntry* world = new WorldEntry();
+				world->name = dir.path().stem().string();
 
 
-			world->playButton = new Button();
-			world->playButton->setText(world->name.c_str());
-			world->playButton->setPosition({ .5f, 0, 0, 125 + i * 40 });
-			world->playButton->setSize({ 0, 384, 0, 32 });
+				world->playButton = new Button();
+				world->playButton->setText(world->name.c_str());
+				world->playButton->setPosition({ .5f, 0, 0, 125 + i * 40 });
+				world->playButton->setSize({ 0, 384, 0, 32 });
 
-			worlds.push_back(world);
+				worlds.push_back(world);
 
-			i++;
-		} else {
-			warn("Ignoring unknown directory:", p);
-			continue;
+				i++;
+			} else {
+				warn("Ignoring unknown directory:", p);
+				continue;
+			}
 		}
-	}
-	if (i != 0) {
-		newWorld->setSize({ 0, 256, 0, 32 });
-		newWorld->setPosition({ .5f, 0, 1, -125 });
+		if (i != 0) {
+			newWorld->setSize({ 0, 256, 0, 32 });
+			newWorld->setPosition({ .5f, 0, 1, -125 });
+		}
+	} catch (std::filesystem::filesystem_error e) {
+		error("Failed to load worlds:", e.what());
 	}
 }
 
