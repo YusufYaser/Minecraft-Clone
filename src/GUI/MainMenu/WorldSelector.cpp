@@ -73,7 +73,7 @@ void WorldSelector::render() {
 	Game* game = Game::getInstance();
 	if (game->loadingWorld()) {
 		if (game->getWorld() != nullptr) {
-			int progress = static_cast<int>((16 - game->getWorld()->chunkLoadQueueCount()) / 16.0f * 100);
+			int progress = static_cast<int>((32 - game->getWorld()->chunkLoadQueueCount()) / 32.0f * 100);
 			std::stringstream str;
 			str << "Loading World (" << progress << "%)";
 			newWorld->setText(str.str().c_str()); // str :P
@@ -124,6 +124,19 @@ void WorldSelector::render() {
 
 				game->setLoadedWorldName(e->name);
 				game->loadWorld(settings, pos);
+
+				double start = glfwGetTime();
+				while (game->getWorld() == nullptr && game->loadingWorld() && glfwGetTime() - start < .1f) {}
+
+				if (game->loadingWorld() && game->getWorld() != nullptr) {
+					glm::ivec2 playerChunk = getPosChunk(pos);
+
+					for (int x = -2 + playerChunk.x; x < 2 + playerChunk.x; x++) {
+						for (int y = -2 + playerChunk.y; y < 2 + playerChunk.y; y++) {
+							game->getWorld()->loadChunk({ x, y, });
+						}
+					}
+				}
 
 				delete data;
 			} catch (std::filesystem::filesystem_error e) {

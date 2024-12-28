@@ -113,8 +113,8 @@ void World::render() {
 
 	shader->setUniform("ambientLight", getAmbientLight());
 
-	for (int x = -(renderDistance / 2) + static_cast<int>(round(pos.x / 16)); x < (renderDistance / 2) + static_cast<int>(round(pos.x / 16)); x++) {
-		for (int y = -(renderDistance / 2) + static_cast<int>(round(pos.z / 16)); y < (renderDistance / 2) + static_cast<int>(round(pos.z / 16)); y++) {
+	for (int x = -(renderDistance / 2) + playerChunk.x; x < (renderDistance / 2) + playerChunk.x; x++) {
+		for (int y = -(renderDistance / 2) + playerChunk.y; y < (renderDistance / 2) + playerChunk.y; y++) {
 			glm::ivec2 cPos = glm::ivec2(x, y);
 
 			if (glm::length(glm::vec2(cPos - playerChunk)) > 1) {
