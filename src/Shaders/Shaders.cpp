@@ -8,7 +8,7 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource) {
 	GLint shaderCompiled = 0;
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &shaderCompiled);
 	if (shaderCompiled == false) {
-		error("Failed to compile shader");
+		error("Failed to compile vertex shader");
 		GLint logLength = 0;
 		glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &logLength);
 		std::string errorLog;
@@ -23,7 +23,7 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource) {
 	glCompileShader(fragmentShader);
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &shaderCompiled);
 	if (shaderCompiled == false) {
-		error("Failed to compile shader");
+		error("Failed to compile fragment shader");
 		GLint logLength = 0;
 		glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &logLength);
 		std::string errorLog;
@@ -42,10 +42,10 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource) {
 	if (shaderCompiled == false) {
 		error("Failed to link shader");
 		GLint logLength = 0;
-		glGetProgramiv(fragmentShader, GL_INFO_LOG_LENGTH, &logLength);
+		glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &logLength);
 		std::string errorLog;
 		errorLog.resize(logLength);
-		glGetProgramInfoLog(fragmentShader, logLength, NULL, &errorLog[0]);
+		glGetProgramInfoLog(m_id, logLength, NULL, &errorLog[0]);
 		error(errorLog);
 		return;
 	}
