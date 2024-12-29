@@ -66,6 +66,7 @@ public:
 	// Get the height at a position from the world generator
 	int getHeight(glm::ivec2 pos);
 	double random(glm::ivec2 pos, int seed = 0);
+	int getSeaLevel() const { return 34; };
 
 	int getTick() const { return m_tick.load(); }
 	int getTime();

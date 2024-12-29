@@ -73,7 +73,7 @@ void World::chunkLoaderFunc() {
 					BLOCK_TYPE type = BLOCK_TYPE::STONE;
 					if (y == 0) {
 						type = BLOCK_TYPE::BEDROCK;
-					} else if (height > 6) {
+					} else if (height > getSeaLevel()) {
 						if (y == height - 1) type = BLOCK_TYPE::GRASS;
 						else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
 					} else {
@@ -83,8 +83,8 @@ void World::chunkLoaderFunc() {
 
 					setBlock(glm::ivec3(x, y, z), type);
 				}
-				if (height <= 6) {
-					for (int y = height; y < 6; y++) {
+				if (height <= getSeaLevel()) {
+					for (int y = height; y < getSeaLevel(); y++) {
 						setBlock(glm::ivec3(x, y, z), BLOCK_TYPE::WATER);
 					}
 				}

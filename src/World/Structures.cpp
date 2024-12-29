@@ -106,14 +106,14 @@ BLOCK_TYPE Structure::getBlock(glm::ivec3 pos) {
 }
 
 bool Structure::isInXZ(glm::ivec2 pos) {
-	if (getBase(pos) + m_pivot.y <= 6) return false;
+	World* world = Game::getInstance()->getWorld();
+
+	if (getBase(pos) + m_pivot.y <= world->getSeaLevel()) return false;
 
 	glm::ivec2 sPos = {
 		(pos.x >= 0) ? pos.x / m_size.x : (pos.x - m_size.x + 1) / m_size.x,
 		(pos.y >= 0) ? pos.y / m_size.z : (pos.y - m_size.z + 1) / m_size.z
 	};
-	World* world = Game::getInstance()->getWorld();
-
 
 	return world->random(sPos, 4u * (int)m_type) <= m_probability;
 }
