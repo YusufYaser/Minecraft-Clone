@@ -16,6 +16,7 @@ public:
 private:
 	Text* title;
 	Button* newWorld;
+	Button* worldsDirectory;
 	Button* back;
 
 	Text* overflow;

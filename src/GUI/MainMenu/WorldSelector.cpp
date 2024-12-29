@@ -14,6 +14,10 @@ WorldSelector::WorldSelector() {
 	newWorld->setPosition({ .5f, 0, .5f, 0 });
 	newWorld->setSize({ 0, 512, 0, 64 });
 
+	worldsDirectory = new Button();
+	worldsDirectory->setText("Open Worlds Directory");
+	worldsDirectory->setPosition({ .5f, 0, 1, -125 });
+
 	back = new Button();
 	back->setText("Back");
 	back->setPosition({ .5f, 0, 1, -75 });
@@ -61,7 +65,8 @@ WorldSelector::WorldSelector() {
 		}
 		if (i != 0) {
 			newWorld->setSize({ 0, 256, 0, 32 });
-			newWorld->setPosition({ .5f, 0, 1, -125 });
+			newWorld->setPosition({ .5f, -128 - 8, 1, -124 });
+			worldsDirectory->setPosition({ .5f, 128 + 8, 1, -124 });
 		}
 	} catch (std::filesystem::filesystem_error e) {
 		error("Failed to load worlds:", e.what());
@@ -103,7 +108,24 @@ void WorldSelector::render() {
 
 	title->render();
 	newWorld->render();
+	worldsDirectory->render();
 	back->render();
+
+	if (worldsDirectory->isClicked()) {
+		std::filesystem::path dirPath = std::filesystem::current_path() / "worlds";
+		std::string dir = dirPath.string();
+		std::string cmd = "echo Platform not supported";
+#ifdef _WIN32
+		cmd = "explorer " + dir;
+#elif __APPLE__
+		cmd = "open " + dir;
+#elif __linux__
+		cmd = "xdg-open " + dir;
+#else
+		error("Platform not supported");
+#endif
+		system(cmd.c_str());
+	}
 
 	glm::ivec2 size = game->getGameWindow()->getSize();
 
