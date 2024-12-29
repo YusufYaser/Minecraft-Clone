@@ -155,30 +155,23 @@ void World::render() {
 
 				for (auto& block : blocks) {
 					if (block == nullptr) continue;
+
+					const glm::ivec3& bPos = block->getPos();
+					const glm::vec3 diff = glm::vec3(bPos) - pos;
+					const float half = .5f;
+
 					uint8_t hiddenFaces = 0;
 
-					if (block->getPos().x + .5f > pos.x) {
-						hiddenFaces |= 1 << (int)BLOCK_FACE::RIGHT;
-					}
-					if (block->getPos().x - .5f < pos.x) {
-						hiddenFaces |= 1 << (int)BLOCK_FACE::LEFT;
-					}
+					hiddenFaces |= (diff.x > -half) << (int)BLOCK_FACE::RIGHT;
+					hiddenFaces |= (diff.x < half) << (int)BLOCK_FACE::LEFT;
 
-					if (block->getPos().y + .5f > pos.y) {
-						hiddenFaces |= 1 << (int)BLOCK_FACE::TOP;
-					}
-					if (block->getPos().y - .5f < pos.y) {
-						hiddenFaces |= 1 << (int)BLOCK_FACE::BOTTOM;
-					}
+					hiddenFaces |= (diff.y > -half) << (int)BLOCK_FACE::TOP;
+					hiddenFaces |= (diff.y < half) << (int)BLOCK_FACE::BOTTOM;
 
-					if (block->getPos().z + .5f > pos.z) {
-						hiddenFaces |= 1 << (int)BLOCK_FACE::FRONT;
-					}
-					if (block->getPos().z - .5f < pos.z) {
-						hiddenFaces |= 1 << (int)BLOCK_FACE::BACK;
-					}
+					hiddenFaces |= (diff.z > -half) << (int)BLOCK_FACE::FRONT;
+					hiddenFaces |= (diff.z < half) << (int)BLOCK_FACE::BACK;
 
-					block->Render(shader, hiddenFaces, false);
+					if ((block->hiddenFaces | hiddenFaces) < 63) block->Render(shader, hiddenFaces, false);
 				}
 			}
 			chunk->lastRendered = time(nullptr);
