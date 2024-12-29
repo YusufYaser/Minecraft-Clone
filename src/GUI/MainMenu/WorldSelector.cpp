@@ -18,6 +18,12 @@ WorldSelector::WorldSelector() {
 	back->setText("Back");
 	back->setPosition({ .5f, 0, 1, -75 });
 
+	overflow = new Text();
+	overflow->setText("There are more worlds below");
+	overflow->setCentered(true);
+	overflow->setPosition({ .5f, 0, 1, -160 });
+	overflow->setColor({ .75f, .75f, .75f, 1.0f });
+
 	try {
 		std::filesystem::create_directory("worlds");
 
@@ -72,6 +78,8 @@ WorldSelector::~WorldSelector() {
 	delete back;
 	back = nullptr;
 
+	delete overflow;
+
 	worlds.clear();
 }
 
@@ -97,7 +105,18 @@ void WorldSelector::render() {
 	newWorld->render();
 	back->render();
 
+	glm::ivec2 size = game->getGameWindow()->getSize();
+
+	bool overflowed = false;
 	for (auto& e : worlds) {
+		if (e->playButton->getPosition().w > size.y - 185) {
+			if (!overflowed) {
+				overflow->setPosition(e->playButton->getPosition());
+			}
+			overflowed = true;
+			continue;
+		}
+
 		e->playButton->render();
 		e->playButton->setEnabled(!game->loadingWorld());
 
@@ -151,6 +170,8 @@ void WorldSelector::render() {
 		}
 	}
 
+	if (overflowed) overflow->render();
+
 	if (newWorld->isClicked()) {
 		WorldSettings settings;
 		settings.generator = Generator::Default;
@@ -166,7 +187,7 @@ void WorldSelector::render() {
 		game->loadWorld(settings);
 	}
 
-	if (back->isClicked() || game->getKeyHandler()->keyHeld(GLFW_KEY_ESCAPE)) {
+	if ((back->isClicked() || game->getKeyHandler()->keyHeld(GLFW_KEY_ESCAPE)) && !game->loadingWorld()) {
 		m_isClosing = true;
 		return;
 	}

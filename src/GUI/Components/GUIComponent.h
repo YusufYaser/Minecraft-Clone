@@ -11,6 +11,11 @@ public:
 	virtual void setSize(glm::vec4 size) { m_size = size; };
 	virtual void setZIndex(int zIndex);
 
+	/*
+	* @return pos xScale, xOffset, yScale, yOffset
+	*/
+	virtual glm::vec4 getPosition() const { return m_pos; };
+
 	virtual void render() { assert("No rendering function set to this GUI component"); };
 
 	bool isRendered();

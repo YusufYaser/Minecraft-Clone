@@ -18,6 +18,8 @@ private:
 	Button* newWorld;
 	Button* back;
 
+	Text* overflow;
+
 	bool m_isClosing = false;
 
 	struct WorldEntry {
