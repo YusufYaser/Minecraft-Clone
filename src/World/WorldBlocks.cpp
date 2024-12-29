@@ -6,22 +6,20 @@ Block* World::getBlock(glm::ivec3 pos) {
 	std::size_t chunkCh = hashPos(getPosChunk(pos));
 
 	chunksMutex.lock();
-	if (chunks.find(chunkCh) == chunks.end()) {
-		chunksMutex.unlock();
+	auto cit = chunks.find(chunkCh);
+	chunksMutex.unlock();
+	if (cit == chunks.end()) {
 		return nullptr; // chunk not loaded
 	}
 
-	Chunk* chunk = chunks[chunkCh];
-	chunksMutex.unlock();
-	if (chunk == nullptr) return nullptr;
+	Chunk* chunk = cit->second;
 
 	chunk->blocksMutex.lock();
-	if (chunk->blocks.find(blockCh) != chunk->blocks.end()) {
-		chunk->blocksMutex.unlock();
-
-		return chunk->blocks[blockCh];
-	}
+	auto bit = chunk->blocks.find(blockCh);
 	chunk->blocksMutex.unlock();
+	if (bit != chunk->blocks.end()) {
+		return bit->second;
+	}
 
 	return nullptr;
 }
@@ -35,21 +33,21 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 	std::size_t chunkCh = hashPos(getPosChunk(pos));
 
 	chunksMutex.lock();
-	if (chunks.find(chunkCh) == chunks.end()) {
-		chunksMutex.unlock();
+	auto cit = chunks.find(chunkCh);
+	chunksMutex.unlock();
+	if (cit == chunks.end()) {
 		return nullptr; // chunk not loaded
 	}
 
-	Chunk* chunk = chunks[chunkCh];
-	chunksMutex.unlock();
-	if (chunk == nullptr) return nullptr;
+	Chunk* chunk = cit->second;
 
 	chunk->blocksMutex.lock();
-	if (chunk->blocks.find(blockCh) != chunk->blocks.end()) {
-		chunk->blocksMutex.unlock();
+	auto bit = chunk->blocks.find(blockCh);
+	chunk->blocksMutex.unlock();
+	if (bit != chunk->blocks.end()) {
 		if (!replace) return nullptr;
 
-		Block* oldBlock = chunk->blocks[blockCh];
+		Block* oldBlock = bit->second;
 		chunk->renderingGroupsMutex.lock();
 		std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[oldBlock->getType()]);
 		std::vector<Block*>::iterator begin = renderingGroup->begin();
@@ -60,13 +58,12 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 		}
 		chunk->renderingGroupsMutex.unlock();
 
+		delete oldBlock;
 		chunk->blocksMutex.lock();
-		delete chunk->blocks[blockCh];
 		chunk->blocks.erase(blockCh);
 		chunk->blocksMutex.unlock();
 		chunk->modified = true;
 	} else {
-		chunk->blocksMutex.unlock();
 		if (type == BLOCK_TYPE::AIR) return nullptr; // it was already air, nothing to change
 	}
 
