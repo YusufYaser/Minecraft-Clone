@@ -91,6 +91,8 @@ void Player::checkInputs(float delta) {
 
 	if (change != glm::vec3(0, 0, 0)) {
 		change = glm::normalize(change) * delta * speed;
+
+		glm::vec3 aChange = glm::abs(change);
 		Block* block;
 		for (int i = 0; i <= 1; i++) {
 			block = world->getBlock({
@@ -105,6 +107,18 @@ void Player::checkInputs(float delta) {
 				round(pos.z + change.z + (change.z > 0 ? .15f : -.15f))
 				});
 			if (block != nullptr && block->hasCollision()) change.z = 0;
+			block = world->getBlock({
+				round(pos.x + change.x + (change.x > 0 ? .15f : -.15f)),
+				round(pos.y + i),
+				round(pos.z + change.z + (change.z > 0 ? .15f : -.15f))
+				});
+			if (block != nullptr && block->hasCollision()) {
+				if (aChange.z > aChange.x) {
+					change.x = 0;
+				} else {
+					change.z = 0;
+				}
+			}
 		}
 		pos += change;
 	}
