@@ -139,7 +139,7 @@ void World::chunkUnloaderFunc() {
 			}
 			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 10)
 				|| unloading.load()) {
-				if (chunk->modified) {
+				if (chunk->modified && chunk->loaded) {
 					try {
 						ChunkSaveData* saveData = new ChunkSaveData();
 						chunk->blocksMutex.lock();
