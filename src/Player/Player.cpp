@@ -50,15 +50,17 @@ void Player::update(float delta) {
 	}
 
 	if (pos.y < -20.0f) {
-		pos.y = 20.0f;
+		pos.y = 100.0f;
 	}
 
 	checkInputs(delta);
 }
 
 void Player::checkInputs(float delta) {
-	KeyHandler* keyHandler = Game::getInstance()->getKeyHandler();
-	GLFWwindow* window = Game::getInstance()->getGlfwWindow();
+	Game* game = Game::getInstance();
+
+	KeyHandler* keyHandler = game->getKeyHandler();
+	GLFWwindow* window = game->getGlfwWindow();
 
 	glm::vec3 orientation2 = glm::vec3(orientation.x, 0.0f, orientation.z);
 
@@ -68,6 +70,9 @@ void Player::checkInputs(float delta) {
 		}
 		if (keyHandler->keyHeld(GLFW_KEY_T)) {
 			pos.y = 100.0f;
+		}
+		if (keyHandler->keyHeld(GLFW_KEY_Y)) {
+			game->getWorld()->setTick(0);
 		}
 	}
 

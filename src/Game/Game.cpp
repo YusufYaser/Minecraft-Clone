@@ -188,7 +188,9 @@ void Game::update() {
 
 	m_keyHandler->update();
 
-	if (m_keyHandler->keyClicked(GLFW_KEY_F3)) {
+	if (m_keyHandler->keyClicked(GLFW_KEY_F3)
+		&& !m_keyHandler->keyHeld(GLFW_KEY_R) && !m_keyHandler->keyHeld(GLFW_KEY_T) && !m_keyHandler->keyHeld(GLFW_KEY_Y)) {
+
 		m_debugTextVisible = !m_debugTextVisible;
 	}
 
