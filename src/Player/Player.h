@@ -16,11 +16,12 @@ constexpr auto PLAYER_RUN_SPEED = 7.5f;
 class Player {
 public:
 	Player();
+	~Player();
 
 	glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	glm::vec3 pos;
+	glm::vec3 pos = glm::vec3();
 	float speed = PLAYER_SPEED;
 	float reachDistance = 7.0f;
 
@@ -36,10 +37,11 @@ public:
 
 private:
 	bool wasHidden = false;
-	World* world;
 
 	float jumpSpeed = 0.0f;
 	float fallSpeed = 0.0f;
 
 	void checkInputs(float delta);
+
+	Image* m_crosshair = nullptr;
 };

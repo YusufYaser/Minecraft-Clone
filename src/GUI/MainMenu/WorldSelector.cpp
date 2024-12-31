@@ -84,6 +84,7 @@ WorldSelector::~WorldSelector() {
 	back = nullptr;
 
 	delete overflow;
+	overflow = nullptr;
 
 	worlds.clear();
 }

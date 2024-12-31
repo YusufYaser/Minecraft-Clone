@@ -1,12 +1,21 @@
 #include "Player.h"
-#include "../Game/Game.h" 
+#include "../Game/Game.h"
 
 Player::Player() {
-	pos = glm::ivec3();
-	world = Game::getInstance()->getWorld();
+	m_crosshair = new Image(getTexture("crosshair"));
+	m_crosshair->setPosition({ .5f, 0, .5f, 0 });
+	m_crosshair->setSize({ 0, 16, 0, 16 });
+	m_crosshair->setZIndex(999);
+}
+
+Player::~Player() {
+	delete m_crosshair;
+	m_crosshair = nullptr;
 }
 
 void Player::update(float delta) {
+	World* world = Game::getInstance()->getWorld();
+
 	glm::ivec3 iPos = glm::ivec3(
 		round(pos.x),
 		round(pos.y),
@@ -54,10 +63,13 @@ void Player::update(float delta) {
 	}
 
 	checkInputs(delta);
+
+	m_crosshair->render();
 }
 
 void Player::checkInputs(float delta) {
 	Game* game = Game::getInstance();
+	World* world = game->getWorld();
 
 	KeyHandler* keyHandler = game->getKeyHandler();
 	GLFWwindow* window = game->getGlfwWindow();
@@ -217,6 +229,8 @@ void Player::checkInputs(float delta) {
 }
 
 void Player::getTargetBlock(Block** block, BLOCK_FACE* face) {
+	World* world = Game::getInstance()->getWorld();
+
 	glm::vec3 oldBlockPos = glm::vec3();
 	glm::vec3 cameraPos = getCameraPos();
 	for (float i = 0; i < reachDistance; i += .01f) {

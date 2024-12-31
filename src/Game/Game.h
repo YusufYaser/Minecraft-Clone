@@ -96,7 +96,6 @@ private:
 	KeyHandler* m_keyHandler = nullptr;
 	Player* m_player = nullptr;
 	World* m_world = nullptr;
-	Image* m_crosshair = nullptr;
 	Image* m_collOverlay = nullptr;
 	SoundEngine* m_soundEngine = nullptr;
 

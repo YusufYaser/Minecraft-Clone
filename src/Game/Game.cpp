@@ -106,11 +106,6 @@ Game::Game(GameSettings& settings) {
 	// initialize other stuff
 	gltInit();
 
-	m_crosshair = new Image(getTexture("crosshair"));
-	m_crosshair->setPosition({ .5f, 0, .5f, 0 });
-	m_crosshair->setSize({ 0, 16, 0, 16 });
-	m_crosshair->setZIndex(999);
-
 	m_collOverlay = new Image(getTexture("stone"));
 	m_collOverlay->setPosition({ .5f, 0, .5f, 0 });
 	m_collOverlay->setSize({ 1, 0, 1, 0 });
@@ -143,9 +138,6 @@ Game::~Game() {
 
 	delete m_world;
 	m_world = nullptr;
-
-	delete m_crosshair;
-	m_crosshair = nullptr;
 
 	delete m_collOverlay;
 	m_collOverlay = nullptr;
@@ -273,8 +265,6 @@ void Game::update() {
 		if (m_world != nullptr && m_player != nullptr) {
 			m_player->update(getSimDelta());
 		}
-
-		m_crosshair->render();
 	}
 
 	if (m_debugTextVisible) DebugText::render();
