@@ -356,11 +356,13 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos) {
 			}
 		}
 
+#ifndef _DEBUG
 		print("Waiting for spawn chunks");
 		while (m_world->chunkLoadQueueCount() != 0) {}
-		if (shouldQuit()) return;
 		print("Loaded spawn chunks");
+#endif
 		print("Created world");
+		if (shouldQuit()) return;
 
 		m_player = new Player();
 		if (playerPos.y == 0) {
