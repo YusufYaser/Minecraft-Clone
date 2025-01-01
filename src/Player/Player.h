@@ -13,6 +13,10 @@
 constexpr auto PLAYER_SPEED = 5.0f;
 constexpr auto PLAYER_RUN_SPEED = 7.5f;
 
+struct ItemStack {
+	BLOCK_TYPE block;
+};
+
 class Player {
 public:
 	Player();
@@ -24,8 +28,6 @@ public:
 	glm::vec3 pos = glm::vec3();
 	float speed = PLAYER_SPEED;
 	float reachDistance = 7.0f;
-
-	BLOCK_TYPE selectedBlock = BLOCK_TYPE::STONE;
 
 	void update(float delta);
 
@@ -44,4 +46,9 @@ private:
 	void checkInputs(float delta);
 
 	Image* m_crosshair = nullptr;
+	Image* m_inventory = nullptr;
+	Image* m_inventoryImages[9];
+	int slot = 0;
+
+	ItemStack* m_items[9];
 };

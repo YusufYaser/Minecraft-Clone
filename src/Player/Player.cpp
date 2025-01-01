@@ -6,11 +6,39 @@ Player::Player() {
 	m_crosshair->setPosition({ .5f, 0, .5f, 0 });
 	m_crosshair->setSize({ 0, 16, 0, 16 });
 	m_crosshair->setZIndex(999);
+
+	m_inventory = new Image(getTexture("inventory"));
+	m_inventory->setPosition({ .5f, 0, 1, -32 });
+	m_inventory->setSize({ 0, 472, 0, 56 });
+	m_inventory->setZIndex(998);
+
+	for (int i = 0; i < 9; i++) {
+		ItemStack* item = new ItemStack();
+		item->block = BLOCK_TYPE(i + 2);
+		m_items[i] = item;
+
+		Image* img = new Image(getTexture(getTextureName(item->block)));
+		img->setZIndex(999);
+		img->setPosition({ .5f, -236 + (52 * i) + 28, 1, -32 });
+		img->setSize({ 0, 48, 0, 48 });
+		m_inventoryImages[i] = img;
+	}
 }
 
 Player::~Player() {
 	delete m_crosshair;
 	m_crosshair = nullptr;
+
+	delete m_inventory;
+	m_inventory = nullptr;
+
+	for (int i = 0; i < 9; i++) {
+		delete m_items[i];
+		m_items[i] = nullptr;
+
+		delete m_inventoryImages[i];
+		m_inventoryImages[i] = nullptr;
+	}
 }
 
 void Player::update(float delta) {
@@ -65,6 +93,12 @@ void Player::update(float delta) {
 	checkInputs(delta);
 
 	m_crosshair->render();
+	m_inventory->render();
+
+	for (int i = 0; i < 9; i++) {
+		m_inventoryImages[i]->setColor(i == slot ? glm::vec4(1.0f, 1.0f, 1.0f, 1.0f) : glm::vec4(.5f, .5f, .5f, 1.0f));
+		m_inventoryImages[i]->render();
+	}
 }
 
 void Player::checkInputs(float delta) {
@@ -147,29 +181,26 @@ void Player::checkInputs(float delta) {
 		speed = PLAYER_SPEED;
 	}
 
-	if (keyHandler->keyHeld(GLFW_KEY_1)) selectedBlock = BLOCK_TYPE::STONE;
-	if (keyHandler->keyHeld(GLFW_KEY_2)) selectedBlock = BLOCK_TYPE::GRASS;
-	if (keyHandler->keyHeld(GLFW_KEY_3)) selectedBlock = BLOCK_TYPE::DIRT;
-	if (keyHandler->keyHeld(GLFW_KEY_4)) selectedBlock = BLOCK_TYPE::OAK_LOG;
-	if (keyHandler->keyHeld(GLFW_KEY_5)) selectedBlock = BLOCK_TYPE::OAK_LEAVES;
-	if (keyHandler->keyHeld(GLFW_KEY_6)) selectedBlock = BLOCK_TYPE::BEDROCK;
-	if (keyHandler->keyHeld(GLFW_KEY_7)) selectedBlock = BLOCK_TYPE::SAND;
-	if (keyHandler->keyHeld(GLFW_KEY_8)) selectedBlock = BLOCK_TYPE::OAK_PLANKS;
-	if (keyHandler->keyHeld(GLFW_KEY_9)) selectedBlock = BLOCK_TYPE::WATER;
+	if (keyHandler->keyHeld(GLFW_KEY_1)) slot = 0;
+	if (keyHandler->keyHeld(GLFW_KEY_2)) slot = 1;
+	if (keyHandler->keyHeld(GLFW_KEY_3)) slot = 2;
+	if (keyHandler->keyHeld(GLFW_KEY_4)) slot = 3;
+	if (keyHandler->keyHeld(GLFW_KEY_5)) slot = 4;
+	if (keyHandler->keyHeld(GLFW_KEY_6)) slot = 5;
+	if (keyHandler->keyHeld(GLFW_KEY_7)) slot = 6;
+	if (keyHandler->keyHeld(GLFW_KEY_8)) slot = 7;
+	if (keyHandler->keyHeld(GLFW_KEY_9)) slot = 8;
 
 	Block* targetBlock = nullptr;
 	BLOCK_FACE face;
 	getTargetBlock(&targetBlock, &face);
 
 	if (targetBlock != nullptr) {
-		if (keyHandler->mouseClicked(GLFW_MOUSE_BUTTON_MIDDLE)) {
-			selectedBlock = targetBlock->getType();
-		}
-
 		static double lastModified = 0;
 		double currentTime = glfwGetTime();
 
-		if (keyHandler->mouseHeld(GLFW_MOUSE_BUTTON_RIGHT) && currentTime > lastModified + .2) {
+		if (keyHandler->mouseHeld(GLFW_MOUSE_BUTTON_RIGHT) && currentTime > lastModified + .2 && m_items[slot] != nullptr) {
+
 			glm::ivec3 iPos = glm::ivec3(
 				round(pos.x),
 				round(pos.y),
@@ -180,7 +211,7 @@ void Player::checkInputs(float delta) {
 				targetBlock->getPos() + getBlockFaceDirection(face) != iPos + glm::ivec3(up)) {
 
 				Block* replacingBlock = world->getBlock(targetBlock->getPos() + getBlockFaceDirection(face));
-				world->setBlock(targetBlock->getPos() + getBlockFaceDirection(face), selectedBlock,
+				world->setBlock(targetBlock->getPos() + getBlockFaceDirection(face), m_items[slot]->block,
 					replacingBlock != nullptr && replacingBlock->getType() == BLOCK_TYPE::WATER);
 
 				lastModified = glfwGetTime();
