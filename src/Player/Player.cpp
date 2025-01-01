@@ -45,7 +45,7 @@ void Player::update(float delta) {
 	World* world = Game::getInstance()->getWorld();
 
 	glm::ivec3 iPos = glm::round(pos);
-	iPos.y = floor(pos.y);
+	iPos.y = static_cast<int>(floor(pos.y));
 
 	Block* aboveBlock = world->getBlock(iPos + glm::ivec3(0, 1, 0));
 
@@ -66,7 +66,7 @@ void Player::update(float delta) {
 			if (!block->hasCollision()) continue;
 
 			verticalVelocity = 0;
-			pos.y = block->getPos().y + 1;
+			pos.y = block->getPos().y + 1.0f;
 
 			break;
 		}
@@ -86,15 +86,15 @@ void Player::update(float delta) {
 	pos.y += verticalVelocity * delta;
 
 	iPos = glm::round(pos);
-	iPos.y = floor(pos.y);
+	iPos.y = static_cast<int>(floor(pos.y));
 
 	if (verticalVelocity <= 0) {
 		Block* collBlock = world->getBlock(iPos);
 		if (collBlock != nullptr && collBlock->hasCollision()) {
 			verticalVelocity = 0;
-			pos.y = collBlock->getPos().y + 1;
+			pos.y = collBlock->getPos().y + 1.0f;
 			iPos = glm::floor(pos);
-			iPos.y = floor(pos.y);
+			iPos.y = static_cast<int>(floor(pos.y));
 		}
 	}
 
