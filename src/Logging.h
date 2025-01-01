@@ -7,14 +7,14 @@
 #else
 #define FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
-#define BASENAME_NO_EXT(filename) ([] { \
-    static char name_without_ext[256];\
-    const char* dot = strrchr(filename, '.');\
-    size_t len = dot ? (dot - filename) : strlen(filename);\
-    strncpy_s(name_without_ext, filename, len);\
-    name_without_ext[len] = '\0';\
-    return name_without_ext;\
-})()
+inline char* BASENAME_NO_EXT(const char* filename) {
+	const char* dot = strrchr(filename, '.');
+	size_t len = dot ? (dot - filename) : strlen(filename);
+	char* name = new char[len + 1];
+	strncpy(name, filename, len);
+	name[len] = '\0';
+	return name;
+}
 
 #define print(...)\
 (std::cout << BOLD BRIGHT_BLUE "Info "\
