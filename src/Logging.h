@@ -23,12 +23,12 @@
 
 #define error(...)\
 (std::cout << BOLD BRIGHT_RED "Err  "\
-            BRIGHT_GREEN "(" << BASENAME_NO_EXT(FILENAME) << ")"\
+            BRIGHT_GREEN "(" << BASENAME_NO_EXT(FILENAME) << ":" << __LINE__ << ")"\
             RED " -> " RESET, printArgs(__VA_ARGS__), std::cout << RESET);
 
 #define warn(...)\
 (std::cout << BOLD BRIGHT_YELLOW "Warn "\
-            BRIGHT_GREEN "(" << BASENAME_NO_EXT(FILENAME) << ")"\
+            BRIGHT_GREEN "(" << BASENAME_NO_EXT(FILENAME) << ":" << __LINE__ << ")"\
             YELLOW " -> " RESET, printArgs(__VA_ARGS__), std::cout << RESET);
 
 template<typename T>
