@@ -40,8 +40,7 @@ public:
 private:
 	bool wasHidden = false;
 
-	float jumpSpeed = 0.0f;
-	float fallSpeed = 0.0f;
+	float verticalVelocity = 0.0f;
 
 	void checkInputs(float delta);
 

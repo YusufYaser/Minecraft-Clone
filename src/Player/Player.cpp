@@ -44,45 +44,57 @@ Player::~Player() {
 void Player::update(float delta) {
 	World* world = Game::getInstance()->getWorld();
 
-	glm::ivec3 iPos = glm::ivec3(
-		round(pos.x),
-		round(pos.y),
-		round(pos.z)
-	);
+	glm::ivec3 iPos = glm::round(pos);
+	iPos.y = floor(pos.y);
 
-	if (jumpSpeed == 0.0f) {
-		Block* belowBlock = world->getBlock(glm::vec3(iPos.x, pos.y, iPos.z) - up * delta);
-		if (belowBlock == nullptr || !belowBlock->hasCollision()) {
-			fallSpeed += 15.0f * delta;
-			if (fallSpeed > 50.0f) fallSpeed = 50.0f;
-		} else {
-			fallSpeed = 0.0f;
-			pos.y = belowBlock->getPos().y + 1.0f;
-		}
-	} else if (jumpSpeed != 0.0f) {
-		Block* aboveBlock = world->getBlock(glm::vec3(iPos.x, pos.y + 1.8, iPos.z) + (jumpSpeed * delta) * up);
-		if (aboveBlock == nullptr || !aboveBlock->hasCollision()) {
-			pos += (jumpSpeed * delta) * up;
-			jumpSpeed -= 15.0f * delta;
-			if (jumpSpeed <= 0.0f) {
-				jumpSpeed = 0.0f;
-				fallSpeed = 15.0f * delta;
-			}
-		} else {
-			jumpSpeed = 0.0f;
-			fallSpeed = 15.0f * delta;
+	Block* aboveBlock = world->getBlock(iPos + glm::ivec3(0, 1, 0));
+
+	if (verticalVelocity > 0) {
+		verticalVelocity -= 9.8f * delta;
+		if (verticalVelocity < 0) verticalVelocity = 0;
+	}
+
+	if (verticalVelocity <= 0) {
+		verticalVelocity -= 9.8f * delta;
+		if (verticalVelocity < -98.0f) verticalVelocity = -98.0f;
+	}
+
+	if (verticalVelocity < 0) {
+		for (int i = iPos.y; i > floor(iPos.y + verticalVelocity * delta); i--) {
+			Block* block = world->getBlock({ iPos.x, i, iPos.z });
+			if (block == nullptr) continue;
+			if (!block->hasCollision()) continue;
+
+			verticalVelocity = 0;
+			pos.y = block->getPos().y + 1;
+
+			break;
 		}
 	}
 
-	pos -= (fallSpeed * delta) * up;
+	if (verticalVelocity > 0) {
+		Block* headBlock = world->getBlock({ iPos.x, pos.y + 1, iPos.z });
+		Block* aboveBlock = world->getBlock({ iPos.x, pos.y + 1.8, iPos.z });
+		Block* feetBlock = world->getBlock(iPos);
 
-	if (fallSpeed == 0.0f) {
+		if (headBlock != nullptr || aboveBlock != nullptr) {
+			verticalVelocity = 0;
+			if (feetBlock == nullptr) verticalVelocity -= 9.8f * delta;
+		}
+	}
+
+	pos.y += verticalVelocity * delta;
+
+	iPos = glm::round(pos);
+	iPos.y = floor(pos.y);
+
+	if (verticalVelocity <= 0) {
 		Block* collBlock = world->getBlock(iPos);
 		if (collBlock != nullptr && collBlock->hasCollision()) {
-			Block* upBlock = world->getBlock(iPos + glm::ivec3(up));
-			if (upBlock == nullptr) {
-				pos.y = collBlock->getPos().y + 1.0f;
-			}
+			verticalVelocity = 0;
+			pos.y = collBlock->getPos().y + 1;
+			iPos = glm::floor(pos);
+			iPos.y = floor(pos.y);
 		}
 	}
 
@@ -137,11 +149,12 @@ void Player::checkInputs(float delta) {
 		change += glm::normalize(glm::cross(orientation2, up));
 	}
 	if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
-		if (fallSpeed == 0.0f && jumpSpeed == 0.0f) jumpSpeed = 5.5f;
+		if (verticalVelocity == 0.0f) verticalVelocity = 4.8f;
 	}
 
 	if (change != glm::vec3(0, 0, 0)) {
 		change = glm::normalize(change) * delta * speed;
+		if (verticalVelocity > 0) change *= 1.1f;
 
 		glm::vec3 aChange = glm::abs(change);
 		Block* block;
