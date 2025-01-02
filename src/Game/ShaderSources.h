@@ -15,3 +15,11 @@ const char* guiVertexShaderFile = {
 const char* guiFragmentShaderFile = {
 #include "../Shaders/GUI/GUI.frag"
 };
+
+const char* skyboxVertexShaderFile = {
+#include "../Shaders/Skybox/Skybox.vert"
+};
+
+const char* skyboxFragmentShaderFile = {
+#include "../Shaders/Skybox/Skybox.frag"
+};

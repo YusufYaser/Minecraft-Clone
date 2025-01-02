@@ -55,6 +55,7 @@ public:
 
 	Shader* getShader() const { return shader; };
 	Shader* getGuiShader() const { return guiShader; };
+	Shader* getSkyboxShader() const { return skyboxShader; };
 
 	// If the game is paused, zero is returned
 	// If the game is running under 10 FPS, this function will return the time delta for 10 FPS.
@@ -110,6 +111,7 @@ private:
 
 	Shader* shader = nullptr;
 	Shader* guiShader = nullptr;
+	Shader* skyboxShader = nullptr;
 
 	// gui
 	PauseMenu* m_pauseMenu = nullptr;

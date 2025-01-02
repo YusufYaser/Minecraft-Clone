@@ -88,11 +88,30 @@ void World::render() {
 	Player* player = Game::getInstance()->getPlayer();
 	if (player == nullptr) return;
 
+	glm::mat4 playerView = player->getView();
+	glm::mat4 playerProjection = player->getProjection();
+
+	static Block* skybox;
+	if (skybox == nullptr) {
+		skybox = new Block(BLOCK_TYPE::STONE, glm::ivec3(0, 0, 0), 0);
+	}
+
+	Shader* skyboxShader = Game::getInstance()->getSkyboxShader();
+	skyboxShader->activate();
+	skyboxShader->setUniform("view", glm::lookAt(glm::vec3(), player->orientation, player->up));
+	skyboxShader->setUniform("projection", playerProjection);
+	skyboxShader->setUniform("ambientLight", getAmbientLight());
+
+	glDepthRange(0.9, 1.0);
+	glBindTexture(GL_TEXTURE_2D, getTexture("skybox")->id);
+	skybox->Render(skyboxShader, 0, false);
+	glDepthRange(0.01, 0.9);
+
 	Shader* shader = Game::getInstance()->getShader();
 
-	shader->activate();;
-	shader->setUniform("view", player->getView());
-	shader->setUniform("projection", player->getProjection());
+	shader->activate();
+	shader->setUniform("view", playerView);
+	shader->setUniform("projection", playerProjection);
 
 	Block* targetBlock = nullptr;
 	player->getTargetBlock(&targetBlock);

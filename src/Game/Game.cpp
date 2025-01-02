@@ -66,7 +66,8 @@ Game::Game(GameSettings& settings) {
 	print("Intializing shaders");
 	shader = new Shader(vertexShaderFile, fragmentShaderFile);
 	guiShader = new Shader(guiVertexShaderFile, guiFragmentShaderFile);
-	if (!shader->successfullyLoaded() || !guiShader->successfullyLoaded()) {
+	skyboxShader = new Shader(skyboxVertexShaderFile, skyboxFragmentShaderFile);
+	if (!shader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded()) {
 		error("Failed to initialize shaders");
 		return;
 	}
@@ -80,6 +81,8 @@ Game::Game(GameSettings& settings) {
 	shader->setUniform("tex0", 0);
 	guiShader->activate();
 	guiShader->setUniform("tex0", 0);
+	skyboxShader->activate();
+	skyboxShader->setUniform("tex0", 0);
 	print("Loaded textures");
 
 	print("Initializing sound engine");
@@ -225,23 +228,15 @@ void Game::update() {
 
 	m_gameWindow->update();
 
+	skyboxShader->activate();
+	skyboxShader->setUniform("gamePaused", m_gamePaused);
 	shader->activate();
 	shader->setUniform("gamePaused", m_gamePaused);
-	glm::vec3 clearColor = glm::vec3();
 	if (m_gamePaused) {
-		if (m_player != nullptr) {
-			clearColor = { .3f, .3f, 1.0f };
-			clearColor *= .5f;
-		} else {
-			clearColor = { 0, .25f, 0 };
-		}
+		glClearColor(0, .25f, 0, 1.0f);
 	} else {
-		clearColor = { .3f, .3f, 1.0f };
+		glClearColor(0, 0, 0, 1.0f);
 	}
-	if (m_world != nullptr && m_player != nullptr) {
-		clearColor *= m_world->getAmbientLight();
-	}
-	glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDepthRange(0.01, 1.0);
 
