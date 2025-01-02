@@ -77,9 +77,9 @@ void Player::update(float delta) {
 		Block* aboveBlock = world->getBlock({ iPos.x, pos.y + 1.8, iPos.z });
 		Block* feetBlock = world->getBlock(iPos);
 
-		if (headBlock != nullptr || aboveBlock != nullptr) {
+		if ((headBlock != nullptr && headBlock->hasCollision()) || (aboveBlock != nullptr && aboveBlock->hasCollision())) {
 			verticalVelocity = 0;
-			if (feetBlock == nullptr) verticalVelocity -= 9.8f * delta;
+			if (feetBlock == nullptr || !feetBlock->hasCollision()) verticalVelocity -= 9.8f * delta;
 		}
 	}
 
