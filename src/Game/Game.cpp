@@ -429,7 +429,9 @@ const char* Game::getBuild() {
 	else if (date[0] == 'N')					oss << "11";
 	else if (date[0] == 'D')					oss << "12";
 	// day
-	oss << date[4] << date[5];
+	if (date[4] == ' ') oss << "0";
+	else oss << date[4];
+	oss << date[5];
 
 #ifdef _DEBUG
 	oss << "D";
