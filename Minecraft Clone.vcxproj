@@ -194,7 +194,7 @@
     <ClCompile Include="libraries\include\glad\gl.c" />
     <ClCompile Include="src\Block\Block.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
-    <ClCompile Include="src\gltext.cpp" />
+    <ClCompile Include="libraries\implementations\gltext.cpp" />
     <ClCompile Include="src\GUI\Components\Button.cpp" />
     <ClCompile Include="src\GUI\Components\GUIComponent.cpp" />
     <ClCompile Include="src\GUI\Components\Image.cpp" />
@@ -204,13 +204,13 @@
     <ClCompile Include="src\GUI\PauseMenu.cpp" />
     <ClCompile Include="src\GUI\Components\Text.cpp" />
     <ClCompile Include="src\KeyHandler\KeyHandler.cpp" />
-    <ClCompile Include="src\miniaudio.cpp" />
+    <ClCompile Include="libraries\implementations\miniaudio.cpp" />
     <ClCompile Include="src\Player\Player.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\GameWindow\GameWindow.cpp" />
     <ClCompile Include="src\Shaders\Shaders.cpp" />
     <ClCompile Include="src\SoundEngine\SoundEngine.cpp" />
-    <ClCompile Include="src\stb.cpp" />
+    <ClCompile Include="libraries\implementations\stb.cpp" />
     <ClCompile Include="src\Textures\Textures.cpp" />
     <ClCompile Include="src\World\Chunk.cpp" />
     <ClCompile Include="src\World\Structures.cpp" />
