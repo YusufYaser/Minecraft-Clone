@@ -198,6 +198,7 @@ void World::render() {
 		}
 	}
 
+	static bool wasLiquidTop = false;
 	for (auto& [chunk, types] : queued) {
 		for (auto& type : types) {
 			if (!chunk->renderingGroupsMutex.try_lock()) continue;
@@ -213,24 +214,12 @@ void World::render() {
 						isLiquidTop = true;
 					}
 				}
-				shader->setUniform("isLiquidTop", isLiquidTop);
+				if (isLiquidTop != wasLiquidTop) {
+					shader->setUniform("isLiquidTop", isLiquidTop);
+					wasLiquidTop = isLiquidTop;
+				}
 
-				const glm::ivec3& bPos = block->getPos();
-				const glm::vec3 diff = glm::vec3(bPos) - pos;
-				const float half = .5f;
-
-				uint8_t hiddenFaces = 0;
-
-				hiddenFaces |= (diff.x > -half) << (int)BLOCK_FACE::RIGHT;
-				hiddenFaces |= (diff.x < half) << (int)BLOCK_FACE::LEFT;
-
-				hiddenFaces |= (diff.y > -half) << (int)BLOCK_FACE::TOP;
-				hiddenFaces |= (diff.y < half) << (int)BLOCK_FACE::BOTTOM;
-
-				hiddenFaces |= (diff.z > -half) << (int)BLOCK_FACE::FRONT;
-				hiddenFaces |= (diff.z < half) << (int)BLOCK_FACE::BACK;
-
-				block->Render(shader, hiddenFaces, false);
+				block->Render(shader, 0, false);
 			}
 		}
 	}
