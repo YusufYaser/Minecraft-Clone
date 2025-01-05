@@ -50,6 +50,7 @@ GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 	if (!images[0].pixels) {
 		return;
 	}
+	images[0].height = images[0].width; // since textures are now 3D we get only the top face
 	glfwSetWindowIcon(glfwWindow, 1, images);
 	stbi_image_free(images[0].pixels);
 }

@@ -2,6 +2,7 @@ R"END(
 #version 410 core
 
 in vec2 texCoord;
+flat in float face;
 
 out vec4 FragColor;
 
@@ -10,7 +11,7 @@ uniform bool gamePaused;
 uniform float ambientLight;
 
 void main() {
-    FragColor = texture(tex0, texCoord);
+    FragColor = texture(tex0, vec2(texCoord.x, (texCoord.y + float(face)) / 6.0f));
 
     FragColor *= vec4(vec3(ambientLight), 1.0f);
 

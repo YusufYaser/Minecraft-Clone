@@ -2,7 +2,7 @@ R"END(
 #version 410 core
 
 in vec2 texCoord;
-in float face;
+flat in float face;
 
 out vec4 FragColor;
 
@@ -14,7 +14,7 @@ uniform float ambientLight;
 const float BORDER_SIZE = .02f;
 
 void main() {
-    FragColor = texture(tex0, texCoord);
+    FragColor = texture(tex0, vec2(texCoord.x, (texCoord.y + float(face)) / 6.0f));
 
     if (highlighted && !(texCoord.x < (1 - BORDER_SIZE) && texCoord.x > BORDER_SIZE &&
        texCoord.y < (1 - BORDER_SIZE) && texCoord.y > BORDER_SIZE)) {
