@@ -5,6 +5,7 @@ Image::Image(Texture* tex) {
 	m_tex = tex;
 	m_color = glm::vec4(1.0f);
 	m_size = { 0, tex->width, 0, tex->height };
+	m_crop = { 1.0f, 1.0f };
 }
 
 void Image::render() {
@@ -58,6 +59,7 @@ void Image::render() {
 	guiShader->setUniform("guiSize", getGuiSize());
 	guiShader->setUniform("guiZIndex", getGuiZIndex());
 	guiShader->setUniform("guiColor", m_color);
+	guiShader->setUniform("guiCrop", m_crop);
 
 	glBindTexture(GL_TEXTURE_2D, m_tex->id);
 	glBindVertexArray(VAO);

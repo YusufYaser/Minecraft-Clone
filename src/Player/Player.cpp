@@ -21,6 +21,7 @@ Player::Player() {
 		img->setZIndex(999);
 		img->setPosition({ .5f, -236 + (52 * i) + 28, 1, -32 });
 		img->setSize({ 0, 48, 0, 48 });
+		img->setCrop({ 1.0f, 1.0f / 6.0f });
 		m_inventoryImages[i] = img;
 	}
 }
