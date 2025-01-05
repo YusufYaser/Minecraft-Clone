@@ -114,6 +114,7 @@ Game::Game(GameSettings& settings) {
 	m_collOverlay->setSize({ 1, 0, 1, 0 });
 	m_collOverlay->setColor({ .25f, .25f, .25f, 1.0f });
 	m_collOverlay->setZIndex(0);
+	m_collOverlay->setCrop({ 1.0f, 1.0f / 6.0f });
 
 	m_keyHandler = new KeyHandler();
 
