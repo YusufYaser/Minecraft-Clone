@@ -183,7 +183,9 @@ void Game::update() {
 
 #ifdef _DEBUG
 	GLenum errorCode;
+	bool err = false;
 	while ((errorCode = glGetError()) != GL_NO_ERROR) {
+		err = true;
 		std::string error;
 		switch (errorCode) {
 		case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
@@ -195,8 +197,8 @@ void Game::update() {
 		case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
 		}
 		error("glGetError():", error);
-		__debugbreak();
 	}
+	if (err) __debugbreak();
 #endif
 
 	m_keyHandler->update();

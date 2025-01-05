@@ -324,7 +324,7 @@ glm::mat4 Player::getProjection() const {
 		toggledRunning = currentTime;
 	}
 	wasRunning = isRunning;
-	float FOV = 45.0f;
+	float FOV = 90.0f;
 	if (isRunning) {
 		if (currentTime - toggledRunning > .1f) {
 			FOV += 7.5f * speed / PLAYER_SPEED;
