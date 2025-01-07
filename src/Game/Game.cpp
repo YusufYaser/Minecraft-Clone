@@ -114,7 +114,6 @@ Game::Game(GameSettings& settings) {
 	m_collOverlay->setSize({ 1, 0, 1, 0 });
 	m_collOverlay->setColor({ .25f, .25f, .25f, 1.0f });
 	m_collOverlay->setZIndex(0);
-	m_collOverlay->setCrop({ 1.0f, 1.0f / 6.0f });
 
 	m_keyHandler = new KeyHandler();
 
@@ -233,8 +232,10 @@ void Game::update() {
 
 	skyboxShader->activate();
 	skyboxShader->setUniform("gamePaused", m_gamePaused);
+	skyboxShader->setUniform("time", startTime);
 	shader->activate();
 	shader->setUniform("gamePaused", m_gamePaused);
+	shader->setUniform("time", startTime);
 	if (m_gamePaused) {
 		glClearColor(0, .25f, 0, 1.0f);
 	} else {
@@ -262,6 +263,7 @@ void Game::update() {
 		Block* upBlock = m_world->getBlock(iPos + glm::ivec3(0, 1, 0));
 		if (upBlock != nullptr) {
 			m_collOverlay->setTexture(getTexture(upBlock->getName()));
+			m_collOverlay->setCrop({ 1.0f / getAnimationFrameCount(upBlock->getType()), 1.0f / 6.0f });
 			if (!m_gamePaused) {
 				m_collOverlay->setColor({ .25f, .25f, .25f, 1.0f });
 			} else {

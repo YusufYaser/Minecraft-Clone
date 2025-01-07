@@ -33,6 +33,7 @@ enum class BLOCK_FACE : uint8_t {
 
 glm::ivec3 getBlockFaceDirection(BLOCK_FACE face);
 const char* getTextureName(BLOCK_TYPE type);
+int getAnimationFrameCount(BLOCK_TYPE type);
 bool blockTypeHasCollision(BLOCK_TYPE type);
 bool isBlockTypeTransparent(BLOCK_TYPE type);
 

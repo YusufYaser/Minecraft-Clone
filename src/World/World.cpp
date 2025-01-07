@@ -164,13 +164,13 @@ void World::render() {
 			m_chunksRendered++;
 
 			for (auto& [type, blocks] : chunk->renderingGroups) {
-				double startTime = glfwGetTime();
 				if (type == BLOCK_TYPE::NONE || type == BLOCK_TYPE::AIR) continue;
 				if (isBlockTypeTransparent(type)) { // TODO: do something better than this
 					queued[chunk].push_back(type);
 					continue;
 				}
 				glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
+				shader->setUniform("animationFrameCount", getAnimationFrameCount(type));
 
 				for (auto& block : blocks) {
 					if (block == nullptr) continue;
@@ -205,6 +205,7 @@ void World::render() {
 			auto& blocks = chunk->renderingGroups[type];
 			chunk->renderingGroupsMutex.unlock();
 			glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
+			shader->setUniform("animationFrameCount", getAnimationFrameCount(type));
 
 			for (auto& block : blocks) {
 				if (block == nullptr) continue;
