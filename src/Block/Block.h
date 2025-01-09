@@ -31,6 +31,13 @@ enum class BLOCK_FACE : uint8_t {
 	TOP,
 };
 
+struct BlockStructureData {
+	GLuint VAO;
+	uint8_t faceCount;
+};
+
+BlockStructureData getBlockStructureData(uint8_t hiddenFaces);
+
 glm::ivec3 getBlockFaceDirection(BLOCK_FACE face);
 const char* getTextureName(BLOCK_TYPE type);
 int getAnimationFrameCount(BLOCK_TYPE type);
@@ -54,11 +61,4 @@ public:
 private:
 	BLOCK_TYPE type;
 	glm::ivec3 pos;
-
-	struct BlockStructureData {
-		GLuint VAO;
-		uint8_t faceCount;
-	};
-
-	static BlockStructureData blockStructures[64];
 };

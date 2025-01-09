@@ -1,7 +1,55 @@
 #include "Block.h"
 #include "CubeVertices.h"
 
-Block::BlockStructureData Block::blockStructures[64];
+inline BlockStructureData blockStructures[64];
+
+BlockStructureData getBlockStructureData(uint8_t hiddenFaces) {
+	BlockStructureData data = blockStructures[hiddenFaces];
+
+	if (data.VAO != 0) {
+		return data;
+	}
+
+	GLuint VBO, VAO;
+	uint8_t faceCount = 0;
+
+	GLfloat* vertices = new GLfloat[6 * VERTEX_SIZE * 6];
+
+	for (int i = 0; i < 6; i++) {
+		if ((hiddenFaces & (1 << i)) != 0) continue;
+
+		for (int j = 0; j < VERTEX_SIZE * 6; j++) {
+			vertices[(faceCount * VERTEX_SIZE * 6) + j] = blockVertices[(i * VERTEX_SIZE * 6) + j];
+		}
+
+		faceCount++;
+	}
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, faceCount * VERTEX_SIZE * 6 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(float), (void*)(5 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	delete[] vertices;
+
+	data.VAO = VAO;
+	data.faceCount = faceCount;
+	blockStructures[hiddenFaces] = data;
+
+	return data;
+}
 
 glm::ivec3 getBlockFaceDirection(BLOCK_FACE face) {
 	switch (face) {
@@ -102,64 +150,9 @@ void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTextu
 
 	if (hiddenFaces == 63) return;
 
-	GLuint VAO;
-	uint8_t faceCount = 0;
+	BlockStructureData data = getBlockStructureData(hiddenFaces);
 
-	BlockStructureData data = blockStructures[hiddenFaces];
-
-	if (data.VAO != 0) {
-		VAO = data.VAO;
-		faceCount = data.faceCount;
-	} else {
-		GLuint VBO, EBO;
-
-		GLfloat* vertices = new GLfloat[6 * VERTEX_SIZE * 4];
-		GLuint* indices = new GLuint[6 * 6];
-
-		for (int i = 0; i < 6; i++) {
-			if ((hiddenFaces & (1 << i)) != 0) continue;
-
-			for (int j = 0; j < VERTEX_SIZE * 4; j++) {
-				vertices[(faceCount * VERTEX_SIZE * 4) + j] = blockVertices[(i * VERTEX_SIZE * 4) + j];
-			}
-			for (int j = 0; j < 6; j++) {
-				indices[(faceCount * 6) + j] = blockIndices[j] + (faceCount * 4);
-			}
-
-			faceCount++;
-		}
-
-		glGenVertexArrays(1, &VAO);
-		glBindVertexArray(VAO);
-
-		glGenBuffers(1, &VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, faceCount * VERTEX_SIZE * 4 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
-
-		glGenBuffers(1, &EBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, faceCount * VERTEX_SIZE * sizeof(GLuint), indices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(float), (void*)0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(float), (void*)(3 * sizeof(float)));
-		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(float), (void*)(5 * sizeof(float)));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		delete[] vertices;
-		delete[] indices;
-
-		data.VAO = VAO;
-		data.faceCount = faceCount;
-		blockStructures[hiddenFaces] = data;
-	}
-
-	if (faceCount == 0) return;
+	if (data.faceCount == 0) return;
 
 	shader->setUniform("blockPos", pos);
 
@@ -169,8 +162,8 @@ void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTextu
 
 	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName())->id);
 
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, faceCount * 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(data.VAO);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, data.faceCount * 6, 1);
 
 	if (highlighted) {
 		shader->setUniform("highlighted", false);

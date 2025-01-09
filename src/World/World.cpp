@@ -179,7 +179,7 @@ void World::render() {
 					const glm::vec3 diff = glm::vec3(bPos) - pos;
 					const float half = .5f;
 
-					uint8_t hiddenFaces = 0;
+					uint8_t hiddenFaces = block->hiddenFaces;
 
 					hiddenFaces |= (diff.x > -half) << (int)BLOCK_FACE::RIGHT;
 					hiddenFaces |= (diff.x < half) << (int)BLOCK_FACE::LEFT;
@@ -190,7 +190,14 @@ void World::render() {
 					hiddenFaces |= (diff.z > -half) << (int)BLOCK_FACE::FRONT;
 					hiddenFaces |= (diff.z < half) << (int)BLOCK_FACE::BACK;
 
-					if ((block->hiddenFaces | hiddenFaces) < 63) block->Render(shader, hiddenFaces, false);
+					if (hiddenFaces >= 63) continue;
+
+					shader->setUniform("blockPos", bPos);
+					shader->setUniform("highlighted", block->highlighted);
+
+					BlockStructureData data = getBlockStructureData(hiddenFaces);
+					glBindVertexArray(data.VAO);
+					glDrawArraysInstanced(GL_TRIANGLES, 0, data.faceCount * 6, 1);
 				}
 			}
 			chunk->lastRendered = time(nullptr);
