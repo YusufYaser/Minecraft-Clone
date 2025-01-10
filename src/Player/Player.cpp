@@ -60,6 +60,10 @@ void Player::update(float delta) {
 		if (verticalVelocity < -98.0f) verticalVelocity = -98.0f;
 	}
 
+	if (verticalVelocity != 0 && !world->isChunkLoaded(getPosChunk(pos))) {
+		verticalVelocity = 0;
+	}
+
 	if (verticalVelocity < 0) {
 		for (int i = iPos.y; i > floor(iPos.y + verticalVelocity * delta); i--) {
 			Block* block = world->getBlock({ iPos.x, i, iPos.z });

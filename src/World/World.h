@@ -66,6 +66,7 @@ public:
 	size_t chunkLoadQueueCount();
 	int chunksRendered() { return m_chunksRendered; };
 	int instancesRendered() { return m_instancesRendered; };
+	bool isChunkLoaded(glm::ivec2 cPos);
 
 	// Get the height at a position from the world generator
 	int getHeight(glm::ivec2 pos);

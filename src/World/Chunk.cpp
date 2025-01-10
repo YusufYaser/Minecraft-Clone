@@ -214,3 +214,9 @@ size_t World::chunkLoadQueueCount() {
 	chunkLoadQueueMutex.unlock();
 	return size;
 }
+
+bool World::isChunkLoaded(glm::ivec2 cPos) {
+	auto it = chunks.find(hashPos(cPos));
+	if (it == chunks.end()) return false;
+	return it->second->loaded;
+}
