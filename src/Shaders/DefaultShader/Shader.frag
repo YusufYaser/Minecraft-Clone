@@ -3,11 +3,12 @@ R"END(
 
 in vec2 texCoord;
 flat in float face;
+flat in int instanceId;
 
 out vec4 FragColor;
 
 uniform sampler2D tex0;
-uniform bool highlighted;
+uniform int highlighted;
 uniform bool gamePaused;
 uniform float ambientLight;
 uniform double time;
@@ -18,7 +19,7 @@ const float BORDER_SIZE = .02f;
 void main() {
     FragColor = texture(tex0, vec2((texCoord.x + float(int(time) % animationFrameCount)) / float(animationFrameCount), (texCoord.y + float(face)) / 6.0f));
 
-    if (highlighted && !(texCoord.x < (1 - BORDER_SIZE) && texCoord.x > BORDER_SIZE &&
+    if (highlighted == instanceId && !(texCoord.x < (1 - BORDER_SIZE) && texCoord.x > BORDER_SIZE &&
        texCoord.y < (1 - BORDER_SIZE) && texCoord.y > BORDER_SIZE)) {
 
         FragColor = vec4(FragColor.rgb, 1.0f);

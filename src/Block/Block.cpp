@@ -1,14 +1,10 @@
 #include "Block.h"
 #include "CubeVertices.h"
 
-inline BlockStructureData blockStructures[64];
+inline BlockStructureData* blockStructures[64];
 
-BlockStructureData getBlockStructureData(uint8_t hiddenFaces) {
-	BlockStructureData data = blockStructures[hiddenFaces];
-
-	if (data.VAO != 0) {
-		return data;
-	}
+BlockStructureData* createBlockStructureData(uint8_t hiddenFaces) {
+	BlockStructureData* data = new BlockStructureData();
 
 	GLuint VBO, VAO;
 	uint8_t faceCount = 0;
@@ -44,8 +40,21 @@ BlockStructureData getBlockStructureData(uint8_t hiddenFaces) {
 
 	delete[] vertices;
 
-	data.VAO = VAO;
-	data.faceCount = faceCount;
+	data->VAO = VAO;
+	data->faceCount = faceCount;
+	data->hiddenFaces = hiddenFaces;
+
+	return data;
+}
+
+BlockStructureData* getBlockStructureData(uint8_t hiddenFaces) {
+	BlockStructureData* data = blockStructures[hiddenFaces];
+
+	if (data != nullptr) {
+		return data;
+	}
+
+	data = createBlockStructureData(hiddenFaces);
 	blockStructures[hiddenFaces] = data;
 
 	return data;
@@ -150,9 +159,9 @@ void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTextu
 
 	if (hiddenFaces == 63) return;
 
-	BlockStructureData data = getBlockStructureData(hiddenFaces);
+	BlockStructureData* data = getBlockStructureData(hiddenFaces);
 
-	if (data.faceCount == 0) return;
+	if (data->faceCount == 0) return;
 
 	shader->setUniform("blockPos", pos);
 
@@ -162,8 +171,8 @@ void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTextu
 
 	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName())->id);
 
-	glBindVertexArray(data.VAO);
-	glDrawArraysInstanced(GL_TRIANGLES, 0, data.faceCount * 6, 1);
+	glBindVertexArray(data->VAO);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, data->faceCount * 6, 1);
 
 	if (highlighted) {
 		shader->setUniform("highlighted", false);

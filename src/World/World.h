@@ -31,6 +31,7 @@ struct WorldSaveData {
 };
 
 #define MAX_HEIGHT 128
+#define MAX_INSTANCE_OFFSETS 10240
 
 struct ChunkSaveData {
 	BLOCK_TYPE blocks[MAX_HEIGHT][16][16];
@@ -128,4 +129,14 @@ private:
 	siv::PerlinNoise perlin;
 
 	int m_chunksRendered = 0;
+
+	struct Instance {
+		BlockStructureData* bStructData;
+		Texture* tex;
+		BLOCK_TYPE blockType;
+		GLuint VBO;
+		int offsetsCount;
+		glm::vec3 offsets[MAX_INSTANCE_OFFSETS];
+		int highlightedOffset;
+	};
 };

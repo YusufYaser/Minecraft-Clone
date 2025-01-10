@@ -33,10 +33,12 @@ enum class BLOCK_FACE : uint8_t {
 
 struct BlockStructureData {
 	GLuint VAO;
+	uint8_t hiddenFaces;
 	uint8_t faceCount;
 };
 
-BlockStructureData getBlockStructureData(uint8_t hiddenFaces);
+BlockStructureData* getBlockStructureData(uint8_t hiddenFaces);
+BlockStructureData* createBlockStructureData(uint8_t hiddenFaces);
 
 glm::ivec3 getBlockFaceDirection(BLOCK_FACE face);
 const char* getTextureName(BLOCK_TYPE type);

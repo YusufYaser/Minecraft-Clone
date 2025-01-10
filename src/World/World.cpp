@@ -132,6 +132,13 @@ void World::render() {
 
 	shader->setUniform("ambientLight", getAmbientLight());
 
+	static std::vector<Instance*> instances = {};
+
+	for (auto& i : instances) {
+		i->offsetsCount = 0;
+		i->highlightedOffset = -1;
+	}
+
 	for (int x = -(renderDistance / 2) + playerChunk.x; x < (renderDistance / 2) + playerChunk.x; x++) {
 		for (int y = -(renderDistance / 2) + playerChunk.y; y < (renderDistance / 2) + playerChunk.y; y++) {
 			glm::ivec2 cPos = glm::ivec2(x, y);
@@ -165,12 +172,8 @@ void World::render() {
 
 			for (auto& [type, blocks] : chunk->renderingGroups) {
 				if (type == BLOCK_TYPE::NONE || type == BLOCK_TYPE::AIR) continue;
-				if (isBlockTypeTransparent(type)) { // TODO: do something better than this
-					queued[chunk].push_back(type);
-					continue;
-				}
-				glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
-				shader->setUniform("animationFrameCount", getAnimationFrameCount(type));
+
+				Texture* tex = getTexture(getTextureName(type));
 
 				for (auto& block : blocks) {
 					if (block == nullptr) continue;
@@ -192,12 +195,37 @@ void World::render() {
 
 					if (hiddenFaces >= 63) continue;
 
-					shader->setUniform("blockPos", bPos);
-					shader->setUniform("highlighted", block->highlighted);
+					Instance* i = nullptr;
+					for (auto& inst : instances) {
+						if (inst->offsetsCount >= MAX_INSTANCE_OFFSETS) continue;
+						if (inst->tex->id != tex->id) continue;
+						if (inst->bStructData->hiddenFaces != hiddenFaces) continue;
+						i = inst;
+						break;
+					}
+					if (i == nullptr) {
+						BlockStructureData* data = createBlockStructureData(hiddenFaces);
+						i = new Instance();
+						instances.push_back(i);
+						i->tex = tex;
+						i->offsetsCount = 0;
+						i->bStructData = data;
+						i->blockType = type;
 
-					BlockStructureData data = getBlockStructureData(hiddenFaces);
-					glBindVertexArray(data.VAO);
-					glDrawArraysInstanced(GL_TRIANGLES, 0, data.faceCount * 6, 1);
+						glBindVertexArray(data->VAO);
+
+						glGenBuffers(1, &i->VBO);
+						glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
+						glBufferData(GL_ARRAY_BUFFER, MAX_INSTANCE_OFFSETS * sizeof(glm::vec3), nullptr, GL_DYNAMIC_DRAW);
+
+						glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
+						glEnableVertexAttribArray(3);
+						glVertexAttribDivisor(3, 1);
+					}
+
+					if (block->highlighted) i->highlightedOffset = i->offsetsCount;
+
+					i->offsets[i->offsetsCount++] = glm::vec3(bPos);
 				}
 			}
 			chunk->lastRendered = time(nullptr);
@@ -205,31 +233,24 @@ void World::render() {
 		}
 	}
 
-	static bool wasLiquidTop = false;
-	for (auto& [chunk, types] : queued) {
-		for (auto& type : types) {
-			if (!chunk->renderingGroupsMutex.try_lock()) continue;
-			auto& blocks = chunk->renderingGroups[type];
-			chunk->renderingGroupsMutex.unlock();
-			glBindTexture(GL_TEXTURE_2D, getTexture(getTextureName(type))->id);
-			shader->setUniform("animationFrameCount", getAnimationFrameCount(type));
+	std::partition(instances.begin(), instances.end(), [](const Instance* i) {
+		return !isBlockTypeTransparent(i->blockType);
+		});
 
-			for (auto& block : blocks) {
-				if (block == nullptr) continue;
-				bool isLiquidTop = false;
-				if (type == BLOCK_TYPE::WATER) {
-					if (getBlock(block->getPos() + glm::ivec3(0, 1, 0)) == nullptr) {
-						isLiquidTop = true;
-					}
-				}
-				if (isLiquidTop != wasLiquidTop) {
-					shader->setUniform("isLiquidTop", isLiquidTop);
-					wasLiquidTop = isLiquidTop;
-				}
+	for (auto& i : instances) {
+		if (i->offsetsCount == 0) continue;
 
-				block->Render(shader, 0, false);
-			}
-		}
+		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
+		glBindVertexArray(i->bStructData->VAO);
+		glBindTexture(GL_TEXTURE_2D, i->tex->id);
+
+		shader->setUniform("animationFrameCount", getAnimationFrameCount(i->blockType));
+		shader->setUniform("isLiquidTop", i->blockType == BLOCK_TYPE::WATER);
+		shader->setUniform("highlighted", i->highlightedOffset);
+
+		glBufferSubData(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec3), i->offsets);
+
+		glDrawArraysInstanced(GL_TRIANGLES, 0, i->bStructData->faceCount * 6, i->offsetsCount);
 	}
 
 	if (targetBlock != nullptr) targetBlock->highlighted = false;

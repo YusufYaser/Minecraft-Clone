@@ -4,13 +4,14 @@ R"END(
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec2 inTexCoord;
 layout(location = 2) in float inFace;
+layout(location = 3) in vec3 blockPos;
 
 out vec2 texCoord;
 flat out float face;
+flat out int instanceId;
 
 uniform mat4 projection;
 uniform mat4 view;
-uniform ivec3 blockPos;
 uniform bool isLiquidTop;
 
 void main() {
@@ -22,5 +23,6 @@ void main() {
 
 	texCoord = inTexCoord;
 	face = inFace;
+	instanceId = gl_InstanceID;
 }
 )END"
