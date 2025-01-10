@@ -83,7 +83,8 @@ WorldSaveData* World::createWorldSaveData() {
 }
 
 void World::render() {
-	m_chunksRendered = false;
+	m_chunksRendered = 0;
+	m_instancesRendered = 0;
 
 	Player* player = Game::getInstance()->getPlayer();
 	if (player == nullptr) return;
@@ -239,6 +240,7 @@ void World::render() {
 
 	for (auto& i : instances) {
 		if (i->offsetsCount == 0) continue;
+		m_instancesRendered++;
 
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBindVertexArray(i->bStructData->VAO);

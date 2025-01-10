@@ -63,6 +63,7 @@ public:
 	size_t chunksLoaded();
 	size_t chunkLoadQueueCount();
 	int chunksRendered() { return m_chunksRendered; };
+	int instancesRendered() { return m_instancesRendered; };
 
 	// Get the height at a position from the world generator
 	int getHeight(glm::ivec2 pos);
@@ -129,6 +130,7 @@ private:
 	siv::PerlinNoise perlin;
 
 	int m_chunksRendered = 0;
+	int m_instancesRendered = 0;
 
 	struct Instance {
 		BlockStructureData* bStructData;
