@@ -213,6 +213,7 @@
     <ClCompile Include="libraries\implementations\stb.cpp" />
     <ClCompile Include="src\Textures\Textures.cpp" />
     <ClCompile Include="src\World\Chunk.cpp" />
+    <ClCompile Include="src\World\Renderer.cpp" />
     <ClCompile Include="src\World\Structures.cpp" />
     <ClCompile Include="src\World\World.cpp" />
     <ClCompile Include="src\World\WorldBlocks.cpp" />

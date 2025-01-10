@@ -10,6 +10,7 @@
 #include <thread>
 #include <future>
 #include <mutex>
+#include <deque>
 #include <random>
 #include <time.h>
 #include "Structures.h"
@@ -32,6 +33,7 @@ struct WorldSaveData {
 
 #define MAX_HEIGHT 128
 #define MAX_INSTANCE_OFFSETS 10240
+#define RENDERER_THREAD_COUNT 4
 
 struct ChunkSaveData {
 	BLOCK_TYPE blocks[MAX_HEIGHT][16][16];
@@ -136,9 +138,24 @@ private:
 		BlockStructureData* bStructData;
 		Texture* tex;
 		BLOCK_TYPE blockType;
+		uint8_t hiddenFaces;
 		GLuint VBO;
 		int offsetsCount;
 		glm::vec3 offsets[MAX_INSTANCE_OFFSETS];
 		int highlightedOffset;
 	};
+
+	std::thread renderingThreads[RENDERER_THREAD_COUNT];
+	std::mutex renderingQueueMutex;
+	std::deque<Chunk*> renderingQueue;
+	std::atomic<bool> rendered[RENDERER_THREAD_COUNT];
+
+	std::mutex instancesMutex;
+	static std::vector<Instance*> instances;
+
+	std::mutex instancesToInitMutex;
+	std::vector<Instance*> instancesToInit;
+
+	std::atomic<bool> rendering;
+	void renderer(int c);
 };
