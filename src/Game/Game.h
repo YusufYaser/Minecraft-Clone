@@ -73,6 +73,8 @@ public:
 
 	int getRenderDistance() const { return m_renderDistance; };
 	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };
+	int getMaxFps() const { return m_maxFps; }
+	void setMaxFps(int maxFps) { m_maxFps = maxFps; }
 
 	void loadWorld(WorldSettings& settings, glm::vec3 playerPos = { 0, 0, 0 });
 	void unloadWorld();
@@ -102,7 +104,9 @@ private:
 
 	float m_realDelta = 1.0f;
 	float m_delta = 1.0f;
+
 	int m_renderDistance = 6;
+	int m_maxFps = 60;
 
 	bool m_gamePaused = false;
 

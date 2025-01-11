@@ -291,15 +291,11 @@ void Game::update() {
 	glfwPollEvents();
 
 	double endTime = glfwGetTime();
-#ifndef _DEBUG
-	double targetFps = 60;
-#else
-	double targetFps = 0;
-#endif
+	double targetFps = m_maxFps;
 
 	if (!m_gameWindow->isFocused()) {
 		m_gamePaused = true;
-		if (targetFps > 5) targetFps = 5;
+		if (targetFps > 5 || targetFps == 0) targetFps = 5;
 	}
 
 	m_realDelta = static_cast<float>(glfwGetTime() - startTime);

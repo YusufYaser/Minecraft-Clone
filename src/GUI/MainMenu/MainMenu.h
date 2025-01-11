@@ -4,6 +4,7 @@
 #include "../Components/Button.h"
 #include "../../World/World.h"
 #include "WorldSelector.h"
+#include "../SettingsMenu.h"
 
 class MainMenu {
 public:
@@ -15,6 +16,7 @@ public:
 private:
 	Text* title;
 	Button* selectWorld;
+	Button* settings;
 	Button* quit;
 	Text* credits;
 #ifdef _DEBUG
@@ -22,4 +24,5 @@ private:
 #endif
 
 	WorldSelector* worldSelector;
+	SettingsMenu* settingsMenu;
 };

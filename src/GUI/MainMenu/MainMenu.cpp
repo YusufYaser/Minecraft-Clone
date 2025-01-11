@@ -12,9 +12,13 @@ MainMenu::MainMenu() {
 	selectWorld->setText("Select World");
 	selectWorld->setPosition({ .5f, 0, .5f, 0 });
 
+	settings = new Button();
+	settings->setText("Settings");
+	settings->setPosition({ .5f, 0, .5f, 50 });
+
 	quit = new Button();
 	quit->setText("Quit Game");
-	quit->setPosition({ .5f, 0, .5f, 50 });
+	quit->setPosition({ .5f, 0, .5f, 100 });
 
 	credits = new Text();
 	credits->setText("Minecraft Clone - github.com/YusufYaser/Minecraft-Clone");
@@ -36,6 +40,9 @@ MainMenu::~MainMenu() {
 	delete selectWorld;
 	selectWorld = nullptr;
 
+	delete settings;
+	settings = nullptr;
+
 	delete quit;
 	quit = nullptr;
 
@@ -55,6 +62,10 @@ void MainMenu::render() {
 		delete worldSelector;
 		worldSelector = nullptr;
 	}
+	if (settingsMenu != nullptr && (lastFrame + 1 != game->getFrameNum() || settingsMenu->isClosing())) {
+		delete settingsMenu;
+		settingsMenu = nullptr;
+	}
 
 	lastFrame = game->getFrameNum();
 
@@ -63,7 +74,13 @@ void MainMenu::render() {
 		return;
 	}
 
+	if (settingsMenu != nullptr) {
+		settingsMenu->render();
+		return;
+	}
+
 	selectWorld->render();
+	settings->render();
 	quit->render();
 	title->render();
 	credits->render();
@@ -73,6 +90,10 @@ void MainMenu::render() {
 
 	if (selectWorld->isClicked()) {
 		worldSelector = new WorldSelector();
+	}
+
+	if (settings->isClicked()) {
+		settingsMenu = new SettingsMenu();
 	}
 
 	if (quit->isClicked()) {

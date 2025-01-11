@@ -203,6 +203,7 @@
     <ClCompile Include="src\GUI\MainMenu\WorldSelector.cpp" />
     <ClCompile Include="src\GUI\PauseMenu.cpp" />
     <ClCompile Include="src\GUI\Components\Text.cpp" />
+    <ClCompile Include="src\GUI\SettingsMenu.cpp" />
     <ClCompile Include="src\KeyHandler\KeyHandler.cpp" />
     <ClCompile Include="libraries\implementations\miniaudio.cpp" />
     <ClCompile Include="src\Player\Player.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="src\GUI\MainMenu\WorldSelector.h" />
     <ClInclude Include="src\GUI\PauseMenu.h" />
     <ClInclude Include="src\GUI\Components\Text.h" />
+    <ClInclude Include="src\GUI\SettingsMenu.h" />
     <ClInclude Include="src\KeyHandler\KeyHandler.h" />
     <ClInclude Include="src\Player\Player.h" />
     <ClInclude Include="src\Logging.h" />

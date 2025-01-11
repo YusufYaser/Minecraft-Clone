@@ -342,7 +342,8 @@ glm::mat4 Player::getProjection() const {
 		FOV -= static_cast<float>(currentTime - toggledRunning) * (7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
 	}
 
-	return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, sqrt(2 * ((renderDistance * 8.0f) * (renderDistance * 8.0f))) + 4.0f);
+	float d = sqrt(2 * ((renderDistance * 8.0f) * (renderDistance * 8.0f))) + 4.0f;
+	return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, d > 1000.0f ? d : 1000.0f);
 }
 
 glm::mat4 Player::getView() const {

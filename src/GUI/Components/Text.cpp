@@ -12,8 +12,8 @@ Text::~Text() {
 	gltDeleteText(m_text);
 }
 
-void Text::setText(const char* content) {
-	gltSetText(m_text, content);
+void Text::setText(std::string content) {
+	gltSetText(m_text, content.c_str());
 }
 
 void Text::render() {

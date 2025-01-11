@@ -11,7 +11,7 @@ public:
 	Text();
 	~Text();
 
-	void setText(const char* content);
+	void setText(std::string content);
 	void setColor(glm::vec4 color) { m_color = color; };
 	void setScale(float scale) { m_scale = scale; };
 	void setCentered(bool centered) { m_centered = centered; };
