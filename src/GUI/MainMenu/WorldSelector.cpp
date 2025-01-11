@@ -35,32 +35,36 @@ WorldSelector::WorldSelector() {
 		for (auto& dir : std::filesystem::directory_iterator("worlds")) {
 			std::string p = dir.path().string();
 
-			if (!dir.is_directory()) {
-				warn("Ignoring unknown file:", p);
-				continue;
-			}
-
-			if (std::filesystem::exists(p + "/world.dat")) {
-				if (std::filesystem::file_size(p + "/world.dat") != sizeof(WorldSaveData)) {
-					warn("Ignoring world with invalid world data size:", p);
+			try {
+				if (!dir.is_directory()) {
+					warn("Ignoring unknown file:", p);
 					continue;
 				}
 
-				WorldEntry* world = new WorldEntry();
-				world->name = dir.path().stem().string();
+				if (std::filesystem::exists(p + "/world.dat")) {
+					if (std::filesystem::file_size(p + "/world.dat") != sizeof(WorldSaveData)) {
+						warn("Ignoring world with invalid world data size:", p);
+						continue;
+					}
+
+					WorldEntry* world = new WorldEntry();
+					world->name = dir.path().stem().string();
 
 
-				world->playButton = new Button();
-				world->playButton->setText(world->name.c_str());
-				world->playButton->setPosition({ .5f, 0, 0, 125 + i * 40 });
-				world->playButton->setSize({ 0, 384, 0, 32 });
+					world->playButton = new Button();
+					world->playButton->setText(world->name.c_str());
+					world->playButton->setPosition({ .5f, 0, 0, 125 + i * 40 });
+					world->playButton->setSize({ 0, 384, 0, 32 });
 
-				worlds.push_back(world);
+					worlds.push_back(world);
 
-				i++;
-			} else {
-				warn("Ignoring unknown directory:", p);
-				continue;
+					i++;
+				} else {
+					warn("Ignoring unknown directory:", p);
+					continue;
+				}
+			} catch (std::filesystem::filesystem_error e) {
+				error("Failed to load world:", e.what());
 			}
 		}
 		if (i != 0) {

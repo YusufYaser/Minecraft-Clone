@@ -318,7 +318,10 @@ glm::mat4 Player::getProjection() const {
 	static double toggledRunning;
 	double currentTime = glfwGetTime();
 
-	glm::vec2 size = Game::getInstance()->getGameWindow()->getSize();
+	Game* game = Game::getInstance();
+
+	glm::vec2 size = game->getGameWindow()->getSize();
+	int renderDistance = game->getRenderDistance();
 
 	bool isRunning = speed == PLAYER_RUN_SPEED;
 	if (isRunning && !wasRunning) {
@@ -339,7 +342,7 @@ glm::mat4 Player::getProjection() const {
 		FOV -= static_cast<float>(currentTime - toggledRunning) * (7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
 	}
 
-	return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, 1000.0f);
+	return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, sqrt(2 * ((renderDistance * 8.0f) * (renderDistance * 8.0f))) + 4.0f);
 }
 
 glm::mat4 Player::getView() const {

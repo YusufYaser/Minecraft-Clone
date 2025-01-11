@@ -173,7 +173,7 @@ void World::render() {
 			glm::ivec2 cPos = glm::ivec2(x, y);
 
 			if (glm::length(glm::vec2(cPos - playerChunk)) > 1) {
-				glm::vec3 chunkCenter = glm::vec3(x * 16 + 8, 0.0f, y * 16 + 8);
+				glm::vec3 chunkCenter = glm::vec3(x * 16 + 8, 20.0f, y * 16 + 8);
 				glm::vec3 playerPos3D = pos;
 
 				glm::vec3 toChunk = glm::normalize(chunkCenter - playerPos3D);
