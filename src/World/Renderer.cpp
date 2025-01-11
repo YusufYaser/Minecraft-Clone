@@ -1,8 +1,6 @@
 #include "World.h"
 #include "../Game/Game.h"
 
-std::vector<World::Instance*> World::instances;
-
 void World::renderer(int c) {
 	std::map<Texture*, std::vector<Instance*>> instancesCache[64];
 	Player* player = nullptr;
@@ -87,6 +85,28 @@ void World::renderer(int c) {
 		}
 
 		chunk->renderingGroupsMutex.unlock();
+	}
+
+	for (int h = 0; h < 64; h++) {
+		for (auto& [t, instances] : instancesCache[h]) {
+			for (auto& i : instances) {
+				glDeleteBuffers(1, &i->VBO);
+				i->VBO = 0;
+
+				glDeleteVertexArrays(1, &i->bStructData->VAO);
+				i->bStructData->VAO = 0;
+
+				glDeleteBuffers(1, &i->bStructData->VBO);
+				i->bStructData->VBO = 0;
+
+				delete i->bStructData;
+				i->bStructData = nullptr;
+
+				delete i;
+				i = nullptr;
+			}
+			instances.clear();
+		}
 	}
 }
 
@@ -231,6 +251,9 @@ void World::render() {
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, i->bStructData->faceCount * 6, i->offsetsCount);
 	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	if (targetBlock != nullptr) targetBlock->highlighted = false;
 }

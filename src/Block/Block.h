@@ -33,6 +33,7 @@ enum class BLOCK_FACE : uint8_t {
 
 struct BlockStructureData {
 	GLuint VAO;
+	GLuint VBO;
 	uint8_t hiddenFaces;
 	uint8_t faceCount;
 };

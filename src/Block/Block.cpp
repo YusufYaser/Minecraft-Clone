@@ -41,6 +41,7 @@ BlockStructureData* createBlockStructureData(uint8_t hiddenFaces) {
 	delete[] vertices;
 
 	data->VAO = VAO;
+	data->VBO = VBO;
 	data->faceCount = faceCount;
 	data->hiddenFaces = hiddenFaces;
 

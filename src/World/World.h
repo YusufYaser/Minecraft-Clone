@@ -152,7 +152,7 @@ private:
 	std::atomic<bool> rendered[RENDERER_THREAD_COUNT];
 
 	std::mutex instancesMutex;
-	static std::vector<Instance*> instances;
+	std::vector<Instance*> instances;
 
 	std::mutex instancesToInitMutex;
 	std::vector<Instance*> instancesToInit;
