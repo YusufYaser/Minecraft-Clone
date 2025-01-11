@@ -51,12 +51,11 @@ void Player::update(float delta) {
 	Block* aboveBlock = world->getBlock(iPos + glm::ivec3(0, 1, 0));
 
 	if (verticalVelocity > 0) {
-		verticalVelocity -= 9.8f * delta;
-		if (verticalVelocity < 0) verticalVelocity = 0;
+		verticalVelocity -= 20.0f * delta;
 	}
 
 	if (verticalVelocity <= 0) {
-		verticalVelocity -= 9.8f * delta;
+		verticalVelocity -= 20.0f * delta;
 		if (verticalVelocity < -98.0f) verticalVelocity = -98.0f;
 	}
 
@@ -154,7 +153,7 @@ void Player::checkInputs(float delta) {
 		change += glm::normalize(glm::cross(orientation2, up));
 	}
 	if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
-		if (verticalVelocity == 0.0f) verticalVelocity = 4.8f;
+		if (verticalVelocity == 0.0f) verticalVelocity = 6.0f;
 	}
 
 	if (change != glm::vec3(0, 0, 0)) {
