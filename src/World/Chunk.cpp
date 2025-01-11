@@ -9,7 +9,21 @@ void World::chunkLoaderFunc() {
 		if (unloading.load()) break;
 
 		if (chunkLoadQueue.size() == 0) continue;
+
+		Player* player = Game::getInstance()->getPlayer();
 		chunkLoadQueueMutex.lock();
+
+		if (player != nullptr) {
+			glm::ivec2 pPos = getPosChunk(player->pos);
+
+			std::sort(chunkLoadQueue.begin(), chunkLoadQueue.end(), [&pPos](glm::ivec2 a, glm::ivec2 b) {
+				auto distanceSquared = [](const glm::ivec2& p1, const glm::ivec2& p2) {
+					return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+					};
+				return distanceSquared(a, pPos) < distanceSquared(b, pPos);
+				});
+		}
+
 		glm::ivec2 pos = chunkLoadQueue.front();
 		chunkLoadQueue.erase(chunkLoadQueue.begin());
 		chunkLoadQueueMutex.unlock();
