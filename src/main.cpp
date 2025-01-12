@@ -84,6 +84,11 @@ int main(int argc, char* argv[]) {
 		delete game;
 		game = nullptr;
 #ifndef _DEBUG
+	} catch (std::exception e) {
+		error("The game has crashed!", e.what());
+#ifdef _WIN32
+		MessageBox(nullptr, L"The game has crashed, information about this crash is available in the game logs. Please try restarting the game", L"Game Crashed", MB_OK | MB_ICONERROR);
+#endif
 	} catch (...) {
 		error("The game has crashed!");
 #ifdef _WIN32
