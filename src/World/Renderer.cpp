@@ -122,11 +122,19 @@ void World::render() {
 
 	static Block* skybox;
 	static Block* clouds;
+	static Block* sun;
+	static Block* moon;
 	if (skybox == nullptr) {
 		skybox = new Block(BLOCK_TYPE::STONE, glm::ivec3(0, 0, 0), 0);
 	}
 	if (clouds == nullptr) {
 		clouds = new Block(BLOCK_TYPE::STONE, glm::ivec3(0, 0, 0), 0);
+	}
+	if (sun == nullptr) {
+		sun = new Block(BLOCK_TYPE::STONE, glm::ivec3(0, 0, 0), 0);
+	}
+	if (moon == nullptr) {
+		moon = new Block(BLOCK_TYPE::STONE, glm::ivec3(0, 0, 0), 0);
 	}
 
 	Shader* shader = Game::getInstance()->getShader();
@@ -136,15 +144,35 @@ void World::render() {
 	skyboxShader->setUniform("projection", playerProjection);
 	skyboxShader->setUniform("ambientLight", getAmbientLight());
 
-	glDepthRange(0.9, 1.0);
+	glDepthRange(0.99, 1.0);
+
 	glBindTexture(GL_TEXTURE_2D, getTexture("skybox")->id);
 	skyboxShader->setUniform("blockPos", glm::vec3(0, 0, 0));
-	skyboxShader->setUniform("clouds", false);
+	skyboxShader->setUniform("type", 0);
 	skybox->Render(nullptr, 0, false);
+
+	glDepthRange(0.95, 0.99);
+
+	glBindTexture(GL_TEXTURE_2D, getTexture("sun")->id);
+	skyboxShader->setUniform("blockPos", glm::vec3(0, .9f, 0));
+	skyboxShader->setUniform("type", 2);
+	glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians((m_tick / 24000.0f) * 360.0f), glm::vec3(0, 0, 1));
+	skyboxShader->setUniform("model", model);
+	sun->Render(nullptr, 47, false);
+
+	glBindTexture(GL_TEXTURE_2D, getTexture("moon")->id);
+	model = glm::rotate(glm::mat4(1.0f), glm::radians((m_tick / 24000.0f - .5f) * 360.0f), glm::vec3(0, 0, 1));
+	skyboxShader->setUniform("model", model);
+	moon->Render(nullptr, 47, false);
+
+	glDepthRange(0.9, .95);
+
 	glBindTexture(GL_TEXTURE_2D, getTexture("clouds")->id);
 	skyboxShader->setUniform("blockPos", glm::vec3(0, .75f, 0));
-	skyboxShader->setUniform("clouds", true);
+	skyboxShader->setUniform("playerPos", player->pos);
+	skyboxShader->setUniform("type", 1);
 	clouds->Render(nullptr, 47, false);
+
 	glDepthRange(0.01, 0.9);
 
 

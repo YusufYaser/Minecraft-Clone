@@ -232,11 +232,11 @@ void Game::update() {
 
 	skyboxShader->activate();
 	skyboxShader->setUniform("gamePaused", m_gamePaused);
-	skyboxShader->setUniform("time", startTime);
+	if (m_world != nullptr) skyboxShader->setUniform("tick", m_world->getTick());
 	shader->activate();
 	shader->setUniform("gamePaused", m_gamePaused);
 	shader->setUniform("time", startTime);
-	if (m_gamePaused) {
+	if (m_gamePaused && m_player == nullptr) {
 		glClearColor(0, .25f, 0, 1.0f);
 	} else {
 		glClearColor(0, 0, 0, 1.0f);
