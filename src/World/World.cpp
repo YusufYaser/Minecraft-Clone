@@ -72,6 +72,24 @@ World::~World() {
 		print("Waiting for rendering thread...");
 		renderingThreads[c].join();
 	}
+
+	for (auto& i : instances) {
+		glDeleteBuffers(1, &i->VBO);
+		i->VBO = 0;
+
+		glDeleteVertexArrays(1, &i->bStructData->VAO);
+		i->bStructData->VAO = 0;
+
+		glDeleteBuffers(1, &i->bStructData->VBO);
+		i->bStructData->VBO = 0;
+
+		delete i->bStructData;
+		i->bStructData = nullptr;
+
+		delete i;
+		i = nullptr;
+	}
+	instances.clear();
 }
 
 WorldSaveData* World::createWorldSaveData() {

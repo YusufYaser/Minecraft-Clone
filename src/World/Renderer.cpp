@@ -86,28 +86,6 @@ void World::renderer(int c) {
 
 		chunk->renderingGroupsMutex.unlock();
 	}
-
-	for (int h = 0; h < 64; h++) {
-		for (auto& [t, instances] : instancesCache[h]) {
-			for (auto& i : instances) {
-				glDeleteBuffers(1, &i->VBO);
-				i->VBO = 0;
-
-				glDeleteVertexArrays(1, &i->bStructData->VAO);
-				i->bStructData->VAO = 0;
-
-				glDeleteBuffers(1, &i->bStructData->VBO);
-				i->bStructData->VBO = 0;
-
-				delete i->bStructData;
-				i->bStructData = nullptr;
-
-				delete i;
-				i = nullptr;
-			}
-			instances.clear();
-		}
-	}
 }
 
 void World::render() {
