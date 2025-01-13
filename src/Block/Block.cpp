@@ -164,10 +164,10 @@ void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTextu
 
 	if (data->faceCount == 0) return;
 
-	shader->setUniform("blockPos", pos);
+	if (shader != nullptr) shader->setUniform("blockPos", pos);
 
 	if (highlighted) {
-		shader->setUniform("highlighted", true);
+		if (shader != nullptr) shader->setUniform("highlighted", true);
 	}
 
 	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName())->id);
@@ -176,6 +176,6 @@ void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTextu
 	glDrawArraysInstanced(GL_TRIANGLES, 0, data->faceCount * 6, 1);
 
 	if (highlighted) {
-		shader->setUniform("highlighted", false);
+		if (shader != nullptr) shader->setUniform("highlighted", false);
 	}
 }

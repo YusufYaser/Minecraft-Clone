@@ -68,7 +68,7 @@ void DebugText::render() {
 		text << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
 		text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n\n";
 
-		text << "Instances Rendered: " << world->instancesRendered() << "\n\n";
+		text << "Instances Rendered: " << world->instancesRendered() << " / " << world->totalInstances() << "\n\n";
 
 		text << "World Name: " << game->getLoadedWorldName() << "\n";
 		text << "World Time: " << world->getTime();

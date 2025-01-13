@@ -121,10 +121,15 @@ void World::render() {
 	glm::mat4 playerProjection = player->getProjection();
 
 	static Block* skybox;
+	static Block* clouds;
 	if (skybox == nullptr) {
 		skybox = new Block(BLOCK_TYPE::STONE, glm::ivec3(0, 0, 0), 0);
 	}
+	if (clouds == nullptr) {
+		clouds = new Block(BLOCK_TYPE::STONE, glm::ivec3(0, 0, 0), 0);
+	}
 
+	Shader* shader = Game::getInstance()->getShader();
 	Shader* skyboxShader = Game::getInstance()->getSkyboxShader();
 	skyboxShader->activate();
 	skyboxShader->setUniform("view", glm::lookAt(glm::vec3(), player->orientation, player->up));
@@ -133,10 +138,15 @@ void World::render() {
 
 	glDepthRange(0.9, 1.0);
 	glBindTexture(GL_TEXTURE_2D, getTexture("skybox")->id);
-	skybox->Render(skyboxShader, 0, false);
+	skyboxShader->setUniform("blockPos", glm::vec3(0, 0, 0));
+	skyboxShader->setUniform("clouds", false);
+	skybox->Render(nullptr, 0, false);
+	glBindTexture(GL_TEXTURE_2D, getTexture("clouds")->id);
+	skyboxShader->setUniform("blockPos", glm::vec3(0, .75f, 0));
+	skyboxShader->setUniform("clouds", true);
+	clouds->Render(nullptr, 47, false);
 	glDepthRange(0.01, 0.9);
 
-	Shader* shader = Game::getInstance()->getShader();
 
 	shader->activate();
 	shader->setUniform("view", playerView);

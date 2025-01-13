@@ -10,9 +10,10 @@ flat out float face;
 
 uniform mat4 projection;
 uniform mat4 view;
+uniform vec3 blockPos;
 
 void main() {
-	gl_Position = projection * view * vec4(position, 1.0f);
+	gl_Position = projection * view * vec4(position + blockPos, 1.0f);
 
 	texCoord = inTexCoord;
 	face = inFace;
