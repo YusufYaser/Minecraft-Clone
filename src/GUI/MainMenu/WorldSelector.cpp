@@ -165,8 +165,16 @@ void WorldSelector::render() {
 				settings.generator = data->generator;
 				settings.initialTick = data->tick;
 				settings.structures.clear();
-				for (int i = 0; i < data->structuresCount; i++) {
-					settings.structures.push_back(data->structures[i]);
+				if (data->structuresCount <= STRUCTURES_COUNT) {
+					for (int i = 0; i < data->structuresCount; i++) {
+						if (i < STRUCTURES_COUNT) {
+							settings.structures.push_back(data->structures[i]);
+						} else {
+							warn("Invalid structure", std::to_string(i));
+						}
+					}
+				} else {
+					warn("Invalid structures count");
 				}
 
 				glm::vec3 pos = {};
