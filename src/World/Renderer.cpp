@@ -188,16 +188,6 @@ void World::render() {
 		for (int y = -(renderDistance / 2) + playerChunk.y; y < (renderDistance / 2) + playerChunk.y; y++) {
 			glm::ivec2 cPos = glm::ivec2(x, y);
 
-			if (glm::length(glm::vec2(cPos - playerChunk)) > 1) {
-				glm::vec3 chunkCenter = glm::vec3(x * 16 + 8, 20.0f, y * 16 + 8);
-				glm::vec3 playerPos3D = pos;
-
-				glm::vec3 toChunk = glm::normalize(chunkCenter - playerPos3D);
-				glm::vec3 viewDir = glm::normalize(player->orientation);
-
-				if (glm::dot(toChunk, viewDir) < cosHalfFOV) continue;
-			}
-
 			std::size_t chunkCh = hashPos(cPos);
 			chunksMutex.lock();
 			std::unordered_map<std::size_t, Chunk*>::iterator it = chunks.find(chunkCh);
@@ -210,6 +200,20 @@ void World::render() {
 			chunksMutex.unlock();
 			if (chunk == nullptr) continue;
 			if (!chunk->loaded) continue;
+
+			if (glm::length(glm::vec2(cPos - playerChunk)) > 1) {
+				glm::vec3 chunkCenter = glm::vec3(x * 16 + 8, 20.0f, y * 16 + 8);
+				glm::vec3 playerPos3D = pos;
+
+				glm::vec3 toChunk = glm::normalize(chunkCenter - playerPos3D);
+				glm::vec3 viewDir = glm::normalize(player->orientation);
+
+				if (glm::dot(toChunk, viewDir) < cosHalfFOV) {
+					chunk->lastRendered = time(nullptr);
+					continue;
+				}
+			}
+
 			m_chunksRendered++;
 
 			renderingQueue.push_back(chunk);
