@@ -54,7 +54,7 @@ void Player::update(float delta) {
 		verticalVelocity -= 20.0f * delta;
 	}
 
-	if (verticalVelocity <= 0) {
+	if (verticalVelocity <= 0 && !flying) {
 		verticalVelocity -= 20.0f * delta;
 		if (verticalVelocity < -98.0f) verticalVelocity = -98.0f;
 	}
@@ -152,13 +152,27 @@ void Player::checkInputs(float delta) {
 	if (keyHandler->keyHeld(GLFW_KEY_D)) {
 		change += glm::normalize(glm::cross(orientation2, up));
 	}
-	if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
-		if (verticalVelocity == 0.0f) verticalVelocity = 6.0f;
+	if (keyHandler->keyClicked(GLFW_KEY_F)) {
+		flying = !flying;
+	}
+	if (flying) {
+		verticalVelocity = 0;
+		if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
+			verticalVelocity += 10.0f;
+		}
+		if (keyHandler->keyHeld(GLFW_KEY_LEFT_SHIFT)) {
+			verticalVelocity += -10.0f;
+		}
+	} else {
+		if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
+			if (verticalVelocity == 0.0f) verticalVelocity = 6.0f;
+		}
 	}
 
 	if (change != glm::vec3(0, 0, 0)) {
 		change = glm::normalize(change) * delta * speed;
-		if (verticalVelocity > 0) change *= 1.1f;
+		if (flying) change *= 2.0f;
+		else if (verticalVelocity > 0) change *= 1.1f;
 
 		glm::vec3 aChange = glm::abs(change);
 		Block* block;

@@ -115,6 +115,12 @@ Game::Game(GameSettings& settings) {
 	m_collOverlay->setColor({ .25f, .25f, .25f, 1.0f });
 	m_collOverlay->setZIndex(0);
 
+	m_flyingText = new Text();
+	m_flyingText->setText("Flying");
+	m_flyingText->setCentered(true);
+	m_flyingText->setPosition({ 1.0f, -40, 1.0f, -15 });
+	m_flyingText->setColor({ .75f, .75f, .75f, 1.0f });
+
 	m_keyHandler = new KeyHandler();
 
 	m_pauseMenu = new PauseMenu();
@@ -144,6 +150,9 @@ Game::~Game() {
 
 	delete m_collOverlay;
 	m_collOverlay = nullptr;
+
+	delete m_flyingText;
+	m_flyingText = nullptr;
 
 	delete m_soundEngine;
 	m_soundEngine = nullptr;
@@ -285,6 +294,7 @@ void Game::update() {
 		}
 	}
 
+	if (m_player != nullptr && m_player->isFlying() && !m_gamePaused) m_flyingText->render();
 	if (m_debugTextVisible) DebugText::render();
 
 	glfwSwapBuffers(getGlfwWindow());

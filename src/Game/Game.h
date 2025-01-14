@@ -100,6 +100,7 @@ private:
 	Player* m_player = nullptr;
 	World* m_world = nullptr;
 	Image* m_collOverlay = nullptr;
+	Text* m_flyingText = nullptr;
 	SoundEngine* m_soundEngine = nullptr;
 
 	float m_realDelta = 1.0f;

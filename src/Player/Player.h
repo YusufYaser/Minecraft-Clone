@@ -37,9 +37,12 @@ public:
 	glm::mat4 getProjection() const;
 	glm::mat4 getView() const;
 
+	bool isFlying() const { return flying; }
+
 private:
 	bool wasHidden = false;
 
+	bool flying = false;
 	float verticalVelocity = 0.0f;
 
 	void checkInputs(float delta);
