@@ -158,10 +158,10 @@ void Player::checkInputs(float delta) {
 	if (flying) {
 		verticalVelocity = 0;
 		if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
-			verticalVelocity += 10.0f;
+			verticalVelocity += speed * 2.0f;
 		}
 		if (keyHandler->keyHeld(GLFW_KEY_LEFT_SHIFT)) {
-			verticalVelocity += -10.0f;
+			verticalVelocity += -speed * 2.0f;
 		}
 	} else {
 		if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
@@ -361,5 +361,5 @@ glm::mat4 Player::getProjection() const {
 }
 
 glm::mat4 Player::getView() const {
-	return glm::lookAt(getCameraPos(), getCameraPos() + orientation, up);
+	return glm::lookAt(glm::vec3(), orientation, up);
 }

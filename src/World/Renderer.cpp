@@ -80,7 +80,7 @@ void World::renderer(int c) {
 
 				if (block->highlighted) i->highlightedOffset = i->offsetsCount;
 
-				i->offsets[i->offsetsCount++] = glm::vec3(bPos);
+				i->offsets[i->offsetsCount++] = glm::vec3(bPos) - pos;
 			}
 		}
 
