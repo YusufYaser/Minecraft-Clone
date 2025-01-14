@@ -20,7 +20,7 @@ void main() {
         break;
 
     case 1: // clouds
-        FragColor = texture(tex0, vec2(texCoord.x + (playerPos.x / 1000.0), texCoord.y + (tick / 2400.0) + (playerPos.z / 1000.0)));
+        FragColor = texture(tex0, vec2(texCoord.x + (playerPos.x / 1000.0), texCoord.y + (tick / 2400.0) + (playerPos.z / 1000.0)) * .03f);
         FragColor *= sin((texCoord.x) * 3.1415);
         FragColor *= sin((texCoord.y) * 3.1415);
         FragColor *= .75f;

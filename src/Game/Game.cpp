@@ -253,7 +253,7 @@ void Game::update() {
 	glDepthRange(0, 0.01);
 	guiShader->activate();
 
-	if (m_player != nullptr) {
+	if (m_player != nullptr && m_world != nullptr) {
 		glm::ivec3 iPos = glm::ivec3(
 			round(m_player->pos.x),
 			round(m_player->pos.y),
