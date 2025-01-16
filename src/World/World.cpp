@@ -92,6 +92,35 @@ World::~World() {
 	instances.clear();
 }
 
+void World::dontRender() {
+	m_chunksRendered = 0;
+	m_instancesRendered = 0;
+
+	glm::vec3 pos = Game::getInstance()->getPlayer()->getCameraPos();
+	glm::ivec2 playerChunk = getPosChunk(pos);
+	int renderDistance = Game::getInstance()->getRenderDistance();
+
+	for (int x = -(renderDistance / 2) + playerChunk.x; x < (renderDistance / 2) + playerChunk.x; x++) {
+		for (int y = -(renderDistance / 2) + playerChunk.y; y < (renderDistance / 2) + playerChunk.y; y++) {
+			glm::ivec2 cPos = glm::ivec2(x, y);
+
+			std::size_t chunkCh = hashPos(cPos);
+			if (!chunksMutex.try_lock()) continue;
+			std::unordered_map<std::size_t, Chunk*>::iterator it = chunks.find(chunkCh);
+			if (it == chunks.end()) {
+				chunksMutex.unlock();
+				loadChunk(cPos);
+				continue;
+			}
+			Chunk* chunk = it->second;
+			chunksMutex.unlock();
+			if (chunk == nullptr) continue;
+			if (!chunk->loaded) continue;
+			chunk->lastRendered = time(nullptr);
+		}
+	}
+}
+
 WorldSaveData* World::createWorldSaveData() {
 	WorldSaveData* data = new WorldSaveData();
 	data->tick = m_tick;

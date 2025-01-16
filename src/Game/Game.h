@@ -98,10 +98,17 @@ private:
 
 	KeyHandler* m_keyHandler = nullptr;
 	Player* m_player = nullptr;
-	World* m_world = nullptr;
 	Image* m_collOverlay = nullptr;
 	Text* m_flyingText = nullptr;
 	SoundEngine* m_soundEngine = nullptr;
+
+	World* m_world = nullptr;
+	GLuint worldFBO;
+	GLuint worldRBO;
+	Texture* worldTex;
+	Image* worldImage;
+	void* worldPixels;
+	bool worldRenderingEnabled = true;
 
 	float m_realDelta = 1.0f;
 	float m_delta = 1.0f;

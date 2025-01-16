@@ -54,6 +54,7 @@ public:
 	WorldSaveData* createWorldSaveData();
 
 	void render();
+	void dontRender();
 
 	Block* getBlock(glm::ivec3 pos);
 	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);

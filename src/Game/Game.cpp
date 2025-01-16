@@ -130,6 +130,24 @@ Game::Game(GameSettings& settings) {
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glClearColor(0, 0, 0, 1.0f);
+
+	glGenFramebuffers(1, &worldFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, worldFBO);
+
+	worldTex = new Texture();
+	glGenTextures(1, &worldTex->id);
+	glBindTexture(GL_TEXTURE_2D, worldTex->id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, worldTex->id, 0);
+	worldImage = new Image(worldTex);
+	worldImage->setSize({ 1.0f, 0, 1.0f, 0 });
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	DebugText::initialize();
 
@@ -168,6 +186,19 @@ Game::~Game() {
 
 	delete m_pauseMenu;
 	m_pauseMenu = nullptr;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glDeleteFramebuffers(1, &worldFBO);
+	glDeleteRenderbuffers(1, &worldRBO);
+
+	delete worldTex;
+	worldTex = nullptr;
+
+	delete worldImage;
+	worldImage = nullptr;
+
+	free(worldPixels);
 
 	DebugText::cleanup();
 
@@ -215,7 +246,16 @@ void Game::update() {
 	if (m_keyHandler->keyClicked(GLFW_KEY_F3)
 		&& !m_keyHandler->keyHeld(GLFW_KEY_R) && !m_keyHandler->keyHeld(GLFW_KEY_T) && !m_keyHandler->keyHeld(GLFW_KEY_Y)) {
 
-		m_debugTextVisible = !m_debugTextVisible;
+		if (m_keyHandler->keyHeld(GLFW_KEY_C)) {
+			worldRenderingEnabled = !worldRenderingEnabled;
+			if (worldRenderingEnabled) {
+				print("Enabled world rendering");
+			} else {
+				warn("Disabled world rendering");
+			}
+		} else {
+			m_debugTextVisible = !m_debugTextVisible;
+		}
 	}
 
 	if (m_keyHandler->keyClicked(GLFW_KEY_ESCAPE) && m_player != nullptr) {
@@ -240,34 +280,71 @@ void Game::update() {
 	m_gameWindow->update();
 
 	skyboxShader->activate();
-	skyboxShader->setUniform("gamePaused", m_gamePaused);
 	if (m_world != nullptr) skyboxShader->setUniform("tick", m_world->getTick());
 	shader->activate();
-	shader->setUniform("gamePaused", m_gamePaused);
 	shader->setUniform("time", startTime);
-	if (m_gamePaused && m_player == nullptr) {
-		glClearColor(0, .25f, 0, 1.0f);
-	} else {
-		glClearColor(0, 0, 0, 1.0f);
-	}
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDepthRange(0.01, 1.0);
+	glDepthRange(0, 1.0);
 
 	glm::vec2 size = m_gameWindow->getSize();
 
-	if (m_world != nullptr) {
-		m_world->render();
+	if (m_world != nullptr && m_player != nullptr) {
+		static glm::ivec2 prevSize;
+		static World* prevWorld;
+		glm::ivec2 iSize = glm::ivec2(size);
+		bool changed = prevSize.x != iSize.x || prevSize.y != iSize.y || prevWorld != m_world;
+
+		worldImage->setPosition({ 0, iSize.x / 2, 0, iSize.y / 2 });
+
+		if ((!m_gamePaused || changed) && worldRenderingEnabled) {
+			glBindTexture(GL_TEXTURE_2D, worldTex->id);
+			glBindFramebuffer(GL_FRAMEBUFFER, worldFBO);
+			glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
+
+			if (changed) {
+				free(worldPixels);
+				worldPixels = (void*)malloc(static_cast<size_t>(iSize.x * iSize.y * 4));
+				glViewport(0, 0, iSize.x, iSize.y);
+
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iSize.x, iSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+				worldTex->width = iSize.x;
+				worldTex->height = iSize.y;
+
+				if (worldRBO != 0) glDeleteRenderbuffers(1, &worldRBO);
+				glGenRenderbuffers(1, &worldRBO);
+				glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
+
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, iSize.x, iSize.y);
+				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, worldRBO);
+
+				prevSize = iSize;
+				prevWorld = m_world;
+			}
+
+			glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+			m_world->render();
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		} else {
+			m_world->dontRender();
+		}
+
+		if (m_gamePaused) {
+			worldImage->setColor({ .5f, .5f, .5f, 1.0f });
+		} else {
+			worldImage->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+		}
+
+		glDepthRange(0.99, 1);
+		worldImage->render();
+		glDepthRange(0, 0.99);
 	}
 
-	glDepthRange(0, 0.01);
 	guiShader->activate();
 
 	if (m_player != nullptr && m_world != nullptr) {
-		glm::ivec3 iPos = glm::ivec3(
-			round(m_player->pos.x),
-			round(m_player->pos.y),
-			round(m_player->pos.z)
-		);
+		glm::ivec3 iPos = glm::round(m_player->pos);
 
 		Block* upBlock = m_world->getBlock(iPos + glm::ivec3(0, 1, 0));
 		if (upBlock != nullptr) {
@@ -338,6 +415,7 @@ void Game::setGamePaused(bool paused) {
 void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos) {
 	if (m_loadingWorld) return;
 	m_loadingWorld = true;
+	worldRenderingEnabled = true;
 
 	print("Creating world");
 

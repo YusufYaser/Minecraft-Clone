@@ -64,6 +64,7 @@ void World::renderer(int c) {
 					i = new Instance();
 					i->tex = tex;
 					i->offsetsCount = 0;
+					i->highlightedOffset = -1;
 					i->blockType = type;
 					i->hiddenFaces = hiddenFaces;
 
@@ -151,8 +152,7 @@ void World::render() {
 	skyboxShader->setUniform("type", 1);
 	clouds->Render(nullptr, 47, false);
 
-	glDepthRange(0.01, 0.9);
-
+	glDepthRange(0, 0.9);
 
 	shader->activate();
 	shader->setUniform("view", playerView);
@@ -171,7 +171,7 @@ void World::render() {
 
 	float cosHalfFOV = std::cos(glm::radians(190.0f / 2.0f));
 
-	glm::ivec2 playerChunk = getPosChunk(player->pos);
+	glm::ivec2 playerChunk = getPosChunk(pos);
 
 	std::unordered_map<Chunk*, std::vector<BLOCK_TYPE>> queued;
 

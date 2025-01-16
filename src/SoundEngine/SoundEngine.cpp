@@ -96,6 +96,7 @@ void SoundEngine::playSound(SOUND_TYPE soundType) {
 
 void SoundEngine::soundTick() {
 	while (!unloading.load()) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		if (queue.size() == 0) continue;
 		queueMux.lock();
 		SOUND_TYPE soundType = queue.front();

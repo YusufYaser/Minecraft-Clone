@@ -9,7 +9,6 @@ out vec4 FragColor;
 
 uniform sampler2D tex0;
 uniform int highlighted;
-uniform bool gamePaused;
 uniform float ambientLight;
 uniform double time;
 uniform int animationFrameCount;
@@ -37,9 +36,5 @@ void main() {
     }
 
     FragColor *= vec4(vec3(ambientLight * lightPercentage), 1.0f);
-
-    if (gamePaused) {
-        FragColor *= vec4(.5f, .5f, .5f, 1.0f);
-    }
 }
 )END"

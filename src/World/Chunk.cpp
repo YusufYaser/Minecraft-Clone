@@ -5,9 +5,7 @@
 void World::chunkLoaderFunc() {
 	std::string name = Game::getInstance()->getLoadedWorldName();
 
-	while (true) {
-		if (unloading.load()) break;
-
+	while (!unloading.load()) {
 		if (chunkLoadQueue.size() == 0) continue;
 
 		Player* player = Game::getInstance()->getPlayer();
