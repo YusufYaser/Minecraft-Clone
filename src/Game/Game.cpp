@@ -374,6 +374,7 @@ void Game::update() {
 	if (m_player != nullptr && m_player->isFlying() && !m_gamePaused) m_flyingText->render();
 	if (m_debugTextVisible) DebugText::render();
 
+	glfwSwapInterval(1);
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();
 
