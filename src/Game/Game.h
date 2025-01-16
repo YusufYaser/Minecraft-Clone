@@ -107,8 +107,9 @@ private:
 	World* m_world = nullptr;
 	GLuint worldFBO;
 	GLuint worldRBO;
+	GLuint worldVAO;
+	GLuint worldVBO;
 	Texture* worldTex;
-	Image* worldImage;
 	void* worldPixels;
 	bool worldRenderingEnabled = true;
 
@@ -128,6 +129,7 @@ private:
 	Shader* shader = nullptr;
 	Shader* guiShader = nullptr;
 	Shader* skyboxShader = nullptr;
+	Shader* postProcessingShader = nullptr;
 
 	// gui
 	PauseMenu* m_pauseMenu = nullptr;

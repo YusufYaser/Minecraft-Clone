@@ -67,7 +67,8 @@ Game::Game(GameSettings& settings) {
 	shader = new Shader(vertexShaderFile, fragmentShaderFile);
 	guiShader = new Shader(guiVertexShaderFile, guiFragmentShaderFile);
 	skyboxShader = new Shader(skyboxVertexShaderFile, skyboxFragmentShaderFile);
-	if (!shader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded()) {
+	postProcessingShader = new Shader(postProcessingVertexShaderFile, postProcessingFragmentShaderFile);
+	if (!shader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded() || !postProcessingShader->successfullyLoaded()) {
 		error("Failed to initialize shaders");
 		return;
 	}
@@ -83,6 +84,8 @@ Game::Game(GameSettings& settings) {
 	guiShader->setUniform("tex0", 0);
 	skyboxShader->activate();
 	skyboxShader->setUniform("tex0", 0);
+	postProcessingShader->activate();
+	postProcessingShader->setUniform("tex0", 0);
 	print("Loaded textures");
 
 	print("Initializing sound engine");
@@ -144,8 +147,27 @@ Game::Game(GameSettings& settings) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 854, 480, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, worldTex->id, 0);
-	worldImage = new Image(worldTex);
-	worldImage->setSize({ 1.0f, 0, 1.0f, 0 });
+
+	GLfloat vertices[] = {
+		-1.0f, -1.0f,		0.0f, 0.0f,
+		 1.0f, -1.0f,		1.0f, 0.0f,
+		 1.0f,  1.0f,		1.0f, 1.0f,
+		-1.0f, -1.0f,		0.0f, 0.0f,
+		 1.0f,  1.0f,		1.0f, 1.0f,
+		 -1.0f,  1.0f,		0.0f, 1.0f,
+	};
+
+	glGenVertexArrays(1, &worldVAO);
+	glBindVertexArray(worldVAO);
+
+	glGenBuffers(1, &worldVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -182,6 +204,12 @@ Game::~Game() {
 	delete guiShader;
 	guiShader = nullptr;
 
+	delete skyboxShader;
+	skyboxShader = nullptr;
+
+	delete postProcessingShader;
+	postProcessingShader = nullptr;
+
 	delete m_gameWindow;
 	m_gameWindow = nullptr;
 
@@ -196,8 +224,8 @@ Game::~Game() {
 	delete worldTex;
 	worldTex = nullptr;
 
-	delete worldImage;
-	worldImage = nullptr;
+	glDeleteBuffers(1, &worldVBO);
+	glDeleteVertexArrays(1, &worldVAO);
 
 	free(worldPixels);
 
@@ -299,8 +327,6 @@ void Game::update() {
 		glm::ivec2 iSize = glm::ivec2(size);
 		bool changed = prevSize.x != iSize.x || prevSize.y != iSize.y || prevWorld != m_world;
 
-		worldImage->setPosition({ 0, iSize.x / 2, 0, iSize.y / 2 });
-
 		if ((!m_gamePaused || changed) && worldRenderingEnabled) {
 			glBindTexture(GL_TEXTURE_2D, worldTex->id);
 			glBindFramebuffer(GL_FRAMEBUFFER, worldFBO);
@@ -327,7 +353,6 @@ void Game::update() {
 			}
 
 			glClear(GL_DEPTH_BUFFER_BIT);
-
 			m_world->render();
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -335,17 +360,12 @@ void Game::update() {
 			m_world->dontRender();
 		}
 
-		if (m_gamePaused) {
-			worldImage->setColor({ .5f, .5f, .5f, 1.0f });
-		} else {
-			worldImage->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-		}
-
 		glDepthRange(0.99, 1);
-		bool wasGuiEnabled = m_guiEnabled;
-		m_guiEnabled = true;
-		worldImage->render();
-		m_guiEnabled = wasGuiEnabled;
+		postProcessingShader->activate();
+		postProcessingShader->setUniform("gamePaused", m_gamePaused);
+		glBindVertexArray(worldVAO);
+		glBindTexture(GL_TEXTURE_2D, worldTex->id);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDepthRange(0, 0.99);
 	}
 

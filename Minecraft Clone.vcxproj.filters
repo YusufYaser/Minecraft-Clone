@@ -187,6 +187,8 @@
     <None Include="src\Shaders\GUI\GUI.vert" />
     <None Include="src\Shaders\Skybox\Skybox.frag" />
     <None Include="src\Shaders\Skybox\Skybox.vert" />
+    <None Include="src\Shaders\PostProcessing\PostProcessing.vert" />
+    <None Include="src\Shaders\PostProcessing\PostProcessing.frag" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">

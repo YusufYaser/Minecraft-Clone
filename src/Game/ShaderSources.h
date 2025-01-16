@@ -23,3 +23,11 @@ const char* skyboxVertexShaderFile = {
 const char* skyboxFragmentShaderFile = {
 #include "../Shaders/Skybox/Skybox.frag"
 };
+
+const char* postProcessingVertexShaderFile = {
+#include "../Shaders/PostProcessing/PostProcessing.vert"
+};
+
+const char* postProcessingFragmentShaderFile = {
+#include "../Shaders/PostProcessing/PostProcessing.frag"
+};
