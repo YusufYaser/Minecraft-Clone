@@ -72,7 +72,10 @@ void Button::setSize(glm::vec4 size) {
 }
 
 void Button::render() {
-	m_lastRenderFrame = Game::getInstance()->getFrameNum();
+	Game* game = Game::getInstance();
+	if (!game->isGuiEnabled()) return;
+
+	m_lastRenderFrame = game->getFrameNum();
 
 	if (isHovered()) {
 		m_image->setColor({ .5f, .5f, .5f, 1.0f });

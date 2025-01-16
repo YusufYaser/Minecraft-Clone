@@ -142,6 +142,7 @@ Game::Game(GameSettings& settings) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 854, 480, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, worldTex->id, 0);
 	worldImage = new Image(worldTex);
 	worldImage->setSize({ 1.0f, 0, 1.0f, 0 });
@@ -273,6 +274,10 @@ void Game::update() {
 		m_gameWindow->setFullscreen(!m_gameWindow->isFullscreen());
 	}
 
+	if (m_keyHandler->keyClicked(GLFW_KEY_F1)) {
+		m_guiEnabled = !m_guiEnabled;
+	}
+
 	if (m_world == nullptr) m_gamePaused = true;
 
 	glfwSetInputMode(getGlfwWindow(), GLFW_CURSOR, m_gamePaused ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
@@ -321,7 +326,7 @@ void Game::update() {
 				prevWorld = m_world;
 			}
 
-			glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			glClear(GL_DEPTH_BUFFER_BIT);
 
 			m_world->render();
 
@@ -337,7 +342,10 @@ void Game::update() {
 		}
 
 		glDepthRange(0.99, 1);
+		bool wasGuiEnabled = m_guiEnabled;
+		m_guiEnabled = true;
 		worldImage->render();
+		m_guiEnabled = wasGuiEnabled;
 		glDepthRange(0, 0.99);
 	}
 
@@ -355,7 +363,10 @@ void Game::update() {
 			} else {
 				m_collOverlay->setColor({ .125f, .125f, .125f, 1.0f });
 			}
+			bool wasGuiEnabled = m_guiEnabled;
+			m_guiEnabled = true;
 			m_collOverlay->render();
+			m_guiEnabled = wasGuiEnabled;
 		}
 	}
 

@@ -17,9 +17,12 @@ void Text::setText(std::string content) {
 }
 
 void Text::render() {
-	m_lastRenderFrame = Game::getInstance()->getFrameNum();
+	Game* game = Game::getInstance();
+	if (!game->isGuiEnabled()) return;
 
-	glm::ivec2 size = Game::getInstance()->getGameWindow()->getSize();
+	m_lastRenderFrame = game->getFrameNum();
+
+	glm::ivec2 size = game->getGameWindow()->getSize();
 
 	gltBeginDraw();
 

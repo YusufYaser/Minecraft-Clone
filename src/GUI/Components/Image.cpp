@@ -9,7 +9,10 @@ Image::Image(Texture* tex) {
 }
 
 void Image::render() {
-	m_lastRenderFrame = Game::getInstance()->getFrameNum();
+	Game* game = Game::getInstance();
+	if (!game->isGuiEnabled()) return;
+
+	m_lastRenderFrame = game->getFrameNum();
 
 	GLfloat vertices[] = {
 		-0.5f, -0.5f,		0.0f, 0.0f,
@@ -50,7 +53,7 @@ void Image::render() {
 
 	static Shader* guiShader = nullptr;
 	if (guiShader == nullptr) {
-		guiShader = Game::getInstance()->getGuiShader();
+		guiShader = game->getGuiShader();
 	}
 
 	guiShader->activate();

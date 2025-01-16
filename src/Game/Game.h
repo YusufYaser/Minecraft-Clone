@@ -68,6 +68,8 @@ public:
 	float getRealDelta() const { return m_realDelta; };
 	int getFrameNum() const { return m_frameNum; }
 
+	bool isGuiEnabled() const { return m_guiEnabled || m_gamePaused; };
+
 	bool gamePaused() const { return m_gamePaused; };
 	void setGamePaused(bool paused);
 
@@ -109,6 +111,8 @@ private:
 	Image* worldImage;
 	void* worldPixels;
 	bool worldRenderingEnabled = true;
+
+	bool m_guiEnabled = true;
 
 	float m_realDelta = 1.0f;
 	float m_delta = 1.0f;
