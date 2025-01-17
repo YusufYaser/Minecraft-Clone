@@ -126,18 +126,6 @@ void Player::checkInputs(float delta) {
 
 	glm::vec3 orientation2 = glm::vec3(orientation.x, 0.0f, orientation.z);
 
-	if (keyHandler->keyHeld(GLFW_KEY_F3)) {
-		if (keyHandler->keyHeld(GLFW_KEY_R)) {
-			pos = { 0.0f, 100.0f, 0.0f };
-		}
-		if (keyHandler->keyHeld(GLFW_KEY_T)) {
-			pos.y = 100.0f;
-		}
-		if (keyHandler->keyHeld(GLFW_KEY_Y)) {
-			game->getWorld()->setTick(0);
-		}
-	}
-
 	glm::vec3 change = glm::vec3();
 
 	if (keyHandler->keyHeld(GLFW_KEY_W)) {

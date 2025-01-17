@@ -124,6 +124,17 @@ Game::Game(GameSettings& settings) {
 	m_flyingText->setPosition({ 1.0f, -40, 1.0f, -15 });
 	m_flyingText->setColor({ .75f, .75f, .75f, 1.0f });
 
+	m_commandsHelp = new Text();
+	m_commandsHelp->setText(R"(Commands
+
+Q: Toggle 3D World Rendering
+R: Teleport to 0, )" + std::to_string(MAX_HEIGHT) + R"(, 0
+T: Teleport to height )" + std::to_string(MAX_HEIGHT) + R"(
+Y: Reset world time
+)");
+	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 6 });
+	m_commandsHelp->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+
 	m_keyHandler = new KeyHandler();
 
 	m_pauseMenu = new PauseMenu();
@@ -270,19 +281,29 @@ void Game::update() {
 
 	m_keyHandler->update();
 
-	if (m_keyHandler->keyClicked(GLFW_KEY_F3)
-		&& !m_keyHandler->keyHeld(GLFW_KEY_R) && !m_keyHandler->keyHeld(GLFW_KEY_T) && !m_keyHandler->keyHeld(GLFW_KEY_Y)) {
-
-		if (m_keyHandler->keyHeld(GLFW_KEY_C)) {
+	if (m_keyHandler->keyHeld(GLFW_KEY_SLASH)) {
+		if (m_keyHandler->keyClicked(GLFW_KEY_Q)) {
 			worldRenderingEnabled = !worldRenderingEnabled;
 			if (worldRenderingEnabled) {
 				print("Enabled world rendering");
 			} else {
 				warn("Disabled world rendering");
 			}
-		} else {
-			m_debugTextVisible = !m_debugTextVisible;
 		}
+
+		if (m_keyHandler->keyClicked(GLFW_KEY_R)) {
+			m_player->pos = { 0.0f, (float)MAX_HEIGHT, 0.0f };
+		}
+		if (m_keyHandler->keyClicked(GLFW_KEY_T)) {
+			m_player->pos.y = (float)MAX_HEIGHT;
+		}
+		if (m_keyHandler->keyClicked(GLFW_KEY_Y)) {
+			m_world->setTick(0);
+		}
+	}
+
+	if (m_keyHandler->keyClicked(GLFW_KEY_F3)) {
+		m_debugTextVisible = !m_debugTextVisible;
 	}
 
 	if (m_keyHandler->keyClicked(GLFW_KEY_ESCAPE) && m_player != nullptr) {
@@ -400,6 +421,10 @@ void Game::update() {
 
 	if (m_player != nullptr && m_player->isFlying() && !m_gamePaused) m_flyingText->render();
 	if (m_debugTextVisible) DebugText::render();
+
+	if (m_keyHandler->keyHeld(GLFW_KEY_SLASH)) {
+		m_commandsHelp->render();
+	}
 
 	glfwSwapInterval(1);
 	glfwSwapBuffers(getGlfwWindow());

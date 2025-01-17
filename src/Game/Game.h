@@ -98,6 +98,8 @@ private:
 
 	std::string m_worldName = "invalid";
 
+	Text* m_commandsHelp = nullptr;
+
 	KeyHandler* m_keyHandler = nullptr;
 	Player* m_player = nullptr;
 	Image* m_collOverlay = nullptr;
