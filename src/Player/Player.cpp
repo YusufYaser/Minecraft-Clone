@@ -226,6 +226,16 @@ void Player::checkInputs(float delta) {
 	BLOCK_FACE face;
 	getTargetBlock(&targetBlock, &face);
 
+	if (keyHandler->mouseClicked(GLFW_MOUSE_BUTTON_MIDDLE) && targetBlock != nullptr) {
+		BLOCK_TYPE type = targetBlock->getType();
+		for (int i = 0; i < 9; i++) {
+			if (m_items[i]->block == type) {
+				slot = i;
+				break;
+			}
+		}
+	}
+
 	if (targetBlock != nullptr) {
 		static double lastModified = 0;
 		double currentTime = glfwGetTime();
