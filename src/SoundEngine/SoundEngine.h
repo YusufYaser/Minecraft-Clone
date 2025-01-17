@@ -5,8 +5,7 @@
 #include <vector>
 #include <mutex>
 #include <thread>
-
-#define SAME_SOUND_COUNT 9
+#include "../config.h"
 
 enum class SOUND_TYPE : uint8_t {
 	BUTTON = 0

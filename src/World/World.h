@@ -15,6 +15,7 @@
 #include <time.h>
 #include "Structures.h"
 #include "stdint.h"
+#include "../config.h"
 
 enum class Generator : uint8_t {
 	Default = 0,
@@ -30,10 +31,6 @@ struct WorldSaveData {
 	STRUCTURE_TYPE structures[STRUCTURES_COUNT];
 	float playerPos[3];
 };
-
-#define MAX_HEIGHT 128
-#define MAX_INSTANCE_OFFSETS 10240
-#define RENDERER_THREAD_COUNT 4
 
 struct ChunkSaveData {
 	BLOCK_TYPE blocks[MAX_HEIGHT][16][16];

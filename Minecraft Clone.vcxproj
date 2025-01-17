@@ -226,6 +226,7 @@
     <ClInclude Include="src\Block\Block.h" />
     <ClInclude Include="src\Block\CubeVertices.h" />
     <ClInclude Include="src\Colors.h" />
+    <ClInclude Include="src\config.h" />
     <ClInclude Include="src\Game\Game.h" />
     <ClInclude Include="src\Game\ShaderSources.h" />
     <ClInclude Include="src\GUI\Components\Button.h" />

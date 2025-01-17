@@ -179,6 +179,9 @@
     <ClInclude Include="src\GUI\SettingsMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\DefaultShader\Shader.frag" />
