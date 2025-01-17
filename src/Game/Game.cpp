@@ -172,6 +172,10 @@ Game::Game(GameSettings& settings) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
+	worldImage = new Image(worldTex);
+	worldImage->setSize({ 1.0f, 0, 1.0f, 0 });
+	worldImage->setPosition({ .5f, 0, .5f, 0 });
+
 	DebugText::initialize();
 
 	m_successfullyLoaded = true;
@@ -223,6 +227,9 @@ Game::~Game() {
 
 	delete worldTex;
 	worldTex = nullptr;
+
+	delete worldImage;
+	worldImage = nullptr;
 
 	glDeleteBuffers(1, &worldVBO);
 	glDeleteVertexArrays(1, &worldVAO);
@@ -328,7 +335,6 @@ void Game::update() {
 		bool changed = prevSize.x != iSize.x || prevSize.y != iSize.y || prevWorld != m_world;
 
 		if ((!m_gamePaused || changed) && worldRenderingEnabled) {
-			glBindTexture(GL_TEXTURE_2D, worldTex->id);
 			glBindFramebuffer(GL_FRAMEBUFFER, worldFBO);
 			glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
 
@@ -337,6 +343,7 @@ void Game::update() {
 				worldPixels = (void*)malloc(static_cast<size_t>(iSize.x * iSize.y * 4));
 				glViewport(0, 0, iSize.x, iSize.y);
 
+				glBindTexture(GL_TEXTURE_2D, worldTex->id);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iSize.x, iSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 				worldTex->width = iSize.x;
 				worldTex->height = iSize.y;
@@ -354,6 +361,11 @@ void Game::update() {
 
 			glClear(GL_DEPTH_BUFFER_BIT);
 			m_world->render();
+			postProcessingShader->activate();
+			postProcessingShader->setUniform("time", (float)glfwGetTime());
+			glBindVertexArray(worldVAO);
+			glBindTexture(GL_TEXTURE_2D, worldTex->id);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		} else {
@@ -361,11 +373,12 @@ void Game::update() {
 		}
 
 		glDepthRange(0.99, 1);
-		postProcessingShader->activate();
-		postProcessingShader->setUniform("gamePaused", m_gamePaused);
-		glBindVertexArray(worldVAO);
-		glBindTexture(GL_TEXTURE_2D, worldTex->id);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		if (m_gamePaused) {
+			worldImage->setColor({ .5f, .5f, .5f, 1.0f });
+		} else {
+			worldImage->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+		}
+		worldImage->render();
 		glDepthRange(0, 0.99);
 	}
 

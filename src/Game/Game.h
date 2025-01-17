@@ -110,6 +110,7 @@ private:
 	GLuint worldVAO;
 	GLuint worldVBO;
 	Texture* worldTex;
+	Image* worldImage;
 	void* worldPixels;
 	bool worldRenderingEnabled = true;
 
