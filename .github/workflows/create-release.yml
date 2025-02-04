@@ -50,4 +50,4 @@ jobs:
           title: "Build ${{ env.RELEASE_VERSION }}"
           prerelease: false
           files: |
-            Game.zip
+            game.release.win64.${{ env.RELEASE_VERSION }}.zip
