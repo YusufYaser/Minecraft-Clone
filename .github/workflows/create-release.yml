@@ -1,4 +1,4 @@
-name: create-release
+name: Create Release
 on:
   workflow_dispatch:
 
@@ -51,4 +51,4 @@ jobs:
           title: "Build ${{ env.RELEASE_VERSION }}"
           prerelease: false
           files: |
-            "Game Build ${{ env.RELEASE_VERSION }}.zip"
+            Game Build ${{ env.RELEASE_VERSION }}.zip
