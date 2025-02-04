@@ -2,6 +2,13 @@ name: create-release
 on:
   workflow_dispatch:
 
+env:
+  SOLUTION_FILE_PATH: .
+  BUILD_CONFIGURATION: Release
+
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: windows-latest
