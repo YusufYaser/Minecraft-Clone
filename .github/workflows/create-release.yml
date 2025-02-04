@@ -27,8 +27,8 @@ jobs:
         env:
           REF: ${{ github.ref }}
         run: |
-          for /f %a in ('powershell -command "[DateTime]::Now.ToString(\"yyMMdd\")"') do set build=%a
-          echo "RELEASE_VERSION=%build%" >> $GITHUB_ENV
+          $Build = Get-Date -Format "yyMMdd"
+          echo "RELEASE_VERSION=$Build" >> $GITHUB_ENV
 
       - name: Set Username and Email
         run: |
@@ -41,13 +41,12 @@ jobs:
           Copy-Item .\assets\ .\Game\ -Recurse
           Copy-Item ".\build\Release\Minecraft Clone.exe" .\Game\
           Compress-Archive -Path Game -DestinationPath Game.zip
-        shell: pwsh
 
       - name: release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "v${{ env.BUILD }}"
+          automatic_release_tag: "v${{ env.Build }}"
           prerelease: false
           files: |
             Game.zip
