@@ -46,6 +46,7 @@ Game::Game(GameSettings& settings) {
 	print("Initialized GLFW");
 
 	m_renderDistance = settings.renderDistance;
+	m_worldRes = settings.worldRes;
 
 #ifndef _DEBUG
 	m_gameWindow = new GameWindow({ 854, 480 }, "Minecraft Clone");
@@ -343,7 +344,7 @@ void Game::update() {
 	if (m_world != nullptr && m_player != nullptr) {
 		static glm::ivec2 prevSize;
 		static World* prevWorld;
-		glm::ivec2 iSize = glm::ivec2(size);
+		glm::ivec2 iSize = glm::ivec2(size * m_worldRes);
 		bool changed = prevSize.x != iSize.x || prevSize.y != iSize.y || prevWorld != m_world;
 
 		if ((!m_gamePaused || changed) && worldRenderingEnabled) {
@@ -352,8 +353,6 @@ void Game::update() {
 			glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
 
 			if (changed) {
-				glViewport(0, 0, iSize.x, iSize.y);
-
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iSize.x, iSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 				worldTex->width = iSize.x;
 				worldTex->height = iSize.y;
@@ -370,7 +369,9 @@ void Game::update() {
 			}
 
 			glClear(GL_DEPTH_BUFFER_BIT);
+			if (m_worldRes != 1.0f) glViewport(0, 0, iSize.x, iSize.y);
 			m_world->render();
+			if (m_worldRes != 1.0f) glViewport(0, 0, int(size.x), int(size.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		} else {

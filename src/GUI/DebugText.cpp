@@ -20,6 +20,7 @@ void DebugText::render() {
 	Player* player = game->getPlayer();
 	World* world = game->getWorld();
 	SoundEngine* soundEngine = game->getSoundEngine();
+	float worldRes = game->getWorldResolution();
 
 	std::stringstream text;
 	text << "Minecraft Clone";
@@ -46,6 +47,7 @@ void DebugText::render() {
 	text << "\n\n";
 
 	text << "Resolution: " << size.x << "x" << size.y << "\n";
+	if (worldRes != 1.0f) text << "3D Resolution: " << size.x * worldRes << "x" << size.y * worldRes << " (" << int(round(worldRes * 100)) << "%)\n";
 	const GPUInfo* gpu = game->getGpuInfo();
 	text << "GPU: " << gpu->renderer << " (" << gpu->vendor << ")" << "\n";
 	text << "Version: " << gpu->version << "\n\n";

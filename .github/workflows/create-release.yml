@@ -41,7 +41,7 @@ jobs:
           New-Item -Path . -Name "Game" -ItemType "directory"
           Copy-Item .\assets\ .\Game\ -Recurse
           Copy-Item ".\build\Release\Minecraft Clone.exe" .\Game\
-          Compress-Archive -Path .\Game\* -DestinationPath "game.release.win64.$Build.zip"
+          Compress-Archive -Path .\Game\* -DestinationPath "Game Build $Build.zip"
 
       - name: release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -51,4 +51,4 @@ jobs:
           title: "Build ${{ env.RELEASE_VERSION }}"
           prerelease: false
           files: |
-            game.release.win64.${{ env.RELEASE_VERSION }}.zip
+            "Game Build ${{ env.RELEASE_VERSION }}.zip"

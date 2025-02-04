@@ -23,5 +23,9 @@ private:
 	Button* iRenderDistance;
 	Button* dRenderDistance;
 
+	Text* worldRes;
+	Button* iWorldRes;
+	Button* dWorldRes;
+
 	bool m_isClosing = false;
 };

@@ -34,6 +34,19 @@ SettingsMenu::SettingsMenu() {
 	dRenderDistance->setSize({ 0, 32, 0, 32 });
 	dRenderDistance->setPosition({ .5f, 250 - 48, 0, 175 + 8 });
 
+	worldRes = new Text();
+	worldRes->setPosition({ .5f, -250, 0, 225 });
+
+	iWorldRes = new Button();
+	iWorldRes->setText("+");
+	iWorldRes->setSize({ 0, 32, 0, 32 });
+	iWorldRes->setPosition({ .5f, 250, 0, 225 + 8 });
+
+	dWorldRes = new Button();
+	dWorldRes->setText("-");
+	dWorldRes->setSize({ 0, 32, 0, 32 });
+	dWorldRes->setPosition({ .5f, 250 - 48, 0, 225 + 8 });
+
 	back = new Button();
 	back->setText("Back");
 	back->setPosition({ .5f, 0, 1, -75 });
@@ -87,6 +100,23 @@ void SettingsMenu::render() {
 
 	renderDistance->setText("Render Distance: " + std::to_string(game->getRenderDistance()));
 	renderDistance->render();
+
+	// 3d resolution
+	int tWorldRes = int(round(game->getWorldResolution() * 100));
+
+	iWorldRes->render();
+	if (iWorldRes->isClicked()) tWorldRes += 5;
+
+	dWorldRes->render();
+	dWorldRes->setEnabled(tWorldRes > 0.01f);
+	if (dWorldRes->isClicked()) tWorldRes -= 5;
+
+	if (tWorldRes < 5) tWorldRes = 5;
+
+	game->setWorldResolution(tWorldRes / 100.0f);
+
+	worldRes->setText("3D Resolution: " + std::to_string(int(game->getWorldResolution() * 100)) + "%");
+	worldRes->render();
 
 	if ((back->isClicked() || game->getKeyHandler()->keyHeld(GLFW_KEY_ESCAPE)) && !game->loadingWorld()) {
 		m_isClosing = true;

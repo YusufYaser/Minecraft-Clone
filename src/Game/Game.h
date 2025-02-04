@@ -25,6 +25,7 @@ struct GameSettings {
 #else
 	int renderDistance = 6;
 #endif
+	float worldRes = 1;
 };
 
 struct GPUInfo {
@@ -77,6 +78,8 @@ public:
 	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };
 	int getMaxFps() const { return m_maxFps; }
 	void setMaxFps(int maxFps) { m_maxFps = maxFps; }
+	float getWorldResolution() const { return m_worldRes; };
+	void setWorldResolution(float newWorldRes) { m_worldRes = newWorldRes; };
 
 	void loadWorld(WorldSettings& settings, glm::vec3 playerPos = { 0, 0, 0 });
 	void unloadWorld();
@@ -121,6 +124,7 @@ private:
 
 	int m_renderDistance = 6;
 	int m_maxFps = 60;
+	float m_worldRes = 1;
 
 	bool m_gamePaused = false;
 
