@@ -426,7 +426,6 @@ void Game::update() {
 		m_commandsHelp->render();
 	}
 
-	glfwSwapInterval(1);
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();
 
