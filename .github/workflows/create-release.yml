@@ -1,5 +1,6 @@
 name: create-release
-on: {}
+on:
+  workflow_dispatch:
 
 jobs:
   build:
