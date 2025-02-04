@@ -22,7 +22,7 @@ void logGlfwError(int error_code, const char* desc) {
 #endif
 }
 
-Game::Game(GameSettings& settings) {
+Game::Game() {
 	if (_instance != nullptr) {
 		error("You cannot initialize 2 game instances");
 		return;
@@ -35,6 +35,21 @@ Game::Game(GameSettings& settings) {
 	print("GitHub:", UNDERLINE "https://github.com/YusufYaser/Minecraft-Clone");
 	print("");
 
+	print("Loading settings");
+	{
+		GameSettings* settings = new GameSettings();
+		if (std::filesystem::exists("settings.dat")) {
+			std::ifstream settingsFile("settings.dat");
+			settingsFile.read(reinterpret_cast<char*>(settings), sizeof(GameSettings));
+			settingsFile.close();
+		}
+		m_maxFps = settings->maxFps;
+		m_renderDistance = settings->renderDistance;
+		m_worldRes = settings->worldRes;
+		delete settings;
+	}
+	print("Loaded settings");
+
 	print("Initializing GLFW");
 
 	if (!glfwInit()) {
@@ -45,8 +60,6 @@ Game::Game(GameSettings& settings) {
 
 	print("Initialized GLFW");
 
-	m_renderDistance = settings.renderDistance;
-	m_worldRes = settings.worldRes;
 
 #ifndef _DEBUG
 	m_gameWindow = new GameWindow({ 854, 480 }, "Minecraft Clone");
@@ -191,6 +204,21 @@ Y: Reset world time
 
 Game::~Game() {
 	if (m_world != nullptr) unloadWorld();
+
+	print("Saving settings");
+	try {
+		GameSettings* settings = new GameSettings();
+		settings->maxFps = m_maxFps;
+		settings->renderDistance = m_renderDistance;
+		settings->worldRes = m_worldRes;
+
+		std::ofstream settingsFile("settings.dat");
+		settingsFile.write(reinterpret_cast<const char*>(settings), sizeof(GameSettings));
+		settingsFile.close();
+		print("Saved settings");
+	} catch (std::filesystem::filesystem_error e) {
+		error("FAILED TO SAVE GAME SETTINGS:", e.what());
+	}
 
 	delete m_keyHandler;
 	m_keyHandler = nullptr;

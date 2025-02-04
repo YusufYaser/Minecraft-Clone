@@ -25,6 +25,7 @@ struct GameSettings {
 #else
 	int renderDistance = 6;
 #endif
+	int maxFps = 60;
 	float worldRes = 1;
 };
 
@@ -36,7 +37,7 @@ struct GPUInfo {
 
 class Game {
 public:
-	Game(GameSettings& settings);
+	Game();
 	~Game();
 	static Game* getInstance() { return _instance; };
 
