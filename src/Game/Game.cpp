@@ -364,6 +364,7 @@ void Game::update() {
 	if (m_world != nullptr) skyboxShader->setUniform("tick", m_world->getTick());
 	shader->activate();
 	shader->setUniform("time", startTime);
+	shader->setUniform("renderDistance", m_renderDistance);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDepthRange(0, 1.0);
 

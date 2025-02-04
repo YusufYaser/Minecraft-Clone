@@ -4,6 +4,7 @@ R"END(
 in vec2 texCoord;
 flat in float face;
 flat in int instanceId;
+flat in vec3 blockPosOffset;
 
 out vec4 FragColor;
 
@@ -12,6 +13,7 @@ uniform int highlighted;
 uniform float ambientLight;
 uniform double time;
 uniform int animationFrameCount;
+uniform int renderDistance;
 
 const float BORDER_SIZE = .02f;
 
@@ -36,5 +38,11 @@ void main() {
     }
 
     FragColor *= vec4(vec3(ambientLight * lightPercentage), 1.0f);
+
+    vec4 SkyColor = vec4(vec3(0.3f, 0.3f, 0.97f) * ambientLight, 1.0f);
+
+    float dist = length(blockPosOffset) - ((renderDistance - 4.0f) * 8.0f);
+    float val = min(max(dist / (3.5f * 8.0f), 0.0f), 1.0f);
+    FragColor = mix(FragColor, SkyColor, val);
 }
 )END"
