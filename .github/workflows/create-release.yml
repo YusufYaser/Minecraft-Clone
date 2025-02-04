@@ -7,7 +7,7 @@ env:
   BUILD_CONFIGURATION: Release
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -28,7 +28,7 @@ jobs:
           REF: ${{ github.ref }}
         run: |
           $Build = Get-Date -Format "yyMMdd"
-          echo "RELEASE_VERSION=$Build" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=$Build" >> $env:GITHUB_ENV
 
       - name: Set Username and Email
         run: |
@@ -46,7 +46,7 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "v${{ env.Build }}"
+          automatic_release_tag: "v${{ env.RELEASE_VERSION }}"
           prerelease: false
           files: |
             Game.zip
