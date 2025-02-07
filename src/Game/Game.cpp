@@ -78,10 +78,10 @@ Game::Game() {
 
 	// initialize shaders
 	print("Intializing shaders");
-	shader = new Shader(vertexShaderFile, fragmentShaderFile);
-	guiShader = new Shader(guiVertexShaderFile, guiFragmentShaderFile);
-	skyboxShader = new Shader(skyboxVertexShaderFile, skyboxFragmentShaderFile);
-	postProcessingShader = new Shader(postProcessingVertexShaderFile, postProcessingFragmentShaderFile);
+	shader = new Shader(vertexShaderFile, fragmentShaderFile, "DefaultShader");
+	guiShader = new Shader(guiVertexShaderFile, guiFragmentShaderFile, "GUI");
+	skyboxShader = new Shader(skyboxVertexShaderFile, skyboxFragmentShaderFile, "Skybox");
+	postProcessingShader = new Shader(postProcessingVertexShaderFile, postProcessingFragmentShaderFile, "PostProcessing");
 	if (!shader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded() || !postProcessingShader->successfullyLoaded()) {
 		error("Failed to initialize shaders");
 		return;
@@ -145,8 +145,9 @@ Q: Toggle 3D World Rendering
 R: Teleport to 0, )" + std::to_string(MAX_HEIGHT) + R"(, 0
 T: Teleport to height )" + std::to_string(MAX_HEIGHT) + R"(
 Y: Reset world time
+U: Reload shaders
 )");
-	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 6 });
+	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 7 });
 	m_commandsHelp->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 
 	m_keyHandler = new KeyHandler();
@@ -328,6 +329,27 @@ void Game::update() {
 		}
 		if (m_keyHandler->keyClicked(GLFW_KEY_Y)) {
 			m_world->setTick(0);
+		}
+
+		if (m_keyHandler->keyClicked(GLFW_KEY_U)) {
+			print("Reloading shaders");
+			Shader* shader = new Shader(vertexShaderFile, fragmentShaderFile, "DefaultShader");
+			Shader* guiShader = new Shader(guiVertexShaderFile, guiFragmentShaderFile, "GUI");
+			Shader* skyboxShader = new Shader(skyboxVertexShaderFile, skyboxFragmentShaderFile, "Skybox");
+			Shader* postProcessingShader = new Shader(postProcessingVertexShaderFile, postProcessingFragmentShaderFile, "PostProcessing");
+			if (!shader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded() || !postProcessingShader->successfullyLoaded()) {
+				error("Failed to reload shaders");
+			} else {
+				delete this->shader;
+				delete this->guiShader;
+				delete this->skyboxShader;
+				delete this->postProcessingShader;
+				this->shader = shader;
+				this->guiShader = guiShader;
+				this->skyboxShader = skyboxShader;
+				this->postProcessingShader = postProcessingShader;
+				print("Reloaded shaders");
+			}
 		}
 	}
 

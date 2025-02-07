@@ -1,9 +1,41 @@
 #include "Shaders.h"
 #include "../Logging.h"
+#include <fstream>
+#include <sstream>
 
-Shader::Shader(const char* vertexSource, const char* fragmentSource) {
+Shader::Shader(const char* vertexSource, const char* fragmentSource, const char* name) {
+	print("Loading", name, "shader");
+
+	std::string vertex;
+	std::string fragment;
+
+	{
+		std::ifstream file("assets/shaders/" + std::string(name) + "/" + std::string(name) + ".vert", std::ios::binary);
+		if (file.is_open()) {
+			print("Using custom vertex shader in assets");
+			std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			vertex = content;
+			file.close();
+		} else {
+			vertex = vertexSource;
+		}
+	}
+
+	{
+		std::ifstream file("assets/shaders/" + std::string(name) + "/" + std::string(name) + ".frag", std::ios::binary);
+		if (file.is_open()) {
+			print("Using custom fragment shader in assets");
+			std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			fragment = content;
+			file.close();
+		} else {
+			fragment = fragmentSource;
+		}
+	}
+
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexSource, 0);
+	const char* vertex2 = vertex.c_str();
+	glShaderSource(vertexShader, 1, &vertex2, 0);
 	glCompileShader(vertexShader);
 	GLint shaderCompiled = 0;
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &shaderCompiled);
@@ -19,7 +51,8 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource) {
 	}
 
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentSource, 0);
+	const char* fragment2 = fragment.c_str();
+	glShaderSource(fragmentShader, 1, &fragment2, 0);
 	glCompileShader(fragmentShader);
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &shaderCompiled);
 	if (shaderCompiled == false) {
@@ -54,6 +87,8 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource) {
 	glDeleteShader(fragmentShader);
 
 	m_successfullyLoaded = true;
+
+	print("Loaded", name, "shader");
 }
 
 Shader::~Shader() {

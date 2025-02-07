@@ -51,10 +51,7 @@ void Image::render() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	static Shader* guiShader = nullptr;
-	if (guiShader == nullptr) {
-		guiShader = game->getGuiShader();
-	}
+	Shader* guiShader = game->getGuiShader();
 
 	guiShader->activate();
 
