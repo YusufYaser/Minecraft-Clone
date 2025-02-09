@@ -70,6 +70,8 @@ public:
 	float getRealDelta() const { return m_realDelta; };
 	int getFrameNum() const { return m_frameNum; }
 
+	int getDebugLevel() const { return m_debugLevel; }
+
 	bool isGuiEnabled() const { return m_guiEnabled || m_gamePaused; };
 
 	bool gamePaused() const { return m_gamePaused; };
@@ -97,6 +99,12 @@ private:
 	GameWindow* m_gameWindow = nullptr;
 
 	int m_frameNum = 0;
+
+#ifdef _DEBUG
+	int m_debugLevel = 1;
+#else
+	int m_debugLevel = 0;
+#endif
 
 	bool m_shouldQuit = false;
 
@@ -144,9 +152,4 @@ private:
 	// gui
 	PauseMenu* m_pauseMenu = nullptr;
 	MainMenu* m_mainMenu = nullptr;
-#ifdef _DEBUG
-	bool m_debugTextVisible = true;
-#else
-	bool m_debugTextVisible = false;
-#endif
 };

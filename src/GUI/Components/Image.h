@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GUIComponent.h"
+#include "Text.h"
 #include "../../Shaders/Shaders.h"
 #include "../../Textures/Textures.h"
 #include <glad/gl.h>
@@ -20,4 +21,6 @@ private:
 
 	glm::vec4 m_color;
 	glm::vec2 m_crop;
+
+	static Text* debugText;
 };

@@ -380,7 +380,7 @@ void Game::update() {
 	}
 
 	if (m_keyHandler->keyClicked(GLFW_KEY_F3)) {
-		m_debugTextVisible = !m_debugTextVisible;
+		m_debugLevel = (m_debugLevel + 1) % 3;
 	}
 
 	if (m_keyHandler->keyClicked(GLFW_KEY_ESCAPE) && m_player != nullptr) {
@@ -527,7 +527,7 @@ void Game::update() {
 	}
 
 	if (m_player != nullptr && m_player->isFlying() && !m_gamePaused) m_flyingText->render();
-	if (m_debugTextVisible) DebugText::render();
+	if (m_debugLevel != 0) DebugText::render();
 
 	if (m_keyHandler->keyHeld(GLFW_KEY_SLASH)) {
 		m_commandsHelp->render();

@@ -1,11 +1,17 @@
 #include "Image.h"
 #include "../../Game/Game.h"
 
+Text* Image::debugText = nullptr;
+
 Image::Image(Texture* tex) {
 	m_tex = tex;
 	m_color = glm::vec4(1.0f);
 	m_size = { 0, tex->width, 0, tex->height };
 	m_crop = { 1.0f, 1.0f };
+
+	if (debugText == nullptr) {
+		debugText = new Text();
+	}
 }
 
 void Image::render() {
@@ -65,4 +71,13 @@ void Image::render() {
 	glBindVertexArray(VAO);
 
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+
+	if (game->getDebugLevel() == 2) {
+		std::stringstream stream;
+		stream << std::hex << this;
+		debugText->setText(stream.str());
+		stream.clear();
+		debugText->setPosition(m_pos - (m_size / 2.0f) + glm::vec4(0, 0, m_size.z, m_size.w - 15));
+		debugText->render();
+	}
 }

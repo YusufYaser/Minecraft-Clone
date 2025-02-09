@@ -14,6 +14,7 @@ void DebugText::cleanup() {
 
 void DebugText::render() {
 	Game* game = Game::getInstance();
+	int l = game->getDebugLevel();
 	double currentTime = glfwGetTime();
 	float delta = game->getDelta();
 	glm::ivec2 size = game->getGameWindow()->getSize();
@@ -42,12 +43,14 @@ void DebugText::render() {
 	}
 	text << "FPS: " << lastFps;
 	text << " (" << lastDelta1 << ")";
-	text << " (" << round(1 / lastDelta2) << ":" << round(lastDelta2 * 1000) / 1000 << ")";
-	text << " (" << round(1 / lastDelta3) << ":" << round(lastDelta3 * 1000) / 1000 << ")";
+	if (l == 2) {
+		text << " (" << round(1 / lastDelta2) << ":" << round(lastDelta2 * 1000) / 1000 << ")";
+		text << " (" << round(1 / lastDelta3) << ":" << round(lastDelta3 * 1000) / 1000 << ")";
+	}
 	text << "\n\n";
 
 	text << "Resolution: " << size.x << "x" << size.y << "\n";
-	if (worldRes != 1.0f) text << "3D Resolution: " << size.x * worldRes << "x" << size.y * worldRes << " (" << int(round(worldRes * 100)) << "%)\n";
+	if (l == 2) if (worldRes != 1.0f) text << "3D Resolution: " << size.x * worldRes << "x" << size.y * worldRes << " (" << int(round(worldRes * 100)) << "%)\n";
 	const GPUInfo* gpu = game->getGpuInfo();
 	text << "GPU: " << gpu->renderer << " (" << gpu->vendor << ")" << "\n";
 	text << "Version: " << gpu->version << "\n\n";
@@ -66,15 +69,22 @@ void DebugText::render() {
 
 	if (world != nullptr) {
 		text << "Render Distance: " << game->getRenderDistance() << "\n";
-		text << "Chunks Rendered: " << world->chunksRendered() << "\n";
-		text << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
-		text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n\n";
+		if (l == 2) {
+			text << "Chunks Rendered: " << world->chunksRendered() << "\n";
+			text << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
+			text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n\n";
+			text << "Instances Rendered: " << world->instancesRendered() << " / " << world->totalInstances() << "\n";
+		}
+		text << "\n";
 
-		text << "Instances Rendered: " << world->instancesRendered() << " / " << world->totalInstances() << "\n\n";
 
 		text << "World Name: " << game->getLoadedWorldName() << "\n";
-		text << "World Time: " << world->getTime();
-		text << " (Day " << floor(world->getTime() / 24000.0f) << ")\n";
+		if (l == 2) {
+			text << "World Time: " << world->getTime();
+			text << " ticks (" << floor(world->getTime() / 24000.0f) << " days)\n";
+		} else {
+			text << "World Time: " << floor(world->getTime() / 24000.0f) << " days\n";
+		}
 		text << "World Seed: " << world->getSeed() << "\n\n";
 	}
 
