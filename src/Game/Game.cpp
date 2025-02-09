@@ -130,7 +130,7 @@ Game::Game() {
 	m_collOverlay->setPosition({ .5f, 0, .5f, 0 });
 	m_collOverlay->setSize({ 1, 0, 1, 0 });
 	m_collOverlay->setColor({ .25f, .25f, .25f, 1.0f });
-	m_collOverlay->setZIndex(0);
+	m_collOverlay->setZIndex(2);
 
 	m_flyingText = new Text();
 	m_flyingText->setText("Flying");
@@ -173,6 +173,24 @@ U: Reload shaders
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 854, 480, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, worldTex->id, 0);
+
+	glGenFramebuffers(1, &worldFBOp);
+	glBindFramebuffer(GL_FRAMEBUFFER, worldFBOp);
+
+	worldTexp = new Texture();
+	glGenTextures(1, &worldTexp->id);
+	glBindTexture(GL_TEXTURE_2D, worldTexp->id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 854, 480, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, worldTexp->id, 0);
+
+	worldImg = new Image(worldTexp);
+	worldImg->setZIndex(1);
+	worldImg->setSize({ 1.0f, 0, 1.0f, 0 });
+	worldImg->setPosition({ .5f, 0, .5f, 0 });
 
 	GLfloat vertices[] = {
 		-1.0f, -1.0f,		0.0f, 0.0f,
@@ -261,9 +279,17 @@ Game::~Game() {
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glDeleteFramebuffers(1, &worldFBO);
 	glDeleteRenderbuffers(1, &worldRBO);
+	glDeleteFramebuffers(1, &worldFBOp);
+	glDeleteRenderbuffers(1, &worldRBOp);
 
 	delete worldTex;
 	worldTex = nullptr;
+
+	delete worldTexp;
+	worldTexp = nullptr;
+
+	delete worldImg;
+	worldImg = nullptr;
 
 	glDeleteBuffers(1, &worldVBO);
 	glDeleteVertexArrays(1, &worldVAO);
@@ -408,6 +434,13 @@ void Game::update() {
 				worldTex->width = iSize.x;
 				worldTex->height = iSize.y;
 
+				glBindTexture(GL_TEXTURE_2D, worldTexp->id);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iSize.x, iSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+				worldTexp->width = iSize.x;
+				worldTexp->height = iSize.y;
+
+				// texture
+				glBindTexture(GL_TEXTURE_2D, worldTex->id);
 				if (worldRBO != 0) glDeleteRenderbuffers(1, &worldRBO);
 				glGenRenderbuffers(1, &worldRBO);
 				glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
@@ -415,13 +448,37 @@ void Game::update() {
 				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, iSize.x, iSize.y);
 				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, worldRBO);
 
+				glBindTexture(GL_TEXTURE_2D, worldTexp->id);
+				glBindFramebuffer(GL_FRAMEBUFFER, worldFBOp);
+				if (worldRBOp != 0) glDeleteRenderbuffers(1, &worldRBOp);
+				glGenRenderbuffers(1, &worldRBOp);
+				glBindRenderbuffer(GL_RENDERBUFFER, worldRBOp);
+
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, iSize.x, iSize.y);
+				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, worldRBOp);
+
+
+				glBindTexture(GL_TEXTURE_2D, worldTex->id);
+				glBindFramebuffer(GL_FRAMEBUFFER, worldFBO);
+				glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
+
 				prevSize = iSize;
 				prevWorld = m_world;
 			}
 
-			glClear(GL_DEPTH_BUFFER_BIT);
 			if (m_worldRes != 1.0f) glViewport(0, 0, iSize.x, iSize.y);
+
+			glClear(GL_DEPTH_BUFFER_BIT);
 			m_world->render();
+
+			glBindFramebuffer(GL_FRAMEBUFFER, worldFBOp);
+			glBindRenderbuffer(GL_RENDERBUFFER, worldRBOp);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			postProcessingShader->activate();
+			glBindVertexArray(worldVAO);
+			glBindTexture(GL_TEXTURE_2D, worldTex->id);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+
 			if (m_worldRes != 1.0f) glViewport(0, 0, int(size.x), int(size.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -429,13 +486,11 @@ void Game::update() {
 			m_world->dontRender();
 		}
 
-		glDepthRange(0.99, 1);
-		postProcessingShader->activate();
-		postProcessingShader->setUniform("gamePaused", m_gamePaused);
-		glBindVertexArray(worldVAO);
-		glBindTexture(GL_TEXTURE_2D, worldTex->id);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDepthRange(0, 0.99);
+		bool wasGuiEnabled = m_guiEnabled;
+		m_guiEnabled = true;
+		worldImg->setColor(glm::vec4(glm::vec3(m_gamePaused ? .5f : 1.0f), 1.0f));
+		worldImg->render();
+		m_guiEnabled = wasGuiEnabled;
 	}
 
 	guiShader->activate();

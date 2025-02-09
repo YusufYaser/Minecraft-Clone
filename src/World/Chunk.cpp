@@ -6,7 +6,10 @@ void World::chunkLoaderFunc() {
 	std::string name = Game::getInstance()->getLoadedWorldName();
 
 	while (!unloading.load()) {
-		if (chunkLoadQueue.size() == 0) continue;
+		if (chunkLoadQueue.size() == 0) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
+			continue;
+		}
 
 		Player* player = Game::getInstance()->getPlayer();
 		chunkLoadQueueMutex.lock();
@@ -143,8 +146,8 @@ void World::chunkUnloaderFunc() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		if (Game::getInstance()->loadingWorld() && !unloading.load()) continue;
 		time_t current = time(nullptr);
-		if (!chunksMutex.try_lock()) continue;
-	unloader_func_chunks_loop:
+		chunksMutex.lock();
+
 		for (auto& [ch, chunk] : chunks) {
 			if (chunk == nullptr) {
 				chunks.erase(ch);
@@ -180,9 +183,14 @@ void World::chunkUnloaderFunc() {
 				}
 
 				delete chunks[ch];
-				chunks.erase(ch);
-				goto unloader_func_chunks_loop;
+				if (!unloading.load()) {
+					chunks.erase(ch);
+					break;
+				}
 			}
+		}
+		if (unloading.load()) {
+			chunks.clear();
 		}
 		chunksMutex.unlock();
 	}

@@ -115,7 +115,11 @@ private:
 	GLuint worldRBO;
 	GLuint worldVAO;
 	GLuint worldVBO;
+	GLuint worldFBOp;
+	GLuint worldRBOp;
 	Texture* worldTex;
+	Texture* worldTexp;
+	Image* worldImg;
 	bool worldRenderingEnabled = true;
 
 	bool m_guiEnabled = true;
