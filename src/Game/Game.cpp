@@ -475,8 +475,19 @@ void Game::update() {
 			glBindRenderbuffer(GL_RENDERBUFFER, worldRBOp);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			postProcessingShader->activate();
-			glBindVertexArray(worldVAO);
+
+			// uniform sampler2D tex0
 			glBindTexture(GL_TEXTURE_2D, worldTex->id);
+			// uniform float time
+			postProcessingShader->setUniform("time", (float)glfwGetTime());
+			// uniform ivec2 resolution
+			postProcessingShader->setUniform("resolution", iSize);
+			Block* upBlock = m_world->getBlock(glm::ivec3(glm::round(m_player->pos)) + glm::ivec3(0, 1, 0));
+			// uniform bool underWater
+			postProcessingShader->setUniform("underWater", upBlock != nullptr && upBlock->getType() == BLOCK_TYPE::WATER);
+
+
+			glBindVertexArray(worldVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 
 			if (m_worldRes != 1.0f) glViewport(0, 0, int(size.x), int(size.y));

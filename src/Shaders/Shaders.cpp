@@ -144,6 +144,11 @@ void Shader::setUniform<glm::vec2>(const GLchar* name, const glm::vec2& val) {
 }
 
 template<>
+void Shader::setUniform<glm::ivec2>(const GLchar* name, const glm::ivec2& val) {
+	glUniform2iv(getUniformLoc(name), 1, glm::value_ptr(val));
+}
+
+template<>
 void Shader::setUniform<glm::vec3>(const GLchar* name, const glm::vec3& val) {
 	glUniform3fv(getUniformLoc(name), 1, glm::value_ptr(val));
 }

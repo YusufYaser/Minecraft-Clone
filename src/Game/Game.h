@@ -119,15 +119,15 @@ private:
 	SoundEngine* m_soundEngine = nullptr;
 
 	World* m_world = nullptr;
-	GLuint worldFBO;
-	GLuint worldRBO;
-	GLuint worldVAO;
-	GLuint worldVBO;
-	GLuint worldFBOp;
-	GLuint worldRBOp;
-	Texture* worldTex;
-	Texture* worldTexp;
-	Image* worldImg;
+	GLuint worldFBO = 0;
+	GLuint worldRBO = 0;
+	GLuint worldVAO = 0;
+	GLuint worldVBO = 0;
+	GLuint worldFBOp = 0;
+	GLuint worldRBOp = 0;
+	Texture* worldTex = nullptr;
+	Texture* worldTexp = nullptr;
+	Image* worldImg = nullptr;
 	bool worldRenderingEnabled = true;
 
 	bool m_guiEnabled = true;
