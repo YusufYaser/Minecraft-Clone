@@ -39,7 +39,7 @@ void main() {
 
     FragColor *= vec4(vec3(ambientLight * lightPercentage), 1.0f);
 
-    vec4 SkyColor = vec4(vec3(0.3f, 0.3f, 0.97f) * ambientLight, 1.0f);
+    vec4 SkyColor = vec4(vec3(78.0f / 255.0f, 78.0f / 255.0f, 251.0f / 255.0f) * ambientLight, 1.0f);
 
     float dist = length(blockPosOffset) - ((renderDistance - 4.0f) * 8.0f);
     float val = min(max(dist / (3.5f * 8.0f), 0.0f), 1.0f);
