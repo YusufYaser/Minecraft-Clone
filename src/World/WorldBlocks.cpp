@@ -24,7 +24,7 @@ Block* World::getBlock(glm::ivec3 pos) {
 	return nullptr;
 }
 
-Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
+Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace, bool fast) {
 	if (type == BLOCK_TYPE::NONE) return nullptr;
 
 	if (pos.y < 0 || pos.y >= MAX_HEIGHT) return nullptr;
@@ -41,43 +41,45 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 
 	Chunk* chunk = cit->second;
 
-	chunk->blocksMutex.lock();
-	auto bit = chunk->blocks.find(blockCh);
-	chunk->blocksMutex.unlock();
-	if (bit != chunk->blocks.end()) {
-		if (!replace) return nullptr;
-
-		Block* oldBlock = bit->second;
-		chunk->renderingGroupsMutex.lock();
-		std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[oldBlock->getType()]);
-		std::vector<Block*>::iterator begin = renderingGroup->begin();
-		std::vector<Block*>::iterator end = renderingGroup->end();
-		std::vector<Block*>::iterator it = std::find(begin, end, chunk->blocks[blockCh]);
-		if (it != end) {
-			renderingGroup->erase(it);
-		}
-		chunk->renderingGroupsMutex.unlock();
-
-		delete oldBlock;
+	if (!fast) {
 		chunk->blocksMutex.lock();
-		chunk->blocks.erase(blockCh);
+		auto bit = chunk->blocks.find(blockCh);
 		chunk->blocksMutex.unlock();
-		chunk->modified = true;
-	} else {
-		if (type == BLOCK_TYPE::AIR) return nullptr; // it was already air, nothing to change
-	}
+		if (bit != chunk->blocks.end()) {
+			if (!replace) return nullptr;
 
-	if (type == BLOCK_TYPE::AIR) {
-		for (int i = 0; i < 6; i++) {
-			Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
-			if (otherBlock == nullptr) continue;
-			int opposite = (i % 2 == 0) ? i + 1 : i - 1;
-			if ((otherBlock->hiddenFaces & (1 << opposite)) != 0) {
-				otherBlock->hiddenFaces ^= 1 << opposite;
+			Block* oldBlock = bit->second;
+			chunk->renderingGroupsMutex.lock();
+			std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[oldBlock->getType()]);
+			std::vector<Block*>::iterator begin = renderingGroup->begin();
+			std::vector<Block*>::iterator end = renderingGroup->end();
+			std::vector<Block*>::iterator it = std::find(begin, end, chunk->blocks[blockCh]);
+			if (it != end) {
+				renderingGroup->erase(it);
 			}
-			if (otherBlock->hiddenFaces != 63) setRenderingGroup(otherBlock);
+			chunk->renderingGroupsMutex.unlock();
+
+			delete oldBlock;
+			chunk->blocksMutex.lock();
+			chunk->blocks.erase(blockCh);
+			chunk->blocksMutex.unlock();
+			chunk->modified = true;
+		} else {
+			if (type == BLOCK_TYPE::AIR) return nullptr; // it was already air, nothing to change
 		}
-		return nullptr;
+
+		if (type == BLOCK_TYPE::AIR) {
+			for (int i = 0; i < 6; i++) {
+				Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
+				if (otherBlock == nullptr) continue;
+				int opposite = (i % 2 == 0) ? i + 1 : i - 1;
+				if ((otherBlock->hiddenFaces & (1 << opposite)) != 0) {
+					otherBlock->hiddenFaces ^= 1 << opposite;
+				}
+				if (otherBlock->hiddenFaces != 63) setRenderingGroup(otherBlock);
+			}
+			return nullptr;
+		}
 	}
 
 	uint8_t hiddenFaces = 0;

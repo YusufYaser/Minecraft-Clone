@@ -169,8 +169,8 @@ U: Reload shaders
 	glBindTexture(GL_TEXTURE_2D, worldTex->id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 854, 480, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, worldTex->id, 0);
 
@@ -182,8 +182,8 @@ U: Reload shaders
 	glBindTexture(GL_TEXTURE_2D, worldTexp->id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 854, 480, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, worldTexp->id, 0);
 
@@ -590,12 +590,12 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos) {
 	print("Creating world");
 
 	if (settings.seed == 0) {
-		siv::PerlinNoise::seed_type seed = 0;
+		unsigned int seed = 0;
 		std::random_device rd;
 		std::mt19937 gen(rd());
-		std::uniform_int_distribution<siv::PerlinNoise::seed_type> dis(
-			std::numeric_limits<siv::PerlinNoise::seed_type>::min(),
-			std::numeric_limits<siv::PerlinNoise::seed_type>::max()
+		std::uniform_int_distribution<unsigned int> dis(
+			std::numeric_limits<unsigned int>::min(),
+			std::numeric_limits<unsigned int>::max()
 		);
 
 		settings.seed = dis(gen);

@@ -94,6 +94,7 @@ void DebugText::render() {
 
 		if (targetBlock != nullptr) {
 			text << "=== Target Block ===\n";
+			if (l == 2) text << " " << targetBlock << "\n";
 			text << " Block ID: " << (int)targetBlock->getType() << "\n";
 			text << " Block Type: " << targetBlock->getName() << "\n";
 			glm::vec3 bPos = targetBlock->getPos();

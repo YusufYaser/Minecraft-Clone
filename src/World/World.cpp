@@ -20,10 +20,6 @@ World::World(WorldSettings& settings) {
 
 	unloading.store(false);
 
-	chunkLoader = std::thread([this]() {
-		chunkLoaderFunc();
-		});
-
 	chunkUnloader = std::thread([this]() {
 		chunkUnloaderFunc();
 		});
@@ -57,14 +53,22 @@ World::World(WorldSettings& settings) {
 			renderer(c);
 			}, c);
 	}
+
+	for (int c = 0; c < CHUNK_LOADER_THREAD_COUNT; c++) {
+		chunkLoaderThreads[c] = std::thread([this]() {
+			chunkLoaderFunc();
+			});
+	}
 }
 
 World::~World() {
 	unloading.store(true);
 	print("Waiting for world tick thread...");
 	tickThread.join();
-	print("Waiting for chunk loader thread...");
-	chunkLoader.join();
+	for (int c = 0; c < CHUNK_LOADER_THREAD_COUNT; c++) {
+		print("Waiting for chunk loader thread...");
+		chunkLoaderThreads[c].join();
+	}
 	print("Waiting for chunk unloader thread...");
 	chunkUnloader.join();
 

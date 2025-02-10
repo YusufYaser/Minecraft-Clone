@@ -54,7 +54,8 @@ public:
 	void dontRender();
 
 	Block* getBlock(glm::ivec3 pos);
-	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
+	// use fast only when generating chunks
+	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true, bool fast = false);
 
 	siv::PerlinNoise::seed_type getSeed() const { return seed; };
 
@@ -120,7 +121,6 @@ private:
 
 	void setRenderingGroup(Block* block);
 
-	std::thread chunkLoader;
 	void chunkLoaderFunc();
 	std::thread chunkUnloader;
 	void chunkUnloaderFunc();
@@ -146,6 +146,7 @@ private:
 	};
 
 	std::thread renderingThreads[RENDERER_THREAD_COUNT];
+	std::thread chunkLoaderThreads[CHUNK_LOADER_THREAD_COUNT];
 	std::mutex renderingQueueMutex;
 	std::deque<Chunk*> renderingQueue;
 	std::atomic<bool> rendered[RENDERER_THREAD_COUNT];

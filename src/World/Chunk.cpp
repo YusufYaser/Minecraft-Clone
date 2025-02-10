@@ -14,17 +14,6 @@ void World::chunkLoaderFunc() {
 		Player* player = Game::getInstance()->getPlayer();
 		chunkLoadQueueMutex.lock();
 
-		if (player != nullptr) {
-			glm::ivec2 pPos = getPosChunk(player->pos);
-
-			std::sort(chunkLoadQueue.begin(), chunkLoadQueue.end(), [&pPos](glm::ivec2 a, glm::ivec2 b) {
-				auto distanceSquared = [](const glm::ivec2& p1, const glm::ivec2& p2) {
-					return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
-					};
-				return distanceSquared(a, pPos) < distanceSquared(b, pPos);
-				});
-		}
-
 		glm::ivec2 pos = chunkLoadQueue.front();
 		chunkLoadQueue.erase(chunkLoadQueue.begin());
 		chunkLoadQueueMutex.unlock();
@@ -58,7 +47,7 @@ void World::chunkLoaderFunc() {
 							z + (pos.y * 16),
 						};
 
-						setBlock(bPos, saveData->blocks[y][x][z]);
+						setBlock(bPos, saveData->blocks[y][x][z], false, true);
 					}
 				}
 			}
@@ -78,6 +67,8 @@ void World::chunkLoaderFunc() {
 			continue;
 		}
 
+		int seaLevel = getSeaLevel();
+
 		for (int x = pos.x * 16; x < 16 + pos.x * 16; x++) {
 			for (int z = pos.y * 16; z < 16 + pos.y * 16; z++) {
 				if (unloading.load()) break;
@@ -88,7 +79,7 @@ void World::chunkLoaderFunc() {
 					BLOCK_TYPE type = BLOCK_TYPE::STONE;
 					if (y == 0) {
 						type = BLOCK_TYPE::BEDROCK;
-					} else if (height > getSeaLevel()) {
+					} else if (height > seaLevel) {
 						if (y == height - 1) type = BLOCK_TYPE::GRASS;
 						else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
 					} else {
@@ -96,17 +87,19 @@ void World::chunkLoaderFunc() {
 						else type = BLOCK_TYPE::STONE;
 					}
 
-					setBlock(glm::ivec3(x, y, z), type);
+					setBlock(glm::ivec3(x, y, z), type, false, true);
 				}
-				if (height <= getSeaLevel()) {
-					for (int y = height; y < getSeaLevel(); y++) {
-						setBlock(glm::ivec3(x, y, z), BLOCK_TYPE::WATER);
+				if (height <= seaLevel) {
+					for (int y = height; y < seaLevel; y++) {
+						setBlock(glm::ivec3(x, y, z), BLOCK_TYPE::WATER, false, true);
 					}
 				}
 
 				int MAX_STRUCTURE_HEIGHT = 0;
 
 				std::vector<Structure*> structuresInChunk;
+
+				bool genStructures = false;
 
 				for (Structure* structure : structures) {
 					if (!structure->isInXZ({ x, z })) continue;
@@ -117,15 +110,16 @@ void World::chunkLoaderFunc() {
 					if (sHeight > MAX_STRUCTURE_HEIGHT) MAX_STRUCTURE_HEIGHT = sHeight;
 
 					structuresInChunk.push_back(structure);
+					genStructures = true;
 				}
 
-				if (structuresInChunk.size() == 0) continue;
+				if (!genStructures) continue;
 
 				for (int y = 0; y < height + MAX_STRUCTURE_HEIGHT; y++) {
 					for (Structure* structure : structuresInChunk) {
 						BLOCK_TYPE blockType = structure->getBlock({ x, y, z });
 						if (blockType != BLOCK_TYPE::NONE) {
-							setBlock(glm::ivec3(x, y, z), blockType);
+							setBlock(glm::ivec3(x, y, z), blockType, false, true);
 							break;
 						}
 					}
@@ -218,6 +212,19 @@ void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
 
 	chunkLoadQueueMutex.lock();
 	chunkLoadQueue.push_back(pos);
+
+	Player* player = Game::getInstance()->getPlayer();
+	if (player != nullptr) {
+		glm::ivec2 pPos = getPosChunk(player->pos);
+
+		std::sort(chunkLoadQueue.begin(), chunkLoadQueue.end(), [&pPos](glm::ivec2 a, glm::ivec2 b) {
+			auto distanceSquared = [](const glm::ivec2& p1, const glm::ivec2& p2) {
+				return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+				};
+			return distanceSquared(a, pPos) < distanceSquared(b, pPos);
+			});
+	}
+
 	chunkLoadQueueMutex.unlock();
 }
 
