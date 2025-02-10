@@ -24,10 +24,76 @@ Block* World::getBlock(glm::ivec3 pos) {
 	return nullptr;
 }
 
-Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace, bool fast) {
+void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
+	if (type == BLOCK_TYPE::NONE) return;
+
+	start.y = std::min(MAX_HEIGHT, std::max(0, start.y));
+	end.y = std::min(MAX_HEIGHT, std::max(0, end.y));
+
+	std::unordered_map<Chunk*, bool> cLoaded;
+
+	for (int x = start.x + 1; x < end.x; x++) {
+		for (int y = start.y + 1; y < end.y; y++) {
+			for (int z = start.z + 1; z < end.z; z++) {
+				if (unloading.load()) break;
+
+				glm::ivec3 pos = { x, y, z };
+				std::size_t chunkCh = hashPos(getPosChunk(pos));
+				std::size_t blockCh = hashPos(pos);
+
+				Chunk* chunk = nullptr;
+
+				chunksMutex.lock();
+				auto cit = chunks.find(chunkCh);
+				chunksMutex.unlock();
+				if (cit == chunks.end()) {
+					return; // chunk not loaded
+				}
+
+				chunk = cit->second;
+				if (!cLoaded[chunk]) {
+					cLoaded[chunk] = true;
+					chunk->blocksMutex.lock();
+				}
+
+				Block* block = new Block(type, pos);
+				block->hiddenFaces = 63;
+				chunk->blocks[blockCh] = block;
+			}
+		}
+	}
+
+	for (auto& [chunk, _] : cLoaded) {
+		chunk->blocksMutex.unlock();
+	}
+
+	for (int y = start.y; y <= end.y; y++) {
+		for (int z = start.z; z <= end.z; z++) {
+			setBlock({ start.x, y, z }, type, true);
+			setBlock({ end.x, y, z }, type, true);
+		}
+	}
+
+	for (int x = start.x; x <= end.x; x++) {
+		for (int z = start.z; z <= end.z; z++) {
+			setBlock({ x, start.y, z }, type, true);
+			setBlock({ x, end.y, z }, type, true);
+		}
+	}
+
+	for (int x = start.x; x <= end.x; x++) {
+		for (int y = start.y; y <= end.y; y++) {
+			setBlock({ x, y, start.z }, type, true);
+			setBlock({ x, y, end.z }, type, true);
+		}
+	}
+}
+
+Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 	if (type == BLOCK_TYPE::NONE) return nullptr;
 
 	if (pos.y < 0 || pos.y >= MAX_HEIGHT) return nullptr;
+	if (unloading.load()) return nullptr;
 
 	std::size_t blockCh = hashPos(pos);
 	std::size_t chunkCh = hashPos(getPosChunk(pos));
@@ -41,45 +107,43 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace, bool fast)
 
 	Chunk* chunk = cit->second;
 
-	if (!fast) {
+	chunk->blocksMutex.lock();
+	auto bit = chunk->blocks.find(blockCh);
+	chunk->blocksMutex.unlock();
+	if (bit != chunk->blocks.end()) {
+		if (!replace) return nullptr;
+
+		Block* oldBlock = bit->second;
+		chunk->renderingGroupsMutex.lock();
+		std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[oldBlock->getType()]);
+		std::vector<Block*>::iterator begin = renderingGroup->begin();
+		std::vector<Block*>::iterator end = renderingGroup->end();
+		std::vector<Block*>::iterator it = std::find(begin, end, chunk->blocks[blockCh]);
+		if (it != end) {
+			renderingGroup->erase(it);
+		}
+		chunk->renderingGroupsMutex.unlock();
+
+		delete oldBlock;
 		chunk->blocksMutex.lock();
-		auto bit = chunk->blocks.find(blockCh);
+		chunk->blocks.erase(blockCh);
 		chunk->blocksMutex.unlock();
-		if (bit != chunk->blocks.end()) {
-			if (!replace) return nullptr;
+		chunk->modified = true;
+	} else {
+		if (type == BLOCK_TYPE::AIR) return nullptr; // it was already air, nothing to change
+	}
 
-			Block* oldBlock = bit->second;
-			chunk->renderingGroupsMutex.lock();
-			std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[oldBlock->getType()]);
-			std::vector<Block*>::iterator begin = renderingGroup->begin();
-			std::vector<Block*>::iterator end = renderingGroup->end();
-			std::vector<Block*>::iterator it = std::find(begin, end, chunk->blocks[blockCh]);
-			if (it != end) {
-				renderingGroup->erase(it);
+	if (type == BLOCK_TYPE::AIR) {
+		for (int i = 0; i < 6; i++) {
+			Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
+			if (otherBlock == nullptr) continue;
+			int opposite = (i % 2 == 0) ? i + 1 : i - 1;
+			if ((otherBlock->hiddenFaces & (1 << opposite)) != 0) {
+				otherBlock->hiddenFaces ^= 1 << opposite;
 			}
-			chunk->renderingGroupsMutex.unlock();
-
-			delete oldBlock;
-			chunk->blocksMutex.lock();
-			chunk->blocks.erase(blockCh);
-			chunk->blocksMutex.unlock();
-			chunk->modified = true;
-		} else {
-			if (type == BLOCK_TYPE::AIR) return nullptr; // it was already air, nothing to change
+			if (otherBlock->hiddenFaces != 63) setRenderingGroup(otherBlock);
 		}
-
-		if (type == BLOCK_TYPE::AIR) {
-			for (int i = 0; i < 6; i++) {
-				Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
-				if (otherBlock == nullptr) continue;
-				int opposite = (i % 2 == 0) ? i + 1 : i - 1;
-				if ((otherBlock->hiddenFaces & (1 << opposite)) != 0) {
-					otherBlock->hiddenFaces ^= 1 << opposite;
-				}
-				if (otherBlock->hiddenFaces != 63) setRenderingGroup(otherBlock);
-			}
-			return nullptr;
-		}
+		return nullptr;
 	}
 
 	uint8_t hiddenFaces = 0;

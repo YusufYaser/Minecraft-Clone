@@ -47,7 +47,7 @@ void World::chunkLoaderFunc() {
 							z + (pos.y * 16),
 						};
 
-						setBlock(bPos, saveData->blocks[y][x][z], false, true);
+						setBlock(bPos, saveData->blocks[y][x][z], false);
 					}
 				}
 			}
@@ -69,12 +69,27 @@ void World::chunkLoaderFunc() {
 
 		int seaLevel = getSeaLevel();
 
+		int heightMap[16][16] = {};
+		int minHeight = MAX_HEIGHT;
+
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+				heightMap[x][z] = getHeight({ x + pos.x * 16, z + pos.y * 16 });
+				if (heightMap[x][z] < minHeight) minHeight = heightMap[x][z];
+			}
+		}
+
+		minHeight -= 3;
+
+		fillBlocks({ pos.x * 16, 0, pos.y * 16 }, { 15 + pos.x * 16, 0, 15 + pos.y * 16 }, BLOCK_TYPE::BEDROCK);
+		if (minHeight >= 1) fillBlocks({ pos.x * 16, 1, pos.y * 16 }, { 15 + pos.x * 16, minHeight, 15 + pos.y * 16 }, BLOCK_TYPE::STONE);
+
 		for (int x = pos.x * 16; x < 16 + pos.x * 16; x++) {
 			for (int z = pos.y * 16; z < 16 + pos.y * 16; z++) {
 				if (unloading.load()) break;
 
-				int height = getHeight({ x, z });
-				for (int y = 0; y < height; y++) {
+				int height = heightMap[x - pos.x * 16][z - pos.y * 16];
+				for (int y = minHeight; y < height; y++) {
 					if (unloading.load()) break;
 					BLOCK_TYPE type = BLOCK_TYPE::STONE;
 					if (y == 0) {
@@ -87,11 +102,11 @@ void World::chunkLoaderFunc() {
 						else type = BLOCK_TYPE::STONE;
 					}
 
-					setBlock(glm::ivec3(x, y, z), type, false, true);
+					setBlock(glm::ivec3(x, y, z), type, false);
 				}
 				if (height <= seaLevel) {
 					for (int y = height; y < seaLevel; y++) {
-						setBlock(glm::ivec3(x, y, z), BLOCK_TYPE::WATER, false, true);
+						setBlock(glm::ivec3(x, y, z), BLOCK_TYPE::WATER, false);
 					}
 				}
 
@@ -119,7 +134,7 @@ void World::chunkLoaderFunc() {
 					for (Structure* structure : structuresInChunk) {
 						BLOCK_TYPE blockType = structure->getBlock({ x, y, z });
 						if (blockType != BLOCK_TYPE::NONE) {
-							setBlock(glm::ivec3(x, y, z), blockType, false, true);
+							setBlock(glm::ivec3(x, y, z), blockType, false);
 							break;
 						}
 					}

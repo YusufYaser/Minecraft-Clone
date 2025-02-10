@@ -54,8 +54,8 @@ public:
 	void dontRender();
 
 	Block* getBlock(glm::ivec3 pos);
-	// use fast only when generating chunks
-	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true, bool fast = false);
+	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
+	void fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type);
 
 	siv::PerlinNoise::seed_type getSeed() const { return seed; };
 
