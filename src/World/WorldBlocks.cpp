@@ -7,10 +7,11 @@ Block* World::getBlock(glm::ivec3 pos) {
 
 	chunksMutex.lock();
 	auto cit = chunks.find(chunkCh);
-	chunksMutex.unlock();
 	if (cit == chunks.end()) {
+		chunksMutex.unlock();
 		return nullptr; // chunk not loaded
 	}
+	chunksMutex.unlock();
 
 	Chunk* chunk = cit->second;
 

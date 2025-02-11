@@ -298,7 +298,9 @@ Game::~Game() {
 
 	print("Terminating GLFW");
 	glfwTerminate();
+#ifdef _WIN32
 	gltTerminate();
+#endif
 
 	_instance = nullptr;
 }

@@ -31,17 +31,28 @@ inline std::atomic<bool> oom = false;
 inline std::thread::id mainThread;
 
 void oomHandler() {
-	free(emergencyMemory);
-	error(std::this_thread::get_id(), ": Out of game memory");
+	std::thread::id id = std::this_thread::get_id();
+	if (!oom.load()) free(emergencyMemory);
+	if (id == mainThread) {
+		std::cerr << id << " (main): Out of game memory" << std::endl;
+	} else {
+		std::cerr << id << ": Out of game memory" << std::endl;
+	}
 	if (oom.load()) {
-		if (mainThread != std::this_thread::get_id()) std::terminate();
+		if (mainThread != id) {
+			std::this_thread::sleep_for(std::chrono::seconds(999));
+		}
 		return;
 	}
 	oom.store(true);
 #ifdef _WIN32
 	MessageBoxW(nullptr, L"The game ran out of memory. Try reducing your maximum render distance.", L"Out of Memory", MB_OK | MB_ICONERROR);
 #endif
-	if (mainThread != std::this_thread::get_id()) std::terminate();
+	if (mainThread != id) {
+		std::this_thread::sleep_for(std::chrono::seconds(999));
+	} else {
+		std::abort();
+	}
 }
 
 int main(int argc, char* argv[]) {

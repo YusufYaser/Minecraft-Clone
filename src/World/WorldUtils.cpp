@@ -5,10 +5,20 @@ inline std::size_t combineHashes(std::size_t hash1, std::size_t hash2) {
 	return hash1 ^ (hash2 + 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
 }
 
+static inline std::size_t hash_int32(int32_t value) {
+	const uint8_t* data = reinterpret_cast<const uint8_t*>(&value);
+	std::size_t hash = 14695981039346656037ULL;
+	for (std::size_t i = 0; i < sizeof(value); ++i) {
+		hash ^= data[i];
+		hash *= 1099511628211ULL;
+	}
+	return hash;
+}
+
 std::size_t hashPos(const glm::ivec3& pos) {
-	std::size_t hx = std::hash<int32_t>()(pos.x);
-	std::size_t hy = std::hash<int32_t>()(pos.y);
-	std::size_t hz = std::hash<int32_t>()(pos.z);
+	std::size_t hx = hash_int32(pos.x);
+	std::size_t hy = hash_int32(pos.y);
+	std::size_t hz = hash_int32(pos.z);
 
 	std::size_t combinedHash = combineHashes(hx, hy);
 	combinedHash = combineHashes(combinedHash, hz);

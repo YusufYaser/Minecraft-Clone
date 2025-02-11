@@ -3,7 +3,9 @@
 #include <stb/stb_image.h>
 #include <filesystem>
 #include "../Logging.h"
+#ifndef __gl_h_
 #include <glad/gl.h>
+#endif
 #include <map>
 #include <string>
 

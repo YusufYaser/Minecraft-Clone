@@ -1,4 +1,6 @@
 #include "Textures.h"
+#include <vector>
+#include <algorithm>
 
 using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 
@@ -93,8 +95,7 @@ Texture* getTexture(std::string name) {
 	auto it = textures.find(name);
 	if (it == textures.end()) {
 		static std::vector<std::string> names;
-		auto end = names.end();
-		if (std::find(names.begin(), end, name) == end) {
+		if (std::find(names.begin(), names.end(), name) == names.end()) {
 			warn("Couldn't find texture:", name);
 			names.push_back(name);
 		}

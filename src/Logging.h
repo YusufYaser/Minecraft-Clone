@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <iostream>
 #include "Colors.h"
+#include <cstring>
 
 #ifdef _WIN32
 #define FILENAME (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)

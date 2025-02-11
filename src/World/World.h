@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glad/gl.h>
 #include <glm/glm.hpp>
 #include "../Block/Block.h"
 #include "../Shaders/Shaders.h"

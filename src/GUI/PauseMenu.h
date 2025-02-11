@@ -19,5 +19,5 @@ private:
 	Button* settings;
 	Button* mainMenu;
 
-	SettingsMenu* settingsMenu;
+	SettingsMenu* settingsMenu = nullptr;
 };

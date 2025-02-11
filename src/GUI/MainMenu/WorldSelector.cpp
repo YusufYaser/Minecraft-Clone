@@ -216,7 +216,11 @@ void WorldSelector::render() {
 
 		time_t timestamp = time(nullptr);
 		tm datetime;
+#ifdef _WIN32
 		localtime_s(&datetime, &timestamp);
+#else
+		localtime_r(&timestamp, &datetime);
+#endif
 		char name[21];
 
 		strftime(name, sizeof(name), "%d %b %Y %H-%M-%S", &datetime);

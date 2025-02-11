@@ -23,6 +23,6 @@ private:
 	Text* debug;
 #endif
 
-	WorldSelector* worldSelector;
-	SettingsMenu* settingsMenu;
+	WorldSelector* worldSelector = nullptr;
+	SettingsMenu* settingsMenu = nullptr;
 };

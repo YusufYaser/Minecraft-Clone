@@ -1,6 +1,7 @@
 #include "World.h"
 #include "Utils.h"
 #include "../Game/Game.h"
+#include <glad/gl.h>
 
 World::World(WorldSettings& settings) {
 	World::seed = settings.seed;

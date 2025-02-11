@@ -125,7 +125,7 @@ const char* getTextureName(BLOCK_TYPE type) {
 
 int getAnimationFrameCount(BLOCK_TYPE type) {
 	Texture* tex = getTexture(getTextureName(type));
-	return static_cast<int>(round(tex->width / (tex->height / 6)));
+	return static_cast<int>(round(tex->width / (static_cast<float>(tex->height) / 6.0f)));
 }
 
 bool blockTypeHasCollision(BLOCK_TYPE type) {

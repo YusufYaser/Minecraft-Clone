@@ -62,8 +62,10 @@ GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 	glfwSetWindowIcon(glfwWindow, 1, images);
 	stbi_image_free(images[0].pixels);
 
+#ifdef _WIN32
 	BOOL darkMode = TRUE;
 	DwmSetWindowAttribute(glfwGetWin32Window(glfwWindow), 20, &darkMode, sizeof(BOOL));
+#endif
 }
 
 GameWindow::~GameWindow() {

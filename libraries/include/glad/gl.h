@@ -26,6 +26,7 @@
  *
  */
 
+#ifndef __gl_h_
 #ifndef GLAD_GL_H_
 #define GLAD_GL_H_
 
@@ -4221,5 +4222,6 @@ GLAD_API_CALL int gladLoadGL( GLADloadfunc load);
 
 #ifdef __cplusplus
 }
+#endif
 #endif
 #endif

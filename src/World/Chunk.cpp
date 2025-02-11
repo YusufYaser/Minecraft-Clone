@@ -30,7 +30,7 @@ void World::chunkLoaderFunc() {
 
 		std::string path = "worlds/" + name + "/c" + std::to_string(chunkCh);
 		if (std::filesystem::exists(path)) {
-			std::ifstream chunkFile(path);
+			std::ifstream chunkFile(path, std::ios::binary);
 			ChunkSaveData* saveData = new ChunkSaveData();
 			chunkFile.read(reinterpret_cast<char*>(saveData), sizeof(ChunkSaveData));
 			chunkFile.close();
@@ -177,7 +177,7 @@ void World::chunkUnloaderFunc() {
 						}
 						chunk->blocksMutex.unlock();
 
-						std::ofstream chunkFile("worlds/" + name + "/c" + std::to_string(ch));
+						std::ofstream chunkFile("worlds/" + name + "/c" + std::to_string(ch), std::ios::binary);
 						chunkFile.write(reinterpret_cast<const char*>(saveData), sizeof(ChunkSaveData));
 						chunk->modified = false;
 						chunkFile.close();

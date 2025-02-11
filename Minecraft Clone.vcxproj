@@ -117,7 +117,7 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>rmdir $(OutDir)\assets\ /s /q &amp;&amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+      <Command>rmdir $(OutDir)\assets\ /s /q &amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
@@ -150,7 +150,7 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>rmdir $(OutDir)\assets\ /s /q &amp;&amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+      <Command>rmdir $(OutDir)\assets\ /s /q &amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
@@ -179,7 +179,7 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>rmdir $(OutDir)\assets\ /s /q &amp;&amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+      <Command>rmdir $(OutDir)\assets\ /s /q &amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
@@ -212,7 +212,7 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>rmdir $(OutDir)\assets\ /s /q &amp;&amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+      <Command>rmdir $(OutDir)\assets\ /s /q &amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
