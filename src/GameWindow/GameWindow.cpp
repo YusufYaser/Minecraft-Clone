@@ -2,6 +2,13 @@
 #include "GameWindow.h"
 #include "../Logging.h"
 #include <stb/stb_image.h>
+#ifdef _WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#include <Windows.h>
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
+#endif
 
 GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -54,6 +61,9 @@ GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 	images[0].height = images[0].width; // since textures are now 3D we get only the top face
 	glfwSetWindowIcon(glfwWindow, 1, images);
 	stbi_image_free(images[0].pixels);
+
+	BOOL darkMode = TRUE;
+	DwmSetWindowAttribute(glfwGetWin32Window(glfwWindow), 20, &darkMode, sizeof(BOOL));
 }
 
 GameWindow::~GameWindow() {

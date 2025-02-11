@@ -9,6 +9,8 @@ public:
 	PauseMenu();
 	~PauseMenu();
 
+	bool onSettings() const { return settingsMenu != nullptr; }
+
 	void render();
 
 private:

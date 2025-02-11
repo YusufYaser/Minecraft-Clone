@@ -423,6 +423,7 @@ void Game::update() {
 		static World* prevWorld;
 		glm::ivec2 iSize = glm::ivec2(size * m_worldRes);
 		bool changed = prevSize.x != iSize.x || prevSize.y != iSize.y || prevWorld != m_world;
+		static double lastChanged = 0;
 
 		if ((!m_gamePaused || changed) && worldRenderingEnabled) {
 			glBindTexture(GL_TEXTURE_2D, worldTex->id);
@@ -462,6 +463,7 @@ void Game::update() {
 				glBindFramebuffer(GL_FRAMEBUFFER, worldFBO);
 				glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
 
+				if (m_pauseMenu->onSettings()) lastChanged = startTime;
 				prevSize = iSize;
 				prevWorld = m_world;
 			}
@@ -499,7 +501,7 @@ void Game::update() {
 
 		bool wasGuiEnabled = m_guiEnabled;
 		m_guiEnabled = true;
-		worldImg->setColor(glm::vec4(glm::vec3(m_gamePaused ? .5f : 1.0f), 1.0f));
+		worldImg->setColor(glm::vec4(glm::vec3((m_gamePaused && (!m_pauseMenu->onSettings() || startTime - lastChanged > 1)) ? .5f : 1.0f), 1.0f));
 		worldImg->render();
 		m_guiEnabled = wasGuiEnabled;
 	}

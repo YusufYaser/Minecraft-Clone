@@ -6,22 +6,21 @@ void World::chunkLoaderFunc() {
 	std::string name = Game::getInstance()->getLoadedWorldName();
 
 	while (!unloading.load()) {
+		chunkLoadQueueMutex.lock();
 		if (chunkLoadQueue.size() == 0) {
+			chunkLoadQueueMutex.unlock();
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 			continue;
 		}
 
 		Player* player = Game::getInstance()->getPlayer();
-		chunkLoadQueueMutex.lock();
 
-		glm::ivec2 pos = chunkLoadQueue.front();
+		Chunk* chunk = chunkLoadQueue.front();
 		chunkLoadQueue.erase(chunkLoadQueue.begin());
 		chunkLoadQueueMutex.unlock();
 
+		glm::ivec2 pos = chunk->pos;
 		std::size_t chunkCh = hashPos(pos);
-		chunksMutex.lock();
-		Chunk* chunk = chunks[chunkCh];
-		chunksMutex.unlock();
 
 		if (time(0) - chunk->lastRendered > 10) {
 			delete chunk;
@@ -86,8 +85,6 @@ void World::chunkLoaderFunc() {
 
 		for (int x = pos.x * 16; x < 16 + pos.x * 16; x++) {
 			for (int z = pos.y * 16; z < 16 + pos.y * 16; z++) {
-				if (unloading.load()) break;
-
 				int height = heightMap[x - pos.x * 16][z - pos.y * 16];
 				for (int y = minHeight; y < height; y++) {
 					if (unloading.load()) break;
@@ -152,7 +149,7 @@ void World::chunkUnloaderFunc() {
 
 	while (true) {
 		if (unloading.load() && chunks.size() == 0) break;
-		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		if (!unloading.load()) std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		if (Game::getInstance()->loadingWorld() && !unloading.load()) continue;
 		time_t current = time(nullptr);
 		chunksMutex.lock();
@@ -209,34 +206,35 @@ void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
 	std::size_t chunkCh = hashPos(pos);
 	auto it = chunks.find(chunkCh);
 
-	if (it == chunks.end()) {
-		Chunk* chunk = new Chunk();
-		chunk->blocks = std::unordered_map<std::size_t, Block*>();
-		for (int i = 0; i < BLOCK_TYPE_COUNT; i++) {
-			chunk->renderingGroups[(BLOCK_TYPE)i] = std::vector<Block*>();
-		}
-		chunk->permanentlyLoaded = permanentlyLoaded;
-		chunk->lastRendered = time(nullptr);
-		chunksMutex.lock();
-		chunks[chunkCh] = chunk;
-		chunksMutex.unlock();
-	} else {
+	if (it != chunks.end()) {
 		it->second->lastRendered = time(nullptr);
 		return; // already loaded
 	}
 
+	Chunk* chunk = new Chunk();
+	chunk->blocks = std::unordered_map<std::size_t, Block*>();
+	for (int i = 0; i < BLOCK_TYPE_COUNT; i++) {
+		chunk->renderingGroups[(BLOCK_TYPE)i] = std::vector<Block*>();
+	}
+	chunk->permanentlyLoaded = permanentlyLoaded;
+	chunk->lastRendered = time(nullptr);
+	chunk->pos = pos;
+	chunksMutex.lock();
+	chunks[chunkCh] = chunk;
+	chunksMutex.unlock();
+
 	chunkLoadQueueMutex.lock();
-	chunkLoadQueue.push_back(pos);
+	chunkLoadQueue.push_back(chunk);
 
 	Player* player = Game::getInstance()->getPlayer();
 	if (player != nullptr) {
 		glm::ivec2 pPos = getPosChunk(player->pos);
 
-		std::sort(chunkLoadQueue.begin(), chunkLoadQueue.end(), [&pPos](glm::ivec2 a, glm::ivec2 b) {
+		std::sort(chunkLoadQueue.begin(), chunkLoadQueue.end(), [&pPos](Chunk* a, Chunk* b) {
 			auto distanceSquared = [](const glm::ivec2& p1, const glm::ivec2& p2) {
 				return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
 				};
-			return distanceSquared(a, pPos) < distanceSquared(b, pPos);
+			return distanceSquared(a->pos, pPos) < distanceSquared(b->pos, pPos);
 			});
 	}
 

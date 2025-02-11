@@ -14,21 +14,23 @@ void Structure::initialize() {
 	StructureConfig treeConfig;
 	treeConfig.priority = 0;
 	treeConfig.probability = .0625f;
-	treeConfig.size = { 5, 5, 5 };
+	treeConfig.size = { 5, 6, 5 };
 	treeConfig.pivot = { 2, 0, 2 };
 	Structure* tree = new Structure(STRUCTURE_TYPE::TREE, treeConfig, [](glm::ivec2 sPos, glm::ivec3 vPos) {
+		int height = 5;
+
 		// no blocks will be placed on corners
 		if ((vPos.x == 0 || vPos.x == 4) && (vPos.z == 0 || vPos.z == 4)) return BLOCK_TYPE::NONE;
 
 		// logs
-		if (vPos.y <= 2 && vPos.x == 2 && vPos.z == 2) return BLOCK_TYPE::OAK_LOG;
+		if (vPos.y <= height - 3 && vPos.x == 2 && vPos.z == 2) return BLOCK_TYPE::OAK_LOG;
 
 		// leaves bottom part
-		if (vPos.y >= 2 && vPos.y <= 3) return BLOCK_TYPE::OAK_LEAVES;
+		if (vPos.y >= height - 3 && vPos.y <= height - 2) return BLOCK_TYPE::OAK_LEAVES;
 
 		// leaves top part
 		if (vPos.x < 1 || vPos.x > 3 || vPos.z < 1 || vPos.z > 3) return BLOCK_TYPE::NONE;
-		if (vPos.y >= 2) return BLOCK_TYPE::OAK_LEAVES;
+		if (vPos.y >= height - 3 && vPos.y < height) return BLOCK_TYPE::OAK_LEAVES;
 
 		return BLOCK_TYPE::NONE;
 		});

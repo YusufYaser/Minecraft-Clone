@@ -67,12 +67,27 @@ void DebugText::render() {
 		text << ", " << round(chunkPos.y * 100) / 100 << "\n\n";
 	}
 
+	static int loadPerSecond = 0;
+	static double lastLoadPerSecondTime = 0;
+	static size_t lastLoadQueueCount = 0;
+	if (glfwGetTime() - lastLoadPerSecondTime > 1.0) {
+		if (world != nullptr) {
+			loadPerSecond = static_cast<int>(round((lastLoadQueueCount - world->chunkLoadQueueCount()) / (glfwGetTime() - lastLoadPerSecondTime)));
+			lastLoadQueueCount = world->chunkLoadQueueCount();
+		} else {
+			loadPerSecond = 0;
+			lastLoadQueueCount = 0;
+		}
+		lastLoadPerSecondTime = glfwGetTime();
+	}
+
 	if (world != nullptr) {
 		text << "Render Distance: " << game->getRenderDistance() << "\n";
 		if (l == 2) {
 			text << "Chunks Rendered: " << world->chunksRendered() << "\n";
 			text << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
-			text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n\n";
+			text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n";
+			text << "Chunks Load Per Second: " << loadPerSecond << "\n\n";
 			text << "Instances Rendered: " << world->instancesRendered() << " / " << world->totalInstances() << "\n";
 		}
 		text << "\n";

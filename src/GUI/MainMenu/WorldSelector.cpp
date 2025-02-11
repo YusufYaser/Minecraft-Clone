@@ -42,9 +42,11 @@ WorldSelector::WorldSelector() {
 				}
 
 				if (std::filesystem::exists(p + "/world.dat")) {
+					bool corrupted = false;
+
 					if (std::filesystem::file_size(p + "/world.dat") != sizeof(WorldSaveData)) {
-						warn("Ignoring world with invalid world data size:", p);
-						continue;
+						warn("Potentially corrupted world:", p);
+						corrupted = true;
 					}
 
 					WorldEntry* world = new WorldEntry();
@@ -53,6 +55,7 @@ WorldSelector::WorldSelector() {
 
 					world->playButton = new Button();
 					world->playButton->setText(world->name.c_str());
+					world->playButton->setEnabled(!corrupted);
 					world->playButton->setPosition({ .5f, 0, 0, 125 + i * 40 });
 					world->playButton->setSize({ 0, 384, 0, 32 });
 
@@ -145,7 +148,7 @@ void WorldSelector::render() {
 		}
 
 		e->playButton->render();
-		e->playButton->setEnabled(!game->loadingWorld());
+		if (game->loadingWorld()) e->playButton->setEnabled(false);
 
 		if (e->playButton->isClicked()) {
 			try {

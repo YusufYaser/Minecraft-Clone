@@ -32,29 +32,32 @@ void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
 
 	std::unordered_map<Chunk*, bool> cLoaded;
 
-	for (int x = start.x + 1; x < end.x; x++) {
-		for (int y = start.y + 1; y < end.y; y++) {
-			for (int z = start.z + 1; z < end.z; z++) {
-				if (unloading.load()) break;
+	Chunk* chunk = nullptr;
+	std::size_t chunkCh = 0;
 
+	for (int x = start.x + 1; x <= end.x - 1; x++) {
+		for (int y = start.y + 1; y <= end.y - 1; y++) {
+			for (int z = start.z + 1; z <= end.z - 1; z++) {
 				glm::ivec3 pos = { x, y, z };
-				std::size_t chunkCh = hashPos(getPosChunk(pos));
+				std::size_t ncch = hashPos(getPosChunk(pos));
+				if (chunkCh != ncch) {
+					chunksMutex.lock();
+					auto cit = chunks.find(ncch);
+					chunksMutex.unlock();
+					if (cit == chunks.end()) {
+						continue; // chunk not loaded
+					}
+
+					chunk = cit->second;
+					chunkCh = ncch;
+					if (!cLoaded[chunk]) {
+						cLoaded[chunk] = true;
+						chunk->blocksMutex.lock();
+					}
+
+					chunk->modified = true;
+				}
 				std::size_t blockCh = hashPos(pos);
-
-				Chunk* chunk = nullptr;
-
-				chunksMutex.lock();
-				auto cit = chunks.find(chunkCh);
-				chunksMutex.unlock();
-				if (cit == chunks.end()) {
-					return; // chunk not loaded
-				}
-
-				chunk = cit->second;
-				if (!cLoaded[chunk]) {
-					cLoaded[chunk] = true;
-					chunk->blocksMutex.lock();
-				}
 
 				Block* block = new Block(type, pos);
 				block->hiddenFaces = 63;

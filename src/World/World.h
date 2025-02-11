@@ -99,6 +99,7 @@ private:
 		time_t lastRendered = 0;
 		std::unordered_map<std::size_t, Block*> blocks;
 		std::unordered_map<BLOCK_TYPE, std::vector<Block*>> renderingGroups;
+		glm::ivec2 pos;
 
 		~Chunk() {
 			blocksMutex.lock();
@@ -126,7 +127,7 @@ private:
 	void chunkUnloaderFunc();
 	std::thread tickThread;
 	void tick();
-	std::vector<glm::ivec2> chunkLoadQueue;
+	std::vector<Chunk*> chunkLoadQueue;
 	std::mutex chunkLoadQueueMutex;
 
 	siv::PerlinNoise perlin;
