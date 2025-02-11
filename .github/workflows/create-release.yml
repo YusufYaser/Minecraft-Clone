@@ -35,13 +35,10 @@ jobs:
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@github.com"
           
-      - name: Create ZIP
+      - name: Rename ZIP
         run: |
           $Build = Get-Date -Format "yyMMdd"
-          New-Item -Path . -Name "Game" -ItemType "directory"
-          Copy-Item .\assets\ .\Game\ -Recurse
-          Copy-Item ".\build\Release\Minecraft Clone.exe" .\Game\
-          Compress-Archive -Path .\Game\* -DestinationPath "Game Build $Build.zip"
+          Move-Item -Path ".\build\Game.zip" -Destination "Game Build $Build.zip"
 
       - name: release
         uses: "marvinpinto/action-automatic-releases@latest"

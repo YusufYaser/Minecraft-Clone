@@ -74,21 +74,25 @@
     <OutDir>build\$(Configuration)\</OutDir>
     <IntDir>build\intermediates\$(Configuration)\</IntDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);libraries\include</IncludePath>
+    <CopyCppRuntimeToOutputDir>true</CopyCppRuntimeToOutputDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>build\$(Configuration)\</OutDir>
     <IntDir>build\intermediates\$(Configuration)\</IntDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);libraries\include</IncludePath>
+    <CopyCppRuntimeToOutputDir>true</CopyCppRuntimeToOutputDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>build\$(Configuration)\</OutDir>
     <IntDir>build\intermediates\$(Configuration)\</IntDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);libraries\include</IncludePath>
+    <CopyCppRuntimeToOutputDir>true</CopyCppRuntimeToOutputDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>build\$(Configuration)\</OutDir>
     <IntDir>build\intermediates\$(Configuration)\</IntDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);libraries\include</IncludePath>
+    <CopyCppRuntimeToOutputDir>true</CopyCppRuntimeToOutputDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -112,6 +116,12 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libraries/lib/glfw3.lib</AdditionalDependencies>
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
+    <PostBuildEvent>
+      <Command>rmdir $(OutDir)\assets\ /s /q &amp;&amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy the assets folder to build directory and create ZIP file</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -139,6 +149,12 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libraries/lib/glfw3.lib</AdditionalDependencies>
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
+    <PostBuildEvent>
+      <Command>rmdir $(OutDir)\assets\ /s /q &amp;&amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy the assets folder to build directory and create ZIP file</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -162,6 +178,12 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libraries/lib/glfw3.lib</AdditionalDependencies>
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
+    <PostBuildEvent>
+      <Command>rmdir $(OutDir)\assets\ /s /q &amp;&amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy the assets folder to build directory and create ZIP file</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -189,6 +211,12 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libraries/lib/glfw3.lib</AdditionalDependencies>
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
+    <PostBuildEvent>
+      <Command>rmdir $(OutDir)\assets\ /s /q &amp;&amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy the assets folder to build directory and create ZIP file</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="libraries\include\glad\gl.c" />
