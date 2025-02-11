@@ -168,6 +168,7 @@ void World::render() {
 	int renderDistance = Game::getInstance()->getRenderDistance();
 	shader->setUniform("highlighted", false);
 	shader->setUniform("isLiquidTop", false);
+	shader->setUniform("fogSize", 2.0f);
 
 	float cosHalfFOV = std::cos(glm::radians(190.0f / 2.0f));
 

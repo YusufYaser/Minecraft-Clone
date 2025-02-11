@@ -131,7 +131,7 @@ void World::chunkLoaderFunc() {
 					for (Structure* structure : structuresInChunk) {
 						BLOCK_TYPE blockType = structure->getBlock({ x, y, z });
 						if (blockType != BLOCK_TYPE::NONE) {
-							setBlock(glm::ivec3(x, y, z), blockType, false);
+							setBlock(glm::ivec3(x, y, z), blockType, true);
 							break;
 						}
 					}
@@ -149,7 +149,7 @@ void World::chunkUnloaderFunc() {
 
 	while (true) {
 		if (unloading.load() && chunks.size() == 0) break;
-		if (!unloading.load()) std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		if (!unloading.load()) std::this_thread::sleep_for(std::chrono::milliseconds(2));
 		if (Game::getInstance()->loadingWorld() && !unloading.load()) continue;
 		time_t current = time(nullptr);
 		chunksMutex.lock();
