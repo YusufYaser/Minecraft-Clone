@@ -9,6 +9,9 @@
 #undef APIENTRY
 #include <Windows.h>
 #endif
+#ifdef __linux__
+#include <sys/resource.h>
+#endif
 
 inline bool ctrlC = false;
 
@@ -71,7 +74,7 @@ int main(int argc, char* argv[]) {
 	emergencyMemory = (char*)malloc(1024 * 1024 * 16);
 	mainThread = std::this_thread::get_id();
 
-#if defined(_WIN32)
+#ifdef _WIN32
 	maxMemory = 4294967296;
 
 	std::set_new_handler(oomHandler);
@@ -92,6 +95,25 @@ int main(int argc, char* argv[]) {
 		return 1;
 	} else {
 		AssignProcessToJobObject(job, GetCurrentProcess());
+	}
+#endif
+
+#ifdef __linux__
+	maxMemory = 4294967296;
+
+	rlimit limit;
+	limit.rlim_cur = maxMemory;
+	limit.rlim_max = maxMemory;
+
+#ifdef __APPLE__
+	int resource = RLIMIT_DATA;
+#else
+	int resource = RLIMIT_AS;
+#endif
+
+	if (setrlimit(resource, &limit) != 0) {
+		error("Failed to set memory limit");
+		return 1;
 	}
 #endif
 

@@ -670,6 +670,16 @@ const char* Game::getBuild() {
 
 	std::stringstream oss;
 
+#ifdef _WIN32
+	oss << "W";
+#endif
+#ifdef __linux__
+	oss << "L";
+#endif	
+#ifdef __APPLE__
+	oss << "A";
+#endif	
+
 	const char* date = __DATE__;
 	// year
 	oss << date[9] << date[10];

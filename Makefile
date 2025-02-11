@@ -21,3 +21,6 @@ $(INTERMEDIATES_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(BUILD_DIR)/game: $(SRCS:$(SRC_DIR)/%.cpp=$(INTERMEDIATES_DIR)/%.o)
 	mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+	cp -r assets $(BUILD_DIR)/assets
+	rm -f Game.zip
+	cd build/Release && zip -r ../../Game.zip * && cd ../..
