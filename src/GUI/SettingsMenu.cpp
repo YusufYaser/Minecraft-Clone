@@ -1,6 +1,8 @@
 #include "SettingsMenu.h"
 #include "../Game/Game.h"
 
+size_t getMaxMemory();
+
 SettingsMenu::SettingsMenu() {
 	title = new Text();
 	title->setText("Settings");
@@ -47,14 +49,12 @@ SettingsMenu::SettingsMenu() {
 	dWorldRes->setSize({ 0, 32, 0, 32 });
 	dWorldRes->setPosition({ .5f, 250 - 48, 0, 225 + 8 });
 
+	memoryUsage = new Text();
+	memoryUsage->setPosition({ 0, 0, 1, -15 });
+
 	back = new Button();
 	back->setText("Back");
 	back->setPosition({ .5f, 0, 1, -75 });
-}
-
-SettingsMenu::~SettingsMenu() {
-	delete back;
-	back = nullptr;
 }
 
 void SettingsMenu::render() {
@@ -98,6 +98,14 @@ void SettingsMenu::render() {
 
 	game->setRenderDistance(tRenderDistance);
 
+	if (tRenderDistance * tRenderDistance * 1.25 * 1024 * 1024 > getMaxMemory() && getMaxMemory() != 0) {
+		renderDistance->setColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+		memoryUsage->setColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+	} else {
+		renderDistance->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+		memoryUsage->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	}
+
 	renderDistance->setText("Render Distance: " + std::to_string(game->getRenderDistance()));
 	renderDistance->render();
 
@@ -117,6 +125,11 @@ void SettingsMenu::render() {
 
 	worldRes->setText("3D Resolution: " + std::to_string(int(game->getWorldResolution() * 100)) + "%");
 	worldRes->render();
+
+	std::stringstream memUsage;
+	memUsage << "Approximate Memory Usage: " << round(tRenderDistance * tRenderDistance * 1.25) << " MB";
+	memoryUsage->setText(memUsage.str().c_str());
+	memoryUsage->render();
 
 	if ((back->isClicked() || game->getKeyHandler()->keyHeld(GLFW_KEY_ESCAPE)) && !game->loadingWorld()) {
 		m_isClosing = true;

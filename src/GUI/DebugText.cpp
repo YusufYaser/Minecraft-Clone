@@ -1,6 +1,8 @@
 #include "DebugText.h"
 #include "../Game/Game.h"
 
+size_t getMaxMemory();
+
 Text* DebugText::m_debugText;
 
 void DebugText::initialize() {
@@ -54,6 +56,7 @@ void DebugText::render() {
 	const GPUInfo* gpu = game->getGpuInfo();
 	text << "GPU: " << gpu->renderer << " (" << gpu->vendor << ")" << "\n";
 	text << "Version: " << gpu->version << "\n\n";
+	if (l == 2) text << "Max Game Memory: " << round(getMaxMemory() / 1024 / 1024) << " MB\n\n";
 
 	text << "Sound Device: " << soundEngine->getSoundDeviceName() << "\n\n";
 

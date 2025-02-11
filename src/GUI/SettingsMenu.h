@@ -6,7 +6,6 @@
 class SettingsMenu {
 public:
 	SettingsMenu();
-	~SettingsMenu();
 
 	void render();
 	bool isClosing() const { return m_isClosing; };
@@ -26,6 +25,8 @@ private:
 	Text* worldRes;
 	Button* iWorldRes;
 	Button* dWorldRes;
+
+	Text* memoryUsage;
 
 	bool m_isClosing = false;
 };
