@@ -53,6 +53,11 @@ GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 		break;
 	}
 
+#ifdef _WIN32
+	BOOL darkMode = TRUE;
+	DwmSetWindowAttribute(glfwGetWin32Window(glfwWindow), 20, &darkMode, sizeof(BOOL));
+#endif
+
 	GLFWimage images[1];
 	images[0].pixels = stbi_load(img, &images[0].width, &images[0].height, 0, 4);
 	if (!images[0].pixels) {
@@ -61,11 +66,6 @@ GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 	images[0].height = images[0].width; // since textures are now 3D we get only the top face
 	glfwSetWindowIcon(glfwWindow, 1, images);
 	stbi_image_free(images[0].pixels);
-
-#ifdef _WIN32
-	BOOL darkMode = TRUE;
-	DwmSetWindowAttribute(glfwGetWin32Window(glfwWindow), 20, &darkMode, sizeof(BOOL));
-#endif
 }
 
 GameWindow::~GameWindow() {

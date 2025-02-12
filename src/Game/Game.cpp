@@ -586,7 +586,7 @@ void Game::setGamePaused(bool paused) {
 	glfwSetCursorPos(getGlfwWindow(), size.x / 2, size.y / 2);
 }
 
-void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos) {
+void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos, glm::vec3 playerOrientation, bool playerFlying) {
 	if (m_loadingWorld) return;
 	m_loadingWorld = true;
 	worldRenderingEnabled = true;
@@ -606,7 +606,7 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos) {
 	}
 	print("World Seed:", settings.seed);
 
-	std::thread t = std::thread([this](WorldSettings settings, glm::vec3 playerPos) {
+	std::thread t = std::thread([this](WorldSettings settings, glm::vec3 playerPos, glm::vec3 playerOrientation, bool playerFlying) {
 		m_world = new World(settings);
 		for (int x = -2; x < 2; x++) {
 			for (int y = -2; y < 2; y++) {
@@ -627,9 +627,11 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos) {
 			playerPos.y = static_cast<float>(m_world->getHeight({ playerPos.x, playerPos.z }));
 		}
 		m_player->pos = playerPos;
+		m_player->orientation = playerOrientation;
+		m_player->setFlying(playerFlying);
 
 		m_loadingWorld = false;
-		}, settings, playerPos);
+		}, settings, playerPos, playerOrientation, playerFlying);
 
 	t.detach();
 

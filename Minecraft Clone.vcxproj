@@ -117,11 +117,17 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>rmdir $(OutDir)\assets\ /s /q &amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>rmdir $(OutDir) /s /q &amp; exit 0</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Remove all files in output directory</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -150,11 +156,17 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>rmdir $(OutDir)\assets\ /s /q &amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>rmdir $(OutDir) /s /q &amp; exit 0</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Remove all files in output directory</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -179,11 +191,17 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>rmdir $(OutDir)\assets\ /s /q &amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>rmdir $(OutDir) /s /q &amp; exit 0</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Remove all files in output directory</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -212,11 +230,17 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>rmdir $(OutDir)\assets\ /s /q &amp; xcopy assets $(OutDir)assets\ /E &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force"</Command>
+      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>rmdir $(OutDir) /s /q &amp; exit 0</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Remove all files in output directory</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="libraries\include\glad\gl.c" />

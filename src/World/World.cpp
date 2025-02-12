@@ -139,10 +139,19 @@ WorldSaveData* World::createWorldSaveData() {
 	}
 	data->structuresCount = i;
 
-	glm::vec3 pos = Game::getInstance()->getPlayer()->pos;
+	Player* player = Game::getInstance()->getPlayer();
+
+	glm::vec3 pos = player->pos;
 	data->playerPos[0] = pos.x;
 	data->playerPos[1] = pos.y;
 	data->playerPos[2] = pos.z;
+
+	glm::vec3 orientation = player->orientation;
+	data->playerOrientation[0] = orientation.x;
+	data->playerOrientation[1] = orientation.y;
+	data->playerOrientation[2] = orientation.z;
+
+	data->playerFlying = player->isFlying();
 
 	return data;
 }

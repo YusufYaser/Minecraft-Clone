@@ -44,8 +44,8 @@ WorldSelector::WorldSelector() {
 				if (std::filesystem::exists(p + "/world.dat")) {
 					bool corrupted = false;
 
-					if (std::filesystem::file_size(p + "/world.dat") != sizeof(WorldSaveData)) {
-						warn("Potentially corrupted world:", p);
+					if (std::filesystem::file_size(p + "/world.dat") < 24) {
+						warn("Invalid world.dat size:", p);
 						corrupted = true;
 					}
 
@@ -185,8 +185,17 @@ void WorldSelector::render() {
 				pos.y = data->playerPos[1];
 				pos.z = data->playerPos[2];
 
+				glm::vec3 orientation = {};
+				orientation.x = data->playerOrientation[0];
+				orientation.y = data->playerOrientation[1];
+				orientation.z = data->playerOrientation[2];
+
+				if (orientation.x == 0 && orientation.y == 0 && orientation.z == 0) {
+					orientation.x = 1;
+				}
+
 				game->setLoadedWorldName(e->name);
-				game->loadWorld(settings, pos);
+				game->loadWorld(settings, pos, orientation, data->playerFlying);
 
 				double start = glfwGetTime();
 				while (game->getWorld() == nullptr && game->loadingWorld() && glfwGetTime() - start < .1f) {}

@@ -29,6 +29,8 @@ struct WorldSaveData {
 	uint8_t structuresCount;
 	STRUCTURE_TYPE structures[STRUCTURES_COUNT];
 	float playerPos[3];
+	float playerOrientation[3];
+	bool playerFlying;
 };
 
 struct ChunkSaveData {

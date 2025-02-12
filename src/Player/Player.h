@@ -38,6 +38,7 @@ public:
 	glm::mat4 getView() const;
 
 	bool isFlying() const { return flying; }
+	void setFlying(bool nFlying) { flying = nFlying; }
 
 private:
 	bool wasHidden = false;
