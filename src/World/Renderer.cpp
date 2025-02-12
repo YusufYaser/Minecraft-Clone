@@ -169,6 +169,7 @@ void World::render() {
 	shader->setUniform("highlighted", false);
 	shader->setUniform("isLiquidTop", false);
 	shader->setUniform("fogSize", 2.0f);
+	shader->setUniform("playerPos", pos);
 
 	float cosHalfFOV = std::cos(glm::radians(190.0f / 2.0f));
 
@@ -267,7 +268,7 @@ void World::render() {
 		glBindTexture(GL_TEXTURE_2D, i->tex->id);
 
 		shader->setUniform("animationFrameCount", getAnimationFrameCount(i->blockType));
-		shader->setUniform("isLiquidTop", i->blockType == BLOCK_TYPE::WATER);
+		shader->setUniform("blockType", (int)i->blockType);
 		shader->setUniform("highlighted", i->highlightedOffset);
 
 		glBufferSubData(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec3), i->offsets);

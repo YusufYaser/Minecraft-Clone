@@ -95,7 +95,7 @@ void World::chunkLoaderFunc() {
 						if (y == height - 1) type = BLOCK_TYPE::GRASS;
 						else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
 					} else {
-						if (y == height - 1) type = BLOCK_TYPE::SAND;
+						if (y == height - 1 || y == height - 2) type = BLOCK_TYPE::SAND;
 						else type = BLOCK_TYPE::STONE;
 					}
 

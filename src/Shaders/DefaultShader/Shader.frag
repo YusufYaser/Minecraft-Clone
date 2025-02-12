@@ -5,6 +5,8 @@ in vec2 texCoord;
 flat in float face;
 flat in int instanceId;
 flat in vec3 blockPosOffset;
+flat in vec3 fPlayerPos;
+flat in int fBlockType;
 
 out vec4 FragColor;
 
@@ -19,10 +21,22 @@ uniform float fogSize;
 const float BORDER_SIZE = .02f;
 
 void main() {
-    FragColor = texture(tex0, vec2((texCoord.x + float(int(time) % animationFrameCount)) / float(animationFrameCount), (texCoord.y + float(face)) / 6.0f));
+    vec2 tc = texCoord;
 
-    if (highlighted == instanceId && !(texCoord.x < (1 - BORDER_SIZE) && texCoord.x > BORDER_SIZE &&
-       texCoord.y < (1 - BORDER_SIZE) && texCoord.y > BORDER_SIZE)) {
+    if (fBlockType == 3 && face == 5 || (fBlockType != 3 && fBlockType != 7)) {
+        vec3 p = fract((blockPosOffset + fPlayerPos) * 0.1031);
+        p += dot(p, p.yxz + 19.19);
+        if (fract((p.x + p.y) * p.z) > 0.5f) {
+            float temp = tc.x;
+            tc.x = tc.y;
+            tc.y = temp;
+        }
+    }
+
+    FragColor = texture(tex0, vec2((tc.x + float(int(time) % animationFrameCount)) / float(animationFrameCount), (tc.y + float(face)) / 6.0f));
+
+    if (highlighted == instanceId && !(tc.x < (1 - BORDER_SIZE) && tc.x > BORDER_SIZE &&
+       tc.y < (1 - BORDER_SIZE) && tc.y > BORDER_SIZE)) {
 
         FragColor = vec4(FragColor.rgb, 1.0f);
         FragColor *= vec4(.25f, .25f, .25f, 1.0f);
