@@ -4,7 +4,6 @@
 #include "../Textures/Textures.h"
 #include "../Shaders/Shaders.h"
 #include <glad/gl.h>
-#include <unordered_map>
 
 enum class BLOCK_TYPE : uint8_t {
 	NONE = 0,
@@ -59,9 +58,10 @@ public:
 	bool hasCollision() const { return blockTypeHasCollision(type); };
 	bool hasTransparency() const { return isBlockTypeTransparent(type); };
 
-	uint8_t hiddenFaces;
-
 private:
-	BLOCK_TYPE type;
 	glm::ivec3 pos;
+	BLOCK_TYPE type;
+
+public:
+	uint8_t hiddenFaces;
 };

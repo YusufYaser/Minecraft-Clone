@@ -5,6 +5,16 @@ inline std::size_t combineHashes(std::size_t hash1, std::size_t hash2) {
 	return hash1 ^ (hash2 + 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
 }
 
+std::uint16_t hashPosForChunk(const glm::ivec3& pos) {
+	glm::ivec2 cPos = getPosChunk(pos);
+	glm::ivec3 pos2 = {
+		pos.x - (cPos.x * 16),
+		pos.y,
+		pos.z - (cPos.y * 16),
+	};
+	return (pos2.y * 16 * 16) + (pos2.z * 16) + pos2.x;
+}
+
 static inline std::size_t hash_int32(int32_t value) {
 	const uint8_t* data = reinterpret_cast<const uint8_t*>(&value);
 	std::size_t hash = 14695981039346656037ULL;

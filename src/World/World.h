@@ -92,28 +92,33 @@ private:
 	std::vector<Structure*> structures;
 
 	struct Chunk {
-		bool loaded = false;
-		bool permanentlyLoaded = false;
-		bool modified = false;
+		bool loaded : 1 = false;
+		bool permanentlyLoaded : 1 = false;
+		bool modified : 1 = false;
+		bool reserved : 5;
 		Mux blocksMutex;
 		Mux renderingGroupsMutex;
 		time_t lastRendered = 0;
-		std::unordered_map<std::size_t, Block*> blocks;
-		std::unordered_map<BLOCK_TYPE, std::vector<Block*>> renderingGroups;
+		Block* blocks[16 * 16 * MAX_HEIGHT];
+		std::array<std::vector<Block*>, BLOCK_TYPE_COUNT> renderingGroups;
 		glm::ivec2 pos;
+
+		Chunk() {
+			for (auto& block : blocks) {
+				block = nullptr;
+			}
+		}
 
 		~Chunk() {
 			blocksMutex.lock();
-			for (auto& [ch, block] : blocks) {
+			for (auto& block : blocks) {
 				delete block;
 			}
-			blocks.clear();
 			blocksMutex.unlock();
 			renderingGroupsMutex.lock();
-			for (auto& [ch, blocks] : renderingGroups) {
+			for (auto& blocks : renderingGroups) {
 				blocks.clear();
 			}
-			renderingGroups.clear();
 			renderingGroupsMutex.unlock();
 		}
 	};

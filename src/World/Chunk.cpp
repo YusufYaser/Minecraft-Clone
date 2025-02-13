@@ -165,7 +165,8 @@ void World::chunkUnloaderFunc() {
 					try {
 						ChunkSaveData* saveData = new ChunkSaveData();
 						chunk->blocksMutex.lock();
-						for (auto& [ch, block] : chunk->blocks) {
+						for (auto& block : chunk->blocks) {
+							if (block == nullptr) continue;
 							glm::ivec3 rPos = block->getPos();
 							glm::ivec2 cPos = getPosChunk(rPos);
 							glm::ivec3 pos = {
@@ -212,10 +213,6 @@ void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
 	}
 
 	Chunk* chunk = new Chunk();
-	chunk->blocks = std::unordered_map<std::size_t, Block*>();
-	for (int i = 0; i < BLOCK_TYPE_COUNT; i++) {
-		chunk->renderingGroups[(BLOCK_TYPE)i] = std::vector<Block*>();
-	}
 	chunk->permanentlyLoaded = permanentlyLoaded;
 	chunk->lastRendered = time(nullptr);
 	chunk->pos = pos;

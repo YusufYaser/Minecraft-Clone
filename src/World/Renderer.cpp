@@ -27,7 +27,10 @@ void World::renderer(int c) {
 
 		if (!chunk->renderingGroupsMutex.try_lock()) continue;
 
-		for (auto& [type, blocks] : chunk->renderingGroups) {
+		for (auto& blocks : chunk->renderingGroups) {
+			if (blocks.size() == 0) continue;
+			BLOCK_TYPE type = blocks[0]->getType();
+
 			if (type == BLOCK_TYPE::NONE || type == BLOCK_TYPE::AIR) continue;
 
 			Texture* tex = getTexture(getTextureName(type));
@@ -171,8 +174,6 @@ void World::render() {
 	float cosHalfFOV = std::cos(glm::radians(190.0f / 2.0f));
 
 	glm::ivec2 playerChunk = getPosChunk(pos);
-
-	std::unordered_map<Chunk*, std::vector<BLOCK_TYPE>> queued;
 
 	shader->setUniform("ambientLight", getAmbientLight());
 

@@ -2,6 +2,8 @@
 #include "Utils.h"
 
 Block* World::getBlock(glm::ivec3 pos) {
+	if (pos.y > MAX_HEIGHT || pos.y < 0) return nullptr;
+
 	std::size_t blockCh = hashPos(pos);
 	std::size_t chunkCh = hashPos(getPosChunk(pos));
 
@@ -16,13 +18,10 @@ Block* World::getBlock(glm::ivec3 pos) {
 	Chunk* chunk = cit->second;
 
 	chunk->blocksMutex.lock();
-	auto bit = chunk->blocks.find(blockCh);
+	Block* block = chunk->blocks[hashPosForChunk(pos)];
 	chunk->blocksMutex.unlock();
-	if (bit != chunk->blocks.end()) {
-		return bit->second;
-	}
 
-	return nullptr;
+	return block;
 }
 
 void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
@@ -62,7 +61,7 @@ void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
 
 				Block* block = new Block(type, pos);
 				block->hiddenFaces = 63;
-				chunk->blocks[blockCh] = block;
+				chunk->blocks[hashPosForChunk(pos)] = block;
 			}
 		}
 	}
@@ -112,17 +111,17 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 	Chunk* chunk = cit->second;
 
 	chunk->blocksMutex.lock();
-	auto bit = chunk->blocks.find(blockCh);
+	Block* block = chunk->blocks[hashPosForChunk(pos)];
 	chunk->blocksMutex.unlock();
-	if (bit != chunk->blocks.end()) {
+	if (block != nullptr) {
 		if (!replace) return nullptr;
 
-		Block* oldBlock = bit->second;
+		Block* oldBlock = block;
 		chunk->renderingGroupsMutex.lock();
-		std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[oldBlock->getType()]);
+		std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[(uint16_t)oldBlock->getType()]);
 		std::vector<Block*>::iterator begin = renderingGroup->begin();
 		std::vector<Block*>::iterator end = renderingGroup->end();
-		std::vector<Block*>::iterator it = std::find(begin, end, chunk->blocks[blockCh]);
+		std::vector<Block*>::iterator it = std::find(begin, end, chunk->blocks[hashPosForChunk(pos)]);
 		if (it != end) {
 			renderingGroup->erase(it);
 		}
@@ -130,7 +129,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 
 		delete oldBlock;
 		chunk->blocksMutex.lock();
-		chunk->blocks.erase(blockCh);
+		chunk->blocks[hashPosForChunk(pos)] = nullptr;
 		chunk->blocksMutex.unlock();
 		chunk->modified = true;
 	} else {
@@ -152,7 +151,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 
 	uint8_t hiddenFaces = 0;
 
-	Block* block = new Block(type, pos);
+	block = new Block(type, pos);
 
 	for (int i = 0; i < 6; i++) {
 		Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
@@ -174,7 +173,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 	block->hiddenFaces = hiddenFaces;
 
 	chunk->blocksMutex.lock();
-	chunk->blocks[blockCh] = block;
+	chunk->blocks[hashPosForChunk(pos)] = block;
 	chunk->blocksMutex.unlock();
 
 	if (block->hiddenFaces != 63) setRenderingGroup(block);
@@ -197,7 +196,7 @@ void World::setRenderingGroup(Block* block) {
 	std::vector<Block*>::iterator end;
 	std::vector<Block*>::iterator it;
 	chunk->renderingGroupsMutex.lock();
-	std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[type]);
+	std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[(uint16_t)type]);
 	if (block == NULL || block->hiddenFaces == 63) {
 		begin = renderingGroup->begin();
 		end = renderingGroup->end();
