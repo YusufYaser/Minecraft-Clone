@@ -3,9 +3,9 @@
 #include <stdint.h>
 #include <map>
 #include <vector>
-#include <mutex>
 #include <thread>
 #include "../config.h"
+#include "../Mux.h"
 
 enum class SOUND_TYPE : uint8_t {
 	BUTTON = 0
@@ -39,7 +39,7 @@ private:
 	};
 
 	std::map<SOUND_TYPE, ESound*> sounds;
-	std::mutex queueMux;
+	Mux queueMux;
 	std::vector<SOUND_TYPE> queue;
 
 	bool m_loaded = false;

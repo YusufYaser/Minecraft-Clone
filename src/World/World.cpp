@@ -88,6 +88,9 @@ World::~World() {
 		glDeleteBuffers(1, &i->bStructData->VBO);
 		i->bStructData->VBO = 0;
 
+		glDeleteBuffers(1, &i->bStructData->EBO);
+		i->bStructData->EBO = 0;
+
 		delete i->bStructData;
 		i->bStructData = nullptr;
 

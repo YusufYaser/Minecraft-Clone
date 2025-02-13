@@ -8,13 +8,13 @@
 #include <PerlinNoise/PerlinNoise.hpp>
 #include <thread>
 #include <future>
-#include <mutex>
 #include <deque>
 #include <random>
 #include <time.h>
 #include "Structures.h"
 #include "stdint.h"
 #include "../config.h"
+#include "../Mux.h"
 
 enum class Generator : uint8_t {
 	Default = 0,
@@ -95,8 +95,8 @@ private:
 		bool loaded = false;
 		bool permanentlyLoaded = false;
 		bool modified = false;
-		std::mutex blocksMutex;
-		std::mutex renderingGroupsMutex;
+		Mux blocksMutex;
+		Mux renderingGroupsMutex;
 		time_t lastRendered = 0;
 		std::unordered_map<std::size_t, Block*> blocks;
 		std::unordered_map<BLOCK_TYPE, std::vector<Block*>> renderingGroups;
@@ -119,7 +119,7 @@ private:
 	};
 
 	std::unordered_map<std::size_t, Chunk*> chunks;
-	std::mutex chunksMutex;
+	Mux chunksMutex;
 
 	void setRenderingGroup(Block* block);
 
@@ -129,7 +129,7 @@ private:
 	std::thread tickThread;
 	void tick();
 	std::vector<Chunk*> chunkLoadQueue;
-	std::mutex chunkLoadQueueMutex;
+	Mux chunkLoadQueueMutex;
 
 	siv::PerlinNoise perlin;
 
@@ -142,21 +142,23 @@ private:
 		BLOCK_TYPE blockType;
 		uint8_t hiddenFaces;
 		GLuint VBO;
-		int offsetsCount;
+		uint16_t offsetsCount;
 		glm::vec3 offsets[MAX_INSTANCE_OFFSETS];
-		int highlightedOffset;
+		uint16_t highlightedOffset;
 	};
 
 	std::thread renderingThreads[RENDERER_THREAD_COUNT];
 	std::thread chunkLoaderThreads[CHUNK_LOADER_THREAD_COUNT];
-	std::mutex renderingQueueMutex;
+	Mux renderingQueueMutex;
 	std::deque<Chunk*> renderingQueue;
 	std::atomic<bool> rendered[RENDERER_THREAD_COUNT];
 
-	std::mutex instancesMutex;
+	Block* targetBlock = nullptr;
+
+	Mux instancesMutex;
 	std::vector<Instance*> instances;
 
-	std::mutex instancesToInitMutex;
+	Mux instancesToInitMutex;
 	std::vector<Instance*> instancesToInit;
 
 	std::atomic<bool> rendering;

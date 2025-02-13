@@ -79,7 +79,7 @@ void World::renderer(int c) {
 					instancesCache[hiddenFaces][tex].push_back(i);
 				}
 
-				if (block->highlighted) i->highlightedOffset = i->offsetsCount;
+				if (block == targetBlock) i->highlightedOffset = i->offsetsCount;
 
 				i->offsets[i->offsetsCount++] = glm::vec3(bPos) - pos;
 			}
@@ -158,10 +158,7 @@ void World::render() {
 	shader->setUniform("view", playerView);
 	shader->setUniform("projection", playerProjection);
 
-	Block* targetBlock = nullptr;
 	player->getTargetBlock(&targetBlock);
-
-	if (targetBlock != nullptr) targetBlock->highlighted = true;
 
 	// Camera Position
 	glm::vec3 pos = player->getCameraPos();
@@ -273,11 +270,9 @@ void World::render() {
 
 		glBufferSubData(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec3), i->offsets);
 
-		glDrawArraysInstanced(GL_TRIANGLES, 0, i->bStructData->faceCount * 6, i->offsetsCount);
+		glDrawElementsInstanced(GL_TRIANGLES, i->bStructData->faceCount * 6, GL_UNSIGNED_BYTE, 0, i->offsetsCount);
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
-	if (targetBlock != nullptr) targetBlock->highlighted = false;
 }

@@ -6,16 +6,20 @@ inline BlockStructureData* blockStructures[64];
 BlockStructureData* createBlockStructureData(uint8_t hiddenFaces) {
 	BlockStructureData* data = new BlockStructureData();
 
-	GLuint VBO, VAO;
+	GLuint VBO, VAO, EBO;
 	uint8_t faceCount = 0;
 
 	GLfloat* vertices = new GLfloat[6 * VERTEX_SIZE * 6];
+	uint8_t* indices = new uint8_t[6 * 6];
 
 	for (int i = 0; i < 6; i++) {
 		if ((hiddenFaces & (1 << i)) != 0) continue;
 
-		for (int j = 0; j < VERTEX_SIZE * 6; j++) {
-			vertices[(faceCount * VERTEX_SIZE * 6) + j] = blockVertices[(i * VERTEX_SIZE * 6) + j];
+		for (int j = 0; j < VERTEX_SIZE * 4; j++) {
+			vertices[(faceCount * VERTEX_SIZE * 4) + j] = blockVertices[(i * VERTEX_SIZE * 4) + j];
+		}
+		for (int j = 0; j < 6; j++) {
+			indices[(faceCount * 6) + j] = blockIndices[j] + (faceCount * 4);
 		}
 
 		faceCount++;
@@ -28,6 +32,10 @@ BlockStructureData* createBlockStructureData(uint8_t hiddenFaces) {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, faceCount * VERTEX_SIZE * 6 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
 
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, faceCount * VERTEX_SIZE * sizeof(uint8_t), indices, GL_STATIC_DRAW);
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(float), (void*)(3 * sizeof(float)));
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(float), (void*)(5 * sizeof(float)));
@@ -39,9 +47,11 @@ BlockStructureData* createBlockStructureData(uint8_t hiddenFaces) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	delete[] vertices;
+	delete[] indices;
 
 	data->VAO = VAO;
 	data->VBO = VBO;
+	data->EBO = EBO;
 	data->faceCount = faceCount;
 	data->hiddenFaces = hiddenFaces;
 
@@ -166,16 +176,8 @@ void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTextu
 
 	if (shader != nullptr) shader->setUniform("blockPos", pos);
 
-	if (highlighted) {
-		if (shader != nullptr) shader->setUniform("highlighted", true);
-	}
-
 	if (bindTexture) glBindTexture(GL_TEXTURE_2D, getTexture(getName())->id);
 
 	glBindVertexArray(data->VAO);
-	glDrawArraysInstanced(GL_TRIANGLES, 0, data->faceCount * 6, 1);
-
-	if (highlighted) {
-		if (shader != nullptr) shader->setUniform("highlighted", false);
-	}
+	glDrawElements(GL_TRIANGLES, data->faceCount * 6, GL_UNSIGNED_BYTE, 0);
 }

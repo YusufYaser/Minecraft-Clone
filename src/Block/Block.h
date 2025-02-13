@@ -34,6 +34,7 @@ enum class BLOCK_FACE : uint8_t {
 struct BlockStructureData {
 	GLuint VAO;
 	GLuint VBO;
+	GLuint EBO;
 	uint8_t hiddenFaces;
 	uint8_t faceCount;
 };
@@ -58,7 +59,6 @@ public:
 	bool hasCollision() const { return blockTypeHasCollision(type); };
 	bool hasTransparency() const { return isBlockTypeTransparent(type); };
 
-	bool highlighted = false;
 	uint8_t hiddenFaces;
 
 private:
