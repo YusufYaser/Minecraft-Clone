@@ -19,7 +19,7 @@ enum class BLOCK_TYPE : uint8_t {
 	OAK_PLANKS
 };
 
-const int BLOCK_TYPE_COUNT = 11;
+#define BLOCK_TYPE_COUNT 11
 
 enum class BLOCK_FACE : uint8_t {
 	FRONT = 0,

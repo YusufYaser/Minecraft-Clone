@@ -1,6 +1,8 @@
 R"END(
 #version 410 core
 
+#define BLOCK_TYPE_COUNT 11
+
 in vec2 texCoord;
 flat in float face;
 flat in int instanceId;
@@ -17,6 +19,7 @@ uniform double time;
 uniform int animationFrameCount;
 uniform int renderDistance;
 uniform float fogSize;
+uniform vec4 atlasRanges[BLOCK_TYPE_COUNT];
 
 const float BORDER_SIZE = .02f;
 
@@ -33,7 +36,12 @@ void main() {
         }
     }
 
-    FragColor = texture(tex0, vec2((tc.x + float(int(time) % animationFrameCount)) / float(animationFrameCount), (tc.y + float(face)) / 6.0f));
+    vec4 range = atlasRanges[fBlockType];
+    vec2 size = vec2(range.z - range.x, range.w - range.y);
+
+    vec2 tc2 = vec2((tc.x + float(int(time) % animationFrameCount)) / float(animationFrameCount), (tc.y + float(face)) / 6.0f);
+    tc2 = range.xy + (tc2 * size);
+    FragColor = texture(tex0, tc2);
 
     if (highlighted == instanceId && !(tc.x < (1 - BORDER_SIZE) && tc.x > BORDER_SIZE &&
        tc.y < (1 - BORDER_SIZE) && tc.y > BORDER_SIZE)) {

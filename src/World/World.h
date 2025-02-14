@@ -143,7 +143,6 @@ private:
 
 	struct Instance {
 		BlockStructureData* bStructData;
-		Texture* tex;
 		BLOCK_TYPE blockType;
 		uint8_t hiddenFaces;
 		GLuint VBO;

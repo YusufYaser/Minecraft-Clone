@@ -58,14 +58,12 @@ void World::renderer(int c) {
 				Instance* i = nullptr;
 				for (auto& inst : instancesCache[hiddenFaces][tex]) {
 					if (inst->offsetsCount >= MAX_INSTANCE_OFFSETS) continue;
-					if (inst->tex->id != tex->id) continue;
 					if (inst->hiddenFaces != hiddenFaces) continue;
 					i = inst;
 					break;
 				}
 				if (i == nullptr) {
 					i = new Instance();
-					i->tex = tex;
 					i->offsetsCount = 0;
 					i->highlightedOffset = -1;
 					i->blockType = type;
@@ -257,13 +255,15 @@ void World::render() {
 		glVertexAttribDivisor(3, 1);
 	}
 
+	TextureAtlas* atlas = Game::getInstance()->getTexAtlas();
+	glBindTexture(GL_TEXTURE_2D, atlas->tex->id);
+
 	for (auto& i : instances) {
 		if (i->offsetsCount == 0 || i->bStructData == nullptr) continue;
 		m_instancesRendered++;
 
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBindVertexArray(i->bStructData->VAO);
-		glBindTexture(GL_TEXTURE_2D, i->tex->id);
 
 		shader->setUniform("animationFrameCount", getAnimationFrameCount(i->blockType));
 		shader->setUniform("blockType", (int)i->blockType);

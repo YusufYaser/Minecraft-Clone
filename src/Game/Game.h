@@ -53,6 +53,8 @@ public:
 	KeyHandler* getKeyHandler() const { return m_keyHandler; };
 	SoundEngine* getSoundEngine() const { return m_soundEngine; };
 
+	TextureAtlas* getTexAtlas() const { return m_texAtlas; }
+
 	const GPUInfo* getGpuInfo();
 
 	Shader* getShader() const { return shader; };
@@ -109,6 +111,8 @@ private:
 	bool m_shouldQuit = false;
 
 	std::string m_worldName = "invalid";
+
+	TextureAtlas* m_texAtlas;
 
 	Text* m_commandsHelp = nullptr;
 

@@ -15,5 +15,11 @@ struct Texture {
 	int width;
 };
 
-void initializeTextures();
+struct TextureAtlas {
+	glm::ivec2 size = glm::ivec2();
+	glm::vec4 ranges[32] = {};
+	Texture* tex;
+};
+
+TextureAtlas* initializeTextures();
 Texture* getTexture(std::string name);

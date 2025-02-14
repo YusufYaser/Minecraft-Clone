@@ -90,10 +90,17 @@ Game::Game() {
 
 	// load textures
 	print("Loading textures");
-	initializeTextures();
+	m_texAtlas = initializeTextures();
 
 	shader->activate();
 	shader->setUniform("tex0", 0);
+
+	shader->activate();
+	for (int i = 0; i < BLOCK_TYPE_COUNT; i++) {
+		std::string name = "atlasRanges[" + std::to_string(i) + "]";
+		glUniform4fv(glGetUniformLocation(shader->getId(), name.c_str()), 1, glm::value_ptr(m_texAtlas->ranges[i]));
+	}
+
 	guiShader->activate();
 	guiShader->setUniform("tex0", 0);
 	skyboxShader->activate();
@@ -317,7 +324,6 @@ void Game::update() {
 	double startTime = glfwGetTime();
 	m_frameNum++;
 
-#ifdef _DEBUG
 	GLenum errorCode;
 	bool err = false;
 	while ((errorCode = glGetError()) != GL_NO_ERROR) {
@@ -334,6 +340,7 @@ void Game::update() {
 		}
 		error("glGetError():", error);
 	}
+#ifdef _DEBUG
 	if (err) __debugbreak();
 #endif
 

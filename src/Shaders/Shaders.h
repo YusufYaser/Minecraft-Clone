@@ -11,6 +11,7 @@ public:
 
 	void activate();
 	GLuint getUniformLoc(const GLchar* name);
+	GLuint getId() const { return m_id; }
 
 	template<typename T>
 	void setUniform(const GLchar* name, const T& value);
