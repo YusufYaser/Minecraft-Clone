@@ -118,7 +118,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 
 		Block* oldBlock = block;
 		chunk->renderingGroupsMutex.lock();
-		std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[(uint16_t)oldBlock->getType()]);
+		std::vector<Block*>* renderingGroup = &(chunk->blocksToRender);
 		std::vector<Block*>::iterator begin = renderingGroup->begin();
 		std::vector<Block*>::iterator end = renderingGroup->end();
 		std::vector<Block*>::iterator it = std::find(begin, end, chunk->blocks[hashPosForChunk(pos)]);
@@ -196,7 +196,7 @@ void World::setRenderingGroup(Block* block) {
 	std::vector<Block*>::iterator end;
 	std::vector<Block*>::iterator it;
 	chunk->renderingGroupsMutex.lock();
-	std::vector<Block*>* renderingGroup = &(chunk->renderingGroups[(uint16_t)type]);
+	std::vector<Block*>* renderingGroup = &(chunk->blocksToRender);
 	if (block == NULL || block->hiddenFaces == 63) {
 		begin = renderingGroup->begin();
 		end = renderingGroup->end();

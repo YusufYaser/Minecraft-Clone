@@ -100,7 +100,7 @@ private:
 		Mux renderingGroupsMutex;
 		time_t lastRendered = 0;
 		Block* blocks[16 * 16 * MAX_HEIGHT];
-		std::array<std::vector<Block*>, BLOCK_TYPE_COUNT> renderingGroups;
+		std::vector<Block*> blocksToRender;
 		glm::ivec2 pos;
 
 		Chunk() {
@@ -116,9 +116,7 @@ private:
 			}
 			blocksMutex.unlock();
 			renderingGroupsMutex.lock();
-			for (auto& blocks : renderingGroups) {
-				blocks.clear();
-			}
+			blocksToRender.clear();
 			renderingGroupsMutex.unlock();
 		}
 	};
@@ -143,12 +141,12 @@ private:
 
 	struct Instance {
 		BlockStructureData* bStructData;
-		BLOCK_TYPE blockType;
 		uint8_t hiddenFaces;
 		GLuint VBO;
 		uint16_t offsetsCount;
-		glm::vec3 offsets[MAX_INSTANCE_OFFSETS];
+		glm::vec4 offsets[MAX_INSTANCE_OFFSETS];
 		uint16_t highlightedOffset;
+		bool transparent;
 	};
 
 	std::thread renderingThreads[RENDERER_THREAD_COUNT];

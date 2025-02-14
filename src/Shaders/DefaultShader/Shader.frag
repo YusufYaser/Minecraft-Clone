@@ -16,7 +16,6 @@ uniform sampler2D tex0;
 uniform int highlighted;
 uniform float ambientLight;
 uniform double time;
-uniform int animationFrameCount;
 uniform int renderDistance;
 uniform float fogSize;
 uniform vec4 atlasRanges[BLOCK_TYPE_COUNT];
@@ -38,6 +37,8 @@ void main() {
 
     vec4 range = atlasRanges[fBlockType];
     vec2 size = vec2(range.z - range.x, range.w - range.y);
+
+    int animationFrameCount = int(round(size.x / (size.y / 6.0f)));
 
     vec2 tc2 = vec2((tc.x + float(int(time) % animationFrameCount)) / float(animationFrameCount), (tc.y + float(face)) / 6.0f);
     tc2 = range.xy + (tc2 * size);

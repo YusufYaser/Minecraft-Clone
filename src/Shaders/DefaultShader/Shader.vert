@@ -4,7 +4,7 @@ R"END(
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec2 inTexCoord;
 layout(location = 2) in float inFace;
-layout(location = 3) in vec3 inBlockPosOffset;
+layout(location = 3) in vec4 inBlockData;
 
 out vec2 texCoord;
 flat out float face;
@@ -16,10 +16,12 @@ flat out int fBlockType;
 uniform mat4 projection;
 uniform mat4 view;
 uniform bool isLiquidTop;
-uniform int blockType;
 uniform vec3 playerPos;
 
 void main() {
+	int blockType = int(inBlockData.w);
+	vec3 inBlockPosOffset = inBlockData.xyz;
+
 	vec3 pos2 = position;
 	if (blockType == 7 && pos2.y > 0) {
 		pos2 -= vec3(0, .05f * 2, 0);
