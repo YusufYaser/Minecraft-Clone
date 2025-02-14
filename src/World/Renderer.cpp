@@ -1,5 +1,7 @@
 #include "World.h"
 #include "../Game/Game.h"
+#include <algorithm>
+#include <execution>
 
 void World::renderer(int c) {
 	std::vector<Instance*> instancesCache[64];
@@ -247,6 +249,9 @@ void World::render() {
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
 		glEnableVertexAttribArray(3);
 		glVertexAttribDivisor(3, 1);
+
+		glBufferStorage(GL_ARRAY_BUFFER, MAX_INSTANCE_OFFSETS * sizeof(glm::vec4), nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+		i->buff = glMapBufferRange(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec4), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 	}
 
 	TextureAtlas* atlas = Game::getInstance()->getTexAtlas();
@@ -261,7 +266,11 @@ void World::render() {
 
 		shader->setUniform("highlighted", i->highlightedOffset);
 
-		glBufferSubData(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec4), i->offsets);
+		std::copy(std::execution::par_unseq,
+			reinterpret_cast<const char*>(i->offsets),
+			reinterpret_cast<const char*>(i->offsets) + (i->offsetsCount * sizeof(glm::vec4)),
+			reinterpret_cast<char*>(i->buff)
+		);
 
 		glDrawElementsInstanced(GL_TRIANGLES, i->bStructData->faceCount * 6, GL_UNSIGNED_BYTE, 0, i->offsetsCount);
 	}

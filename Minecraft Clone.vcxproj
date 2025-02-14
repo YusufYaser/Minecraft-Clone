@@ -243,7 +243,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="libraries\include\glad\gl.c" />
+    <ClCompile Include="libraries\implementations\glad.c" />
     <ClCompile Include="src\Block\Block.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
     <ClCompile Include="libraries\implementations\gltext.cpp" />
