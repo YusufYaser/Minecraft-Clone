@@ -65,7 +65,7 @@ void main() {
 
     vec4 SkyColor = vec4(vec3(78.0f / 255.0f, 78.0f / 255.0f, 251.0f / 255.0f) * ambientLight, 1.0f);
 
-    float dist = length(blockPosOffset) - ((renderDistance - fogSize * 2) * 8.0f);
+    float dist = length(blockPosOffset) - ((renderDistance * 2 - fogSize * 2) * 8.0f);
     float val = min(max(dist / ((fogSize * 2 - 0.5f) * (16.0f / 2.0f)), 0.0f), 1.0f);
     FragColor = mix(FragColor, SkyColor, val);
 }

@@ -24,7 +24,9 @@ void World::chunkLoaderFunc() {
 
 		if (time(0) - chunk->lastRendered > 10) {
 			delete chunk;
+			chunkLoadQueueMutex.lock();
 			chunks.erase(chunkCh);
+			chunkLoadQueueMutex.unlock();
 			continue;
 		}
 

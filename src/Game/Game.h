@@ -21,7 +21,7 @@
 
 struct GameSettings {
 #ifndef _DEBUG
-	int renderDistance = 24;
+	int renderDistance = 12;
 #else
 	int renderDistance = 6;
 #endif
