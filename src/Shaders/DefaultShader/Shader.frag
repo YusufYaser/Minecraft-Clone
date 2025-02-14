@@ -1,5 +1,5 @@
 R"END(
-#version 410 core
+#version 460 core
 
 #define BLOCK_TYPE_COUNT 11
 
