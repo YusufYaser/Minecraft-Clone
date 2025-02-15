@@ -16,6 +16,11 @@ PauseMenu::PauseMenu() {
 	settings->setText("Settings");
 	settings->setPosition({ .5f, 0, .5f, 50 });
 
+	screenshot = new Button();
+	screenshot->setText("Take Photo");
+	screenshot->setPosition({ 1, -65, 1, -25 });
+	screenshot->setSize({ 0, 100, 0, 25 });
+
 	mainMenu = new Button();
 	mainMenu->setText("Main Menu");
 	mainMenu->setPosition({ .5f, 0, .5f, 100 });
@@ -42,6 +47,10 @@ void PauseMenu::render() {
 		delete settingsMenu;
 		settingsMenu = nullptr;
 	}
+	if (screenshotMenu != nullptr && (lastFrame + 1 != game->getFrameNum() || screenshotMenu->isClosing())) {
+		delete screenshotMenu;
+		screenshotMenu = nullptr;
+	}
 
 	lastFrame = game->getFrameNum();
 
@@ -50,9 +59,15 @@ void PauseMenu::render() {
 		return;
 	}
 
+	if (screenshotMenu != nullptr) {
+		screenshotMenu->render();
+		return;
+	}
+
 	resume->render();
 	settings->render();
 	mainMenu->render();
+	screenshot->render();
 	title->render();
 
 	if (resume->isClicked()) {
@@ -61,6 +76,10 @@ void PauseMenu::render() {
 
 	if (settings->isClicked()) {
 		settingsMenu = new SettingsMenu();
+	}
+
+	if (screenshot->isClicked()) {
+		screenshotMenu = new ScreenshotMenu();
 	}
 
 	if (mainMenu->isClicked()) {

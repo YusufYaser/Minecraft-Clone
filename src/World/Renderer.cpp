@@ -156,7 +156,11 @@ void World::render() {
 	shader->setUniform("view", playerView);
 	shader->setUniform("projection", playerProjection);
 
-	player->getTargetBlock(&targetBlock);
+	if (Game::getInstance()->isGuiEnabled()) {
+		player->getTargetBlock(&targetBlock);
+	} else {
+		targetBlock = nullptr;
+	}
 
 	// Camera Position
 	glm::vec3 pos = player->getCameraPos();

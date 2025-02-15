@@ -255,6 +255,7 @@
     <ClCompile Include="src\GUI\MainMenu\WorldSelector.cpp" />
     <ClCompile Include="src\GUI\PauseMenu.cpp" />
     <ClCompile Include="src\GUI\Components\Text.cpp" />
+    <ClCompile Include="src\GUI\ScreenshotMenu.cpp" />
     <ClCompile Include="src\GUI\SettingsMenu.cpp" />
     <ClCompile Include="src\KeyHandler\KeyHandler.cpp" />
     <ClCompile Include="libraries\implementations\miniaudio.cpp" />
@@ -273,6 +274,7 @@
     <ClCompile Include="src\World\WorldUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="C:\Users\yusuf\Downloads\stb_image_write.h" />
     <ClInclude Include="libraries\include\gltext\gltext.h" />
     <ClInclude Include="libraries\include\PerlinNoise\PerlinNoise.hpp" />
     <ClInclude Include="src\Block\Block.h" />
@@ -289,6 +291,7 @@
     <ClInclude Include="src\GUI\MainMenu\WorldSelector.h" />
     <ClInclude Include="src\GUI\PauseMenu.h" />
     <ClInclude Include="src\GUI\Components\Text.h" />
+    <ClInclude Include="src\GUI\ScreenshotMenu.h" />
     <ClInclude Include="src\GUI\SettingsMenu.h" />
     <ClInclude Include="src\KeyHandler\KeyHandler.h" />
     <ClInclude Include="src\Mux.h" />

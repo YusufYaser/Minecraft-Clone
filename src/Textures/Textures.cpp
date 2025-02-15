@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "../Block/Block.h"
 #include "Textures.h"
+#include <stb/stb_image.h>
 
 #define ATLAS_WIDTH 1024
 #define ATLAS_HEIGHT 1024
@@ -45,6 +46,9 @@ TextureAtlas* initializeTextures() {
 	tex->width = 2;
 
 	textures["invalid"] = tex;
+
+	Texture* black = new Texture();
+	textures["black"] = black;
 
 	recursive_directory_iterator it;
 	try {

@@ -3,6 +3,7 @@
 #include "./Components/Text.h"
 #include "./Components/Button.h"
 #include "SettingsMenu.h"
+#include "ScreenshotMenu.h"
 
 class PauseMenu {
 public:
@@ -17,7 +18,9 @@ private:
 	Text* title;
 	Button* resume;
 	Button* settings;
+	Button* screenshot;
 	Button* mainMenu;
 
 	SettingsMenu* settingsMenu = nullptr;
+	ScreenshotMenu* screenshotMenu = nullptr;
 };

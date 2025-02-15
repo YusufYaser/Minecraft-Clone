@@ -54,6 +54,8 @@ public:
 	SoundEngine* getSoundEngine() const { return m_soundEngine; };
 
 	TextureAtlas* getTexAtlas() const { return m_texAtlas; }
+	Texture* getWorldTex() const { return worldTex; }
+	Texture* getWorldPostProcessedTex() const { return worldTexp; }
 
 	const GPUInfo* getGpuInfo();
 

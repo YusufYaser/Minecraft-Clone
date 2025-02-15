@@ -14,6 +14,8 @@ public:
 	void setTexture(Texture* tex) { m_tex = tex; };
 	void setCrop(glm::vec2 crop) { m_crop = crop; };
 
+	Texture* getTexture() const { return m_tex; }
+
 	void render() override;
 
 private:

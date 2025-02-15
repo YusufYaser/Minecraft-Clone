@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stb/stb_image.h>
 #include <filesystem>
 #include "../Logging.h"
 #ifndef __gl_h_
