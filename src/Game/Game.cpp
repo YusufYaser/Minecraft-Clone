@@ -383,6 +383,13 @@ void Game::update() {
 				this->guiShader = guiShader;
 				this->skyboxShader = skyboxShader;
 				this->postProcessingShader = postProcessingShader;
+
+				shader->activate();
+				for (int i = 0; i < BLOCK_TYPE_COUNT; i++) {
+					std::string name = "atlasRanges[" + std::to_string(i) + "]";
+					glUniform4fv(glGetUniformLocation(shader->getId(), name.c_str()), 1, glm::value_ptr(m_texAtlas->ranges[i]));
+				}
+
 				print("Reloaded shaders");
 			}
 		}

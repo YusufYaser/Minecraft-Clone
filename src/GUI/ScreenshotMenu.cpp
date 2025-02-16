@@ -124,7 +124,7 @@ void ScreenshotMenu::render() {
 #endif
 
 			std::ostringstream name;
-			name << "screenshots/" << std::put_time(&datetime, "%Y-%m-%d %H-%M-%S") << ".png";
+			name << "screenshots/" << std::put_time(&datetime, "%Y-%m-%d %H.%M.%S") << ".png";
 
 			int res = stbi_write_png(name.str().c_str(), size.x, size.y, 4, pixelsFlipped, size.x * 4);
 

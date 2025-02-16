@@ -103,6 +103,7 @@ World::~World() {
 void World::dontRender() {
 	m_chunksRendered = 0;
 	m_instancesRendered = 0;
+	m_blocksRendered = 0;
 
 	glm::vec3 pos = Game::getInstance()->getPlayer()->getCameraPos();
 	glm::ivec2 playerChunk = getPosChunk(pos);

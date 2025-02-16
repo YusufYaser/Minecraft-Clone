@@ -80,6 +80,7 @@ public:
 
 	bool gamePaused() const { return m_gamePaused; };
 	void setGamePaused(bool paused);
+	void setDebugLevel(int newDebugLevel) { m_debugLevel = newDebugLevel; };
 
 	int getRenderDistance() const { return m_renderDistance; };
 	void setRenderDistance(int newRenderDistance) { m_renderDistance = newRenderDistance; };

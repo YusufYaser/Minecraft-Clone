@@ -278,9 +278,9 @@ void World::render() {
 	TextureAtlas* atlas = Game::getInstance()->getTexAtlas();
 	glBindTexture(GL_TEXTURE_2D, atlas->tex->id);
 
+	m_blocksRendered = 0;
 	for (auto& i : instances) {
 		if (i->offsetsCount == 0 || i->bStructData == nullptr) continue;
-		m_instancesRendered++;
 
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBindVertexArray(i->bStructData->VAO);
@@ -294,6 +294,9 @@ void World::render() {
 		);
 
 		glDrawElementsInstanced(GL_TRIANGLES, i->bStructData->faceCount * 6, GL_UNSIGNED_BYTE, 0, i->offsetsCount);
+
+		m_instancesRendered++;
+		m_blocksRendered += i->offsetsCount;
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

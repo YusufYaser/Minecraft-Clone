@@ -91,7 +91,8 @@ void DebugText::render() {
 			text << "Chunks Loaded: " << world->chunksLoaded() - world->chunkLoadQueueCount() << "\n";
 			text << "Chunks Load Queue Count: " << world->chunkLoadQueueCount() << "\n";
 			text << "Chunks Load Per Second: " << loadPerSecond << "\n\n";
-			text << "Instances Rendered: " << world->instancesRendered() << " / " << world->totalInstances() << "\n";
+			text << "Instances Rendered: " << world->instancesRendered() << " / " << world->totalInstances();
+			text << " (" << world->blocksRendered() << ")\n";
 		}
 		text << "\n";
 

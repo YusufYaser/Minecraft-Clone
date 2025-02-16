@@ -108,12 +108,20 @@ void Player::update(float delta) {
 
 	checkInputs(delta);
 
+	bool wasDebug = false;
+	if (Game::getInstance()->getDebugLevel() == 2) {
+		wasDebug = true;
+		Game::getInstance()->setDebugLevel(0);
+	}
 	m_crosshair->render();
 	m_inventory->render();
 
 	for (int i = 0; i < 9; i++) {
 		m_inventoryImages[i]->setColor(i == slot ? glm::vec4(1.0f, 1.0f, 1.0f, 1.0f) : glm::vec4(.5f, .5f, .5f, 1.0f));
 		m_inventoryImages[i]->render();
+	}
+	if (wasDebug) {
+		Game::getInstance()->setDebugLevel(2);
 	}
 }
 
