@@ -36,7 +36,7 @@ void DebugText::render() {
 	static float lastDelta1 = 0;
 	static float lastDelta2 = 0;
 	static float lastDelta3 = 0;
-	if (currentTime - lastFpsUpdated > .25) {
+	if (currentTime - lastFpsUpdated > .25 || (l == 2 && currentTime - lastFpsUpdated > .1)) {
 		lastFps = static_cast<int>(round(1 / delta));
 		lastDelta1 = delta;
 		lastDelta2 = game->getSimDelta();

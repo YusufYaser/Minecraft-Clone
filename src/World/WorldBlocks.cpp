@@ -56,6 +56,7 @@ void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
 					}
 
 					chunk->modified = true;
+					m_worldRenderModified = true;
 				}
 				std::size_t blockCh = hashPos(pos);
 
@@ -132,6 +133,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 		chunk->blocks[hashPosForChunk(pos)] = nullptr;
 		chunk->blocksMutex.unlock();
 		chunk->modified = true;
+		m_worldRenderModified = true;
 	} else {
 		if (type == BLOCK_TYPE::AIR) return nullptr; // it was already air, nothing to change
 	}
@@ -179,6 +181,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 	if (block->hiddenFaces != 63) setRenderingGroup(block);
 
 	chunk->modified = true;
+	m_worldRenderModified = true;
 	return block;
 }
 

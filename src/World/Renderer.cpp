@@ -42,14 +42,14 @@ void World::renderer(int c) {
 
 			uint8_t hiddenFaces = block->hiddenFaces;
 
-			hiddenFaces |= (diff.x > -half) << (int)BLOCK_FACE::RIGHT;
+			/*hiddenFaces |= (diff.x > -half) << (int)BLOCK_FACE::RIGHT;
 			hiddenFaces |= (diff.x < half) << (int)BLOCK_FACE::LEFT;
 
 			hiddenFaces |= (diff.y > -half) << (int)BLOCK_FACE::TOP;
 			hiddenFaces |= (diff.y < half) << (int)BLOCK_FACE::BOTTOM;
 
 			hiddenFaces |= (diff.z > -half) << (int)BLOCK_FACE::FRONT;
-			hiddenFaces |= (diff.z < half) << (int)BLOCK_FACE::BACK;
+			hiddenFaces |= (diff.z < half) << (int)BLOCK_FACE::BACK;*/
 
 			if (hiddenFaces >= 63) continue;
 
@@ -63,7 +63,6 @@ void World::renderer(int c) {
 			if (i == nullptr) {
 				i = new Instance();
 				i->offsetsCount = 0;
-				i->highlightedOffset = -1;
 				i->hiddenFaces = hiddenFaces;
 				i->transparent = transparent;
 
@@ -78,9 +77,7 @@ void World::renderer(int c) {
 				instancesCache[hiddenFaces].push_back(i);
 			}
 
-			if (block == targetBlock) i->highlightedOffset = i->offsetsCount;
-
-			i->offsets[i->offsetsCount++] = glm::vec4(bPos, type) - glm::vec4(pos, 0);
+			i->offsets[i->offsetsCount++] = glm::vec4(bPos, type);
 		}
 
 		chunk->renderingGroupsMutex.unlock();
@@ -161,12 +158,15 @@ void World::render() {
 	} else {
 		targetBlock = nullptr;
 	}
+	if (targetBlock != nullptr) {
+		shader->setUniform("highlighted", targetBlock->getPos());
+	} else {
+		shader->setUniform("highlighted", glm::ivec3(0, -1, 0));
+	}
 
 	// Camera Position
 	glm::vec3 pos = player->getCameraPos();
 	int renderDistance = Game::getInstance()->getRenderDistance();
-	shader->setUniform("highlighted", false);
-	shader->setUniform("isLiquidTop", false);
 	shader->setUniform("fogSize", 2.0f);
 	shader->setUniform("playerPos", pos);
 
@@ -176,16 +176,12 @@ void World::render() {
 
 	shader->setUniform("ambientLight", getAmbientLight());
 
-	for (auto& i : instances) {
-		i->offsetsCount = 0;
-		i->highlightedOffset = -1;
-	}
-
 	static std::vector<Chunk*> chunksToRender;
 
 	static glm::ivec2 oldPlayerChunk = playerChunk;
 	static size_t oldChunksLoaded = 0;
 	size_t chunksLoaded = this->chunksLoaded() - this->chunkLoadQueueCount();
+	bool rerender = false;
 
 	if (oldPlayerChunk != playerChunk || oldChunksLoaded != chunksLoaded) {
 		chunksToRender.clear();
@@ -215,41 +211,37 @@ void World::render() {
 
 		oldPlayerChunk = playerChunk;
 		oldChunksLoaded = chunksLoaded;
+		rerender = true;
 	}
 
 	int c = 0;
 
-	for (auto& chunk : chunksToRender) {
-		glm::ivec2 cPos = chunk->pos;
+	if (rerender || m_worldRenderModified) {
+		for (auto& chunk : chunksToRender) {
+			glm::ivec2 cPos = chunk->pos;
 
-		if (glm::length(glm::vec2(cPos - playerChunk)) > 1) {
-			glm::vec3 chunkCenter = glm::vec3(cPos.x * 16 + 8, 20.0f, cPos.y * 16 + 8);
-			glm::vec3 playerPos3D = pos;
+			m_chunksRendered++;
 
-			glm::vec3 toChunk = glm::normalize(chunkCenter - playerPos3D);
-			glm::vec3 viewDir = glm::normalize(player->orientation);
+			renderingQueue.push_back(chunk);
+			rendered[c] = false;
 
-			if (glm::dot(toChunk, viewDir) < cosHalfFOV) {
-				chunk->lastRendered = time(nullptr);
-				continue;
-			}
+			c = (c + 1) % RENDERER_THREAD_COUNT;
+
+			chunk->lastRendered = time(nullptr);
 		}
 
-		m_chunksRendered++;
+		for (auto& i : instances) {
+			i->offsetsCount = 0;
+		}
 
-		renderingQueue.push_back(chunk);
-		rendered[c] = false;
+		rendering.store(true);
+		for (int c = 0; c < RENDERER_THREAD_COUNT; c++) {
+			while (!rendered[c].load());
+		}
+		rendering.store(false);
 
-		c = (c + 1) % RENDERER_THREAD_COUNT;
-
-		chunk->lastRendered = time(nullptr);
+		m_worldRenderModified = false;
 	}
-
-	rendering.store(true);
-	for (int c = 0; c < RENDERER_THREAD_COUNT; c++) {
-		while (!rendered[c].load());
-	}
-	rendering.store(false);
 
 	std::partition(instances.begin(), instances.end(), [](const Instance* i) {
 		return !i->transparent;
@@ -266,13 +258,11 @@ void World::render() {
 
 		glGenBuffers(1, &i->VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
+		glBufferData(GL_ARRAY_BUFFER, MAX_INSTANCE_OFFSETS * sizeof(glm::vec4), nullptr, GL_DYNAMIC_DRAW);
 
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
 		glEnableVertexAttribArray(3);
 		glVertexAttribDivisor(3, 1);
-
-		glBufferStorage(GL_ARRAY_BUFFER, MAX_INSTANCE_OFFSETS * sizeof(glm::vec4), nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
-		i->buff = glMapBufferRange(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec4), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 	}
 
 	TextureAtlas* atlas = Game::getInstance()->getTexAtlas();
@@ -285,13 +275,7 @@ void World::render() {
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBindVertexArray(i->bStructData->VAO);
 
-		shader->setUniform("highlighted", i->highlightedOffset);
-
-		std::copy(std::execution::par_unseq,
-			reinterpret_cast<const char*>(i->offsets),
-			reinterpret_cast<const char*>(i->offsets) + (i->offsetsCount * sizeof(glm::vec4)),
-			reinterpret_cast<char*>(i->buff)
-		);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec4), i->offsets);
 
 		glDrawElementsInstanced(GL_TRIANGLES, i->bStructData->faceCount * 6, GL_UNSIGNED_BYTE, 0, i->offsetsCount);
 

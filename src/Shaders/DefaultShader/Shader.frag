@@ -13,7 +13,7 @@ flat in int fBlockType;
 out vec4 FragColor;
 
 uniform sampler2D tex0;
-uniform int highlighted;
+uniform ivec3 highlighted;
 uniform float ambientLight;
 uniform double time;
 uniform int renderDistance;
@@ -44,7 +44,7 @@ void main() {
     tc2 = range.xy + (tc2 * size);
     FragColor = texture(tex0, tc2);
 
-    if (highlighted == instanceId && !(tc.x < (1 - BORDER_SIZE) && tc.x > BORDER_SIZE &&
+    if (ivec3(blockPosOffset + fPlayerPos) == highlighted && !(tc.x < (1 - BORDER_SIZE) && tc.x > BORDER_SIZE &&
        tc.y < (1 - BORDER_SIZE) && tc.y > BORDER_SIZE)) {
 
         FragColor = vec4(FragColor.rgb, 1.0f);

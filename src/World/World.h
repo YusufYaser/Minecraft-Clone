@@ -104,12 +104,6 @@ private:
 		std::vector<Block*> blocksToRender;
 		glm::ivec2 pos;
 
-		Chunk() {
-			for (auto& block : blocks) {
-				block = nullptr;
-			}
-		}
-
 		~Chunk() {
 			blocksMutex.lock();
 			for (auto& block : blocks) {
@@ -141,13 +135,14 @@ private:
 	int m_instancesRendered = 0;
 	int m_blocksRendered = 0;
 
+	bool m_worldRenderModified = 0;
+
 	struct Instance {
 		BlockStructureData* bStructData;
 		uint8_t hiddenFaces;
 		GLuint VBO;
 		uint16_t offsetsCount;
 		glm::vec4 offsets[MAX_INSTANCE_OFFSETS];
-		uint16_t highlightedOffset;
 		bool transparent;
 		void* buff;
 	};
