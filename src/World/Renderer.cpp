@@ -42,8 +42,6 @@ void World::renderer(int c) {
 
 			uint8_t hiddenFaces = block->hiddenFaces;
 
-			if (hiddenFaces >= 63) continue;
-
 			Instance* i = nullptr;
 			for (auto& inst : instancesCache[hiddenFaces]) {
 				if (inst->offsetsCount >= MAX_INSTANCE_OFFSETS) continue;

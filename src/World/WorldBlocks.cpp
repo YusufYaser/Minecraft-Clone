@@ -146,7 +146,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 			if ((otherBlock->hiddenFaces & (1 << opposite)) != 0) {
 				otherBlock->hiddenFaces ^= 1 << opposite;
 			}
-			if (otherBlock->hiddenFaces != 63) setRenderingGroup(otherBlock);
+			setRenderingGroup(otherBlock);
 		}
 		return nullptr;
 	}
@@ -169,7 +169,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 		}
 		otherBlock->hiddenFaces |= 1 << opposite;
 		hiddenFaces |= 1 << i;
-		if (otherBlock->hiddenFaces != 63) setRenderingGroup(otherBlock);
+		setRenderingGroup(otherBlock);
 	}
 
 	block->hiddenFaces = hiddenFaces;
