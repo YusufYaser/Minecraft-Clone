@@ -19,7 +19,7 @@ void main() {
         break;
 
     case 1: // clouds
-        FragColor = texture(tex0, vec2(texCoord.x + (playerPos.x / 1000.0), texCoord.y + (tick / 2400.0) + (playerPos.z / 1000.0)) * .03f);
+        FragColor = texture(tex0, vec2(texCoord.x + (playerPos.x / 1000.0), texCoord.y + (tick / 2400.0) - (playerPos.z / 1000.0)) * .03f);
         
         float dist = length(texCoord - vec2(.5f));
 

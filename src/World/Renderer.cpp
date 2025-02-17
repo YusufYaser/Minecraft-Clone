@@ -42,15 +42,6 @@ void World::renderer(int c) {
 
 			uint8_t hiddenFaces = block->hiddenFaces;
 
-			/*hiddenFaces |= (diff.x > -half) << (int)BLOCK_FACE::RIGHT;
-			hiddenFaces |= (diff.x < half) << (int)BLOCK_FACE::LEFT;
-
-			hiddenFaces |= (diff.y > -half) << (int)BLOCK_FACE::TOP;
-			hiddenFaces |= (diff.y < half) << (int)BLOCK_FACE::BOTTOM;
-
-			hiddenFaces |= (diff.z > -half) << (int)BLOCK_FACE::FRONT;
-			hiddenFaces |= (diff.z < half) << (int)BLOCK_FACE::BACK;*/
-
 			if (hiddenFaces >= 63) continue;
 
 			Instance* i = nullptr;
@@ -272,9 +263,19 @@ void World::render() {
 	TextureAtlas* atlas = Game::getInstance()->getTexAtlas();
 	glBindTexture(GL_TEXTURE_2D, atlas->tex->id);
 
+	glEnable(GL_CULL_FACE);
+	static bool blend = true;
+
 	m_blocksRendered = 0;
 	for (auto& i : instances) {
 		if (i->offsetsCount == 0 || i->bStructData == nullptr) continue;
+		if (i->transparent && !blend) {
+			glEnable(GL_BLEND);
+			blend = true;
+		} else if (!i->transparent && blend) {
+			glDisable(GL_BLEND);
+			blend = false;
+		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBindVertexArray(i->bStructData->VAO);
@@ -285,6 +286,12 @@ void World::render() {
 
 		m_instancesRendered++;
 		m_blocksRendered += i->offsetsCount;
+	}
+	glDisable(GL_CULL_FACE);
+
+	if (!blend) {
+		glEnable(GL_BLEND);
+		blend = true;
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

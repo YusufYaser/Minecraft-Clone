@@ -169,9 +169,10 @@ U: Reload shaders
 	m_mainMenu = new MainMenu();
 
 	glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glFrontFace(GL_CW);
 	glClearColor(0, 0, 0, 1.0f);
 
 	glGenFramebuffers(1, &worldFBO);
