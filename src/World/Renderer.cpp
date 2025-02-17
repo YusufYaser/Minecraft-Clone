@@ -214,6 +214,7 @@ void World::render() {
 		rerender = true;
 	}
 
+	static int oldChunksRendered = 0;
 	int c = 0;
 
 	if (rerender || m_worldRenderModified) {
@@ -240,7 +241,10 @@ void World::render() {
 		}
 		rendering.store(false);
 
+		oldChunksRendered = m_chunksRendered;
 		m_worldRenderModified = false;
+	} else {
+		m_chunksRendered = oldChunksRendered;
 	}
 
 	std::partition(instances.begin(), instances.end(), [](const Instance* i) {

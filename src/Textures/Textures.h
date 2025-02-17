@@ -12,6 +12,7 @@ struct Texture {
 	GLuint id;
 	int height;
 	int width;
+	glm::vec4 lod[6];
 };
 
 struct TextureAtlas {

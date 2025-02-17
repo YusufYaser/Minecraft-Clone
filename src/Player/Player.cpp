@@ -83,7 +83,7 @@ void Player::update(float delta) {
 
 		if ((headBlock != nullptr && headBlock->hasCollision()) || (aboveBlock != nullptr && aboveBlock->hasCollision())) {
 			verticalVelocity = 0;
-			if (feetBlock == nullptr || !feetBlock->hasCollision()) verticalVelocity -= 9.8f * delta;
+			if ((feetBlock == nullptr || !feetBlock->hasCollision()) && !flying) verticalVelocity -= 9.8f * delta;
 		}
 	}
 
