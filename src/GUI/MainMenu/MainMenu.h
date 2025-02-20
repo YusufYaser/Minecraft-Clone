@@ -19,7 +19,7 @@ private:
 	Button* settings;
 	Button* quit;
 	Text* credits;
-#ifdef _DEBUG
+#ifdef GAME_DEBUG
 	Text* debug;
 #endif
 

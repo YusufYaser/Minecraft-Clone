@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
 	}
 #endif
 
-#ifdef _DEBUG
+#ifdef GAME_DEBUG
 	warn("Warning: You are running a debug build of the game");
 	warn("         Some stuff such as chunk loading will be slow.");
 #endif
@@ -158,7 +158,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-#ifndef _DEBUG
+#ifndef GAME_DEBUG
 	try {
 #endif
 		while (!game->shouldQuit() && !ctrlC && !oom) {
@@ -174,7 +174,7 @@ int main(int argc, char* argv[]) {
 
 		delete game;
 		game = nullptr;
-#ifndef _DEBUG
+#ifndef GAME_DEBUG
 	} catch (std::exception e) {
 		error("The game has crashed!", e.what());
 #ifdef _WIN32

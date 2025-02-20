@@ -9,7 +9,7 @@
 
 Game* Game::_instance = nullptr;
 
-void logGlfwError(int error_code, const char* desc) {
+inline void logGlfwError(int error_code, const char* desc) {
 	error("GLFW Error:", desc);
 
 #ifdef _WIN32
@@ -21,6 +21,12 @@ void logGlfwError(int error_code, const char* desc) {
 	}
 #endif
 }
+
+#ifdef GAME_DEBUG
+inline void logOpengl(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+	print("[OpenGL]", message);
+}
+#endif
 
 Game::Game() {
 	if (_instance != nullptr) {
@@ -61,7 +67,7 @@ Game::Game() {
 	print("Initialized GLFW");
 
 
-#ifndef _DEBUG
+#ifndef GAME_DEBUG
 	m_gameWindow = new GameWindow({ 854, 480 }, "Minecraft Clone");
 #else
 	m_gameWindow = new GameWindow({ 854, 480 }, "Minecraft Clone | Debug Build");
@@ -71,6 +77,12 @@ Game::Game() {
 		error("Failed to create game window");
 		return;
 	}
+#ifdef GAME_DEBUG
+	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	glDebugMessageCallback(logOpengl, nullptr);
+	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+#endif
 
 	const GPUInfo* gpu = getGpuInfo();
 	print("Using GPU:", gpu->renderer);
@@ -347,7 +359,7 @@ void Game::update() {
 		}
 		error("glGetError():", error);
 	}
-#ifdef _DEBUG
+#ifdef GAME_DEBUG
 	if (err) __debugbreak();
 #endif
 
@@ -641,11 +653,11 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos, glm::vec3 pla
 			}
 		}
 
-#ifndef _DEBUG
+
 		print("Waiting for spawn chunks");
 		while (m_world->chunkLoadQueueCount() != 0) {}
 		print("Loaded spawn chunks");
-#endif
+
 		print("Created world");
 		if (shouldQuit()) return;
 
@@ -730,7 +742,7 @@ const char* Game::getBuild() {
 	else oss << date[4];
 	oss << date[5];
 
-#ifdef _DEBUG
+#ifdef GAME_DEBUG
 	oss << "D";
 	const char* time = __TIME__;
 	// hour

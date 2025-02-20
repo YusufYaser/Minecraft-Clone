@@ -5,6 +5,7 @@
 #ifdef _WIN32
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
+#undef APIENTRY
 #include <Windows.h>
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")

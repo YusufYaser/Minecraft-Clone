@@ -20,7 +20,7 @@
 #include "../SoundEngine/SoundEngine.h"
 
 struct GameSettings {
-#ifndef _DEBUG
+#ifndef GAME_DEBUG
 	int renderDistance = 12;
 #else
 	int renderDistance = 6;
@@ -105,8 +105,8 @@ private:
 
 	int m_frameNum = 0;
 
-#ifdef _DEBUG
-	int m_debugLevel = 1;
+#ifdef GAME_DEBUG
+	int m_debugLevel = 2;
 #else
 	int m_debugLevel = 0;
 #endif

@@ -25,7 +25,7 @@ MainMenu::MainMenu() {
 	credits->setPosition({ 0, 0, 1.0f, -15 });
 	credits->setColor({ .75f, .75f, .75f, 1.0f });
 
-#ifdef _DEBUG
+#ifdef GAME_DEBUG
 	debug = new Text();
 	debug->setText("Debug Build");
 	debug->setPosition({ 1.0f, -95, 1.0f, -15 });
@@ -49,7 +49,7 @@ MainMenu::~MainMenu() {
 	delete credits;
 	credits = nullptr;
 
-#ifdef _DEBUG
+#ifdef GAME_DEBUG
 	delete debug;
 	debug = nullptr;
 #endif
@@ -84,7 +84,7 @@ void MainMenu::render() {
 	quit->render();
 	title->render();
 	credits->render();
-#ifdef _DEBUG
+#ifdef GAME_DEBUG
 	if (static_cast<int>(glfwGetTime()) & 1) debug->render();
 #endif
 
