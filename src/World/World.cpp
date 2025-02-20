@@ -108,12 +108,13 @@ void World::dontRender() {
 	glm::vec3 pos = Game::getInstance()->getPlayer()->getCameraPos();
 	glm::ivec2 playerChunk = getPosChunk(pos);
 	int renderDistance = Game::getInstance()->getRenderDistance();
+	Player* player = Game::getInstance()->getPlayer();
 
-	for (int x = -renderDistance + playerChunk.x; x < renderDistance + playerChunk.x; x++) {
-		for (int y = -renderDistance + playerChunk.y; y < renderDistance + playerChunk.y; y++) {
+	for (int x = -renderDistance + playerChunk.x - EXTRA_RENDER_DISTANCE; x < renderDistance + playerChunk.x + EXTRA_RENDER_DISTANCE; x++) {
+		for (int y = -renderDistance + playerChunk.y - EXTRA_RENDER_DISTANCE; y < renderDistance + playerChunk.y + EXTRA_RENDER_DISTANCE; y++) {
 			glm::ivec2 cPos = glm::ivec2(x, y);
 
-			if (glm::length(glm::vec2(cPos - playerChunk)) > renderDistance) continue;
+			if (glm::length(glm::vec2(cPos - getPosChunk(player->pos))) <= Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE) continue;
 
 			std::size_t chunkCh = hashPos(cPos);
 			if (!chunksMutex.try_lock()) continue;
@@ -123,11 +124,7 @@ void World::dontRender() {
 				loadChunk(cPos);
 				continue;
 			}
-			Chunk* chunk = it->second;
 			chunksMutex.unlock();
-			if (chunk == nullptr) continue;
-			if (!chunk->loaded) continue;
-			chunk->lastRendered = time(nullptr);
 		}
 	}
 }

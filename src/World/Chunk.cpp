@@ -22,7 +22,9 @@ void World::chunkLoaderFunc() {
 		glm::ivec2 pos = chunk->pos;
 		std::size_t chunkCh = hashPos(pos);
 
-		if (time(0) - chunk->lastRendered > 10) {
+		if (time(0) - chunk->lastRendered > 10 &&
+			(player == nullptr || glm::length(glm::vec2(chunk->pos - getPosChunk(player->pos))) > Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE)
+			) {
 			delete chunk;
 			chunkLoadQueueMutex.lock();
 			chunks.erase(chunkCh);
@@ -163,15 +165,11 @@ void World::chunkUnloaderFunc() {
 			}
 			Player* player = Game::getInstance()->getPlayer();
 
-			if (player != nullptr) {
-				if (glm::length(glm::vec2(chunk->pos - getPosChunk(player->pos))) <= Game::getInstance()->getRenderDistance()) {
-					chunk->lastRendered = time(0);
-					continue;
-				}
-			}
+			if (!unloading.load() && player != nullptr && glm::length(glm::vec2(chunk->pos - getPosChunk(player->pos))) <= Game::getInstance()->getRenderDistance() + 2) continue;
 
 			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 20)
 				|| unloading.load()) {
+
 				if (chunk->modified && chunk->loaded) {
 					try {
 						ChunkSaveData* saveData = new ChunkSaveData();

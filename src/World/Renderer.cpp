@@ -172,14 +172,14 @@ void World::render() {
 	size_t chunksLoaded = this->chunksLoaded() - this->chunkLoadQueueCount();
 	bool rerender = false;
 
-	if (oldPlayerChunk != playerChunk || oldChunksLoaded != chunksLoaded) {
+	static int oldChunksRendered = 0;
+
+	if (oldPlayerChunk != playerChunk || oldChunksLoaded < chunksLoaded) {
 		chunksToRender.clear();
 
-		for (int x = -renderDistance + playerChunk.x; x < renderDistance + playerChunk.x; x++) {
-			for (int y = -renderDistance + playerChunk.y; y < renderDistance + playerChunk.y; y++) {
+		for (int x = -renderDistance + playerChunk.x - EXTRA_RENDER_DISTANCE; x < renderDistance + playerChunk.x + EXTRA_RENDER_DISTANCE; x++) {
+			for (int y = -renderDistance + playerChunk.y - EXTRA_RENDER_DISTANCE; y < renderDistance + playerChunk.y + EXTRA_RENDER_DISTANCE; y++) {
 				glm::ivec2 cPos = glm::ivec2(x, y);
-
-				if (glm::length(glm::vec2(cPos - playerChunk)) > renderDistance) continue;
 
 				std::size_t chunkCh = hashPos(cPos);
 				chunksMutex.lock();
@@ -187,6 +187,11 @@ void World::render() {
 				if (it == chunks.end()) {
 					chunksMutex.unlock();
 					loadChunk(cPos);
+					continue;
+				}
+
+				if (glm::length(glm::vec2(cPos - playerChunk)) > renderDistance) {
+					chunksMutex.unlock();
 					continue;
 				}
 				Chunk* chunk = it->second;
@@ -198,12 +203,15 @@ void World::render() {
 			}
 		}
 
+		rerender = oldChunksRendered != chunksToRender.size() || oldPlayerChunk != playerChunk;
+
 		oldPlayerChunk = playerChunk;
 		oldChunksLoaded = chunksLoaded;
-		rerender = true;
-	}
 
-	static int oldChunksRendered = 0;
+		if (!rerender) {
+			chunksToRender.clear();
+		}
+	}
 	int c = 0;
 
 	if (rerender || m_worldRenderModified) {
