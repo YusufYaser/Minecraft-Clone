@@ -174,7 +174,7 @@ void World::render() {
 
 	static int oldChunksRendered = 0;
 
-	if (oldPlayerChunk != playerChunk || oldChunksLoaded < chunksLoaded) {
+	if (oldPlayerChunk != playerChunk || oldChunksLoaded < chunksLoaded || m_worldRenderModified) {
 		chunksToRender.clear();
 
 		for (int x = -renderDistance + playerChunk.x - EXTRA_RENDER_DISTANCE; x < renderDistance + playerChunk.x + EXTRA_RENDER_DISTANCE; x++) {
@@ -203,7 +203,7 @@ void World::render() {
 			}
 		}
 
-		rerender = oldChunksRendered != chunksToRender.size() || oldPlayerChunk != playerChunk;
+		rerender = oldChunksRendered != chunksToRender.size() || oldPlayerChunk != playerChunk || m_worldRenderModified;
 
 		oldPlayerChunk = playerChunk;
 		oldChunksLoaded = chunksLoaded;
