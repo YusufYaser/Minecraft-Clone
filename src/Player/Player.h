@@ -42,6 +42,9 @@ public:
 
 private:
 	bool wasHidden = false;
+	bool freecam = false;
+	glm::vec3 freecamPos = glm::vec3();
+	glm::vec3 freecamOrientation = glm::vec3(1.0f, 0, 0);
 
 	bool flying = false;
 	float verticalVelocity = 0.0f;

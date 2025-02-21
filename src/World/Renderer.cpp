@@ -161,7 +161,7 @@ void World::render() {
 
 	float cosHalfFOV = std::cos(glm::radians(190.0f / 2.0f));
 
-	glm::ivec2 playerChunk = getPosChunk(pos);
+	glm::ivec2 playerChunk = getPosChunk(player->pos);
 
 	shader->setUniform("ambientLight", getAmbientLight());
 

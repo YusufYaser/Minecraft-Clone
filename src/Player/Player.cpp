@@ -133,8 +133,15 @@ void Player::checkInputs(float delta) {
 	GLFWwindow* window = game->getGlfwWindow();
 
 	glm::vec3 orientation2 = glm::vec3(orientation.x, 0.0f, orientation.z);
+	if (freecam) {
+		orientation2 = freecamOrientation;
+	}
 
 	glm::vec3 change = glm::vec3();
+
+	if (keyHandler->keyClicked(GLFW_KEY_F4)) {
+		freecam = !freecam;
+	}
 
 	if (keyHandler->keyHeld(GLFW_KEY_W)) {
 		change += glm::normalize(orientation2);
@@ -161,7 +168,7 @@ void Player::checkInputs(float delta) {
 		}
 	} else {
 		if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
-			if (verticalVelocity == 0.0f) verticalVelocity = 6.0f;
+			if (verticalVelocity == 0.0f && !freecam) verticalVelocity = 6.0f;
 		}
 	}
 
@@ -169,36 +176,44 @@ void Player::checkInputs(float delta) {
 		change = glm::normalize(change) * delta * speed;
 		if (flying) change *= 2.0f;
 		else if (verticalVelocity > 0) change *= 1.1f;
-
-		glm::vec3 aChange = glm::abs(change);
-		Block* block;
-		for (int i = 0; i <= 1; i++) {
-			block = world->getBlock({
-				round(pos.x + change.x + (change.x > 0 ? .15f : -.15f)),
-				round(pos.y + i),
-				round(pos.z)
-				});
-			if (block != nullptr && block->hasCollision()) change.x = 0;
-			block = world->getBlock({
-				round(pos.x),
-				round(pos.y + i),
-				round(pos.z + change.z + (change.z > 0 ? .15f : -.15f))
-				});
-			if (block != nullptr && block->hasCollision()) change.z = 0;
-			block = world->getBlock({
-				round(pos.x + change.x + (change.x > 0 ? .15f : -.15f)),
-				round(pos.y + i),
-				round(pos.z + change.z + (change.z > 0 ? .15f : -.15f))
-				});
-			if (block != nullptr && block->hasCollision()) {
-				if (aChange.z > aChange.x) {
-					change.x = 0;
-				} else {
-					change.z = 0;
+		if (!freecam) {
+			glm::vec3 aChange = glm::abs(change);
+			Block* block;
+			for (int i = 0; i <= 1; i++) {
+				block = world->getBlock({
+					round(pos.x + change.x + (change.x > 0 ? .15f : -.15f)),
+					round(pos.y + i),
+					round(pos.z)
+					});
+				if (block != nullptr && block->hasCollision()) change.x = 0;
+				block = world->getBlock({
+					round(pos.x),
+					round(pos.y + i),
+					round(pos.z + change.z + (change.z > 0 ? .15f : -.15f))
+					});
+				if (block != nullptr && block->hasCollision()) change.z = 0;
+				block = world->getBlock({
+					round(pos.x + change.x + (change.x > 0 ? .15f : -.15f)),
+					round(pos.y + i),
+					round(pos.z + change.z + (change.z > 0 ? .15f : -.15f))
+					});
+				if (block != nullptr && block->hasCollision()) {
+					if (aChange.z > aChange.x) {
+						change.x = 0;
+					} else {
+						change.z = 0;
+					}
 				}
 			}
+		} else {
+			change = glm::normalize(change) * delta * 15.0f;
 		}
-		pos += change;
+		if (!freecam) {
+			pos += change;
+			freecamPos = glm::vec3();
+		} else {
+			freecamPos += change;
+		}
 	}
 
 	if (keyHandler->keyHeld(GLFW_KEY_LEFT_CONTROL) && change != glm::vec3(0, 0, 0)) {
@@ -232,7 +247,7 @@ void Player::checkInputs(float delta) {
 		}
 	}
 
-	if (targetBlock != nullptr) {
+	if (targetBlock != nullptr && !freecam) {
 		static double lastModified = 0;
 		double currentTime = glfwGetTime();
 
@@ -278,6 +293,9 @@ void Player::checkInputs(float delta) {
 	float rotY = 120.0f * (float)(posX - size.x / 2) / size.x;
 
 	float pitch = glm::degrees(glm::asin(glm::dot(orientation, up)));
+	if (freecam) {
+		pitch = glm::degrees(glm::asin(glm::dot(freecamOrientation, up)));
+	}
 
 	float maxPitch = 89.9f;
 	if ((pitch - rotX) > maxPitch) {
@@ -288,10 +306,18 @@ void Player::checkInputs(float delta) {
 
 	glm::vec3 right = glm::normalize(glm::cross(orientation, up));
 	glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(-rotX), right);
+	if (freecam) {
+		right = glm::normalize(glm::cross(freecamOrientation, up));
+		newOrientation = glm::rotate(freecamOrientation, glm::radians(-rotX), right);
+	}
 
 	newOrientation = glm::rotate(newOrientation, glm::radians(-rotY), up);
 
-	orientation = glm::normalize(newOrientation);
+	if (!freecam) {
+		orientation = glm::normalize(newOrientation);
+	} else {
+		freecamOrientation = glm::normalize(newOrientation);
+	}
 
 	glfwSetCursorPos(window, size.x / 2, size.y / 2);
 }
@@ -367,5 +393,9 @@ glm::mat4 Player::getProjection() const {
 }
 
 glm::mat4 Player::getView() const {
-	return glm::lookAt(glm::vec3(), orientation, up);
+	if (!freecam) {
+		return glm::lookAt(glm::vec3(), orientation, up);
+	} else {
+		return glm::lookAt(freecamPos, freecamPos + freecamOrientation, up);
+	}
 }

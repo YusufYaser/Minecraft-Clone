@@ -79,7 +79,7 @@ void SettingsMenu::render() {
 
 	fps->setText("Max FPS: " + std::to_string(game->getMaxFps()));
 	if (game->getMaxFps() == 0) {
-		fps->setText("Max FPS: unlimited");
+		fps->setText("Max FPS: unlimited (not recommended)");
 	}
 	fps->render();
 
