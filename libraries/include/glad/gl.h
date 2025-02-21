@@ -20,6 +20,7 @@
 */
 
 
+#ifndef __gl_h_
 #ifndef __glad_h_
 #define __glad_h_
 
@@ -3689,6 +3690,8 @@ GLAPI PFNGLPOLYGONOFFSETCLAMPPROC glad_glPolygonOffsetClamp;
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif
