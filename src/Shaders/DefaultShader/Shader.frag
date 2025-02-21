@@ -63,21 +63,22 @@ void main() {
             FragColor = vec4(FragColor.rgb, 1.0f);
             FragColor *= vec4(.25f, .25f, .25f, 1.0f);
         }
+
+        float lightPercentage;
+
+        if (face == 5) { // top face
+            lightPercentage = 1.0f;
+        } else if (face == 4) { // bottom face
+            lightPercentage = .5f;
+        } else { // sides
+            lightPercentage = .75f;
+        }
+
+        FragColor *= vec4(vec3(ambientLight * lightPercentage), 1.0f);
     } else {
         FragColor = lods[fBlockType][int(face)];
+        FragColor *= vec4(vec3(ambientLight), 1.0f);
     }
-
-    float lightPercentage;
-
-    if (face == 5) { // top face
-        lightPercentage = 1.0f;
-    } else if (face == 4) { // bottom face
-        lightPercentage = .5f;
-    } else { // sides
-        lightPercentage = .75f;
-    }
-
-    FragColor *= vec4(vec3(ambientLight * lightPercentage), 1.0f);
 
     FragColor = mix(FragColor, SkyColor, val);
 }

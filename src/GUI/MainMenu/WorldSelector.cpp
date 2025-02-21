@@ -2,6 +2,8 @@
 #include "../../Game/Game.h"
 #include <filesystem>
 
+std::string getAutoGotoWorld();
+
 WorldSelector::WorldSelector() {
 	title = new Text();
 	title->setText("Select World");
@@ -97,6 +99,8 @@ WorldSelector::~WorldSelector() {
 }
 
 void WorldSelector::render() {
+	static bool autoWentToWorld = false;
+
 	Game* game = Game::getInstance();
 	if (game->loadingWorld()) {
 		if (game->getWorld() != nullptr) {
@@ -150,7 +154,15 @@ void WorldSelector::render() {
 		e->playButton->render();
 		if (game->loadingWorld()) e->playButton->setEnabled(false);
 
-		if (e->playButton->isClicked()) {
+		bool autoGo = false;
+		if (!autoWentToWorld && getAutoGotoWorld() != "") {
+			if (e->name == getAutoGotoWorld()) {
+				autoWentToWorld = true;
+				autoGo = true;
+			}
+		}
+
+		if (e->playButton->isClicked() || autoGo) {
 			try {
 				print("Loading world", e->name);
 				WorldSaveData* data = new WorldSaveData();
@@ -219,7 +231,9 @@ void WorldSelector::render() {
 
 	if (overflowed) overflow->render();
 
-	if (newWorld->isClicked()) {
+	if (newWorld->isClicked() || (!autoWentToWorld && getAutoGotoWorld() == "NEW_WORLD")) {
+		autoWentToWorld = true;
+
 		WorldSettings settings;
 		settings.generator = Generator::Default;
 
@@ -236,6 +250,11 @@ void WorldSelector::render() {
 
 		game->setLoadedWorldName(&name[0]);
 		game->loadWorld(settings);
+	}
+
+	if (!autoWentToWorld && getAutoGotoWorld() != "" && !game->loadingWorld()) {
+		error("World not found:", getAutoGotoWorld());
+		autoWentToWorld = true;
 	}
 
 	if ((back->isClicked() || game->getKeyHandler()->keyHeld(GLFW_KEY_ESCAPE)) && !game->loadingWorld()) {

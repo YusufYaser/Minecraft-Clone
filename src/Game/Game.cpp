@@ -8,6 +8,8 @@
 #endif
 
 Game* Game::_instance = nullptr;
+void oomHandler();
+bool enableSound();
 
 inline void logGlfwError(int error_code, const char* desc) {
 	error("GLFW Error:", desc);
@@ -135,7 +137,7 @@ Game::Game() {
 		print("Loading sounds");
 		m_soundEngine->loadSounds();
 		print("Loaded sounds");
-	} else {
+	} else if (enableSound()) {
 		error("Failed to initialize sound engine");
 
 #ifdef _WIN32
@@ -358,6 +360,11 @@ void Game::update() {
 		case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
 		}
 		error("glGetError():", error);
+
+		if (errorCode == GL_OUT_OF_MEMORY) {
+			oomHandler();
+			return;
+		}
 	}
 #ifdef GAME_DEBUG
 	if (err) __debugbreak();

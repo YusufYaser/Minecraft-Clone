@@ -29,9 +29,19 @@ inline void signalHandler(int signal) {
 }
 
 inline size_t maxMemory;
+inline bool noSound;
+inline std::string autoGotoWorld;
 
 size_t getMaxMemory() {
 	return maxMemory;
+}
+
+bool enableSound() {
+	return !noSound;
+}
+
+std::string getAutoGotoWorld() {
+	return autoGotoWorld;
 }
 
 inline void* emergencyMemory;
@@ -78,15 +88,38 @@ int main(int argc, char* argv[]) {
 	mainThread = std::this_thread::get_id();
 	std::set_new_handler(oomHandler);
 
-#ifdef _WIN32
-	MEMORYSTATUSEX memInfo;
-	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-	if (!GlobalMemoryStatusEx(&memInfo)) {
-		error("Failed to set memory limit");
-		return 1;
+	for (int i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "--max-memory") == 0) {
+			if (i + 1 >= argc) {
+				error("No value provided with --max-memory");
+				return 1;
+			}
+
+			size_t number = std::stoi(argv[++i]);
+			maxMemory = number * 1024 * 1024;
+		} else if (strcmp(argv[i], "--no-sound") == 0) {
+			noSound = true;
+		} else if (strcmp(argv[i], "--world") == 0) {
+			if (i + 1 >= argc) {
+				error("No value provided with --world");
+				return 1;
+			}
+
+			autoGotoWorld = std::string(argv[++i]);
+		}
 	}
 
-	maxMemory = memInfo.ullTotalPhys / 2;
+#ifdef _WIN32
+	if (maxMemory == 0) {
+		MEMORYSTATUSEX memInfo;
+		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+		if (!GlobalMemoryStatusEx(&memInfo)) {
+			error("Failed to set memory limit");
+			return 1;
+		}
+
+		maxMemory = memInfo.ullTotalPhys / 2;
+	}
 
 	HANDLE job = CreateJobObject(NULL, NULL);
 	if (job == NULL) {
@@ -109,21 +142,25 @@ int main(int argc, char* argv[]) {
 
 #if defined(__linux__) || defined(__APPLE__)
 #if defined(__linux__)
-	struct sysinfo sysInfo;
-	if (sysinfo(&sysInfo) != 0) {
-		error("Failed to set memory limit");
-		return 1;
-	}
+	if (maxMemory == 0) {
+		struct sysinfo sysInfo;
+		if (sysinfo(&sysInfo) != 0) {
+			error("Failed to set memory limit");
+			return 1;
+		}
 
-	maxMemory = sysInfo.totalram / 2;
+		maxMemory = sysInfo.totalram / 2;
+	}
 #elif defined(__APPLE__)
-	size_t size = sizeof(maxMemory);
-	if (sysctlbyname("hw.memsize", &maxMemory, &size, nullptr, 0) != 0) {
-		error("Failed to set memory limit");
-		return 1;
-	}
+	if (maxMemory == 0) {
+		size_t size = sizeof(maxMemory);
+		if (sysctlbyname("hw.memsize", &maxMemory, &size, nullptr, 0) != 0) {
+			error("Failed to set memory limit");
+			return 1;
+		}
 
-	maxMemory = maxMemory / 2;
+		maxMemory = maxMemory / 2;
+	}
 #endif
 
 	rlimit limit;

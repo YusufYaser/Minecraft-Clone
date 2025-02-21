@@ -1,6 +1,8 @@
 #include "MainMenu.h"
 #include "../../Game/Game.h"
 
+std::string getAutoGotoWorld();
+
 MainMenu::MainMenu() {
 	title = new Text();
 	title->setText("Minecraft Clone");
@@ -56,6 +58,12 @@ MainMenu::~MainMenu() {
 }
 
 void MainMenu::render() {
+	static bool autoWentToWorld = false;
+	if (!autoWentToWorld && getAutoGotoWorld() != "") {
+		autoWentToWorld = true;
+		worldSelector = new WorldSelector();
+	}
+
 	Game* game = Game::getInstance();
 	static int lastFrame = 0;
 	if (worldSelector != nullptr && (lastFrame + 1 != game->getFrameNum() || worldSelector->isClosing())) {

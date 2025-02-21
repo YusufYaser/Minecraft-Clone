@@ -153,7 +153,7 @@ void World::chunkUnloaderFunc() {
 
 	while (true) {
 		if (unloading.load() && chunks.size() == 0) break;
-		if (!unloading.load()) std::this_thread::sleep_for(std::chrono::milliseconds(2));
+		if (!unloading.load()) std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		if (Game::getInstance()->loadingWorld() && !unloading.load()) continue;
 		time_t current = time(nullptr);
 		chunksMutex.lock();

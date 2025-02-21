@@ -1,7 +1,14 @@
 #include "SoundEngine.h"
 #include "../Logging.h"
 
+bool enableSound();
+
 SoundEngine::SoundEngine() {
+	if (!enableSound()) {
+		warn("Sound Engine disabled using --no-sound");
+		return;
+	}
+
 	ma_engine_config config = ma_engine_config_init();
 
 	engine = new ma_engine();
