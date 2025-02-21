@@ -181,17 +181,17 @@ void World::render() {
 			for (int y = -renderDistance + playerChunk.y - EXTRA_RENDER_DISTANCE; y < renderDistance + playerChunk.y + EXTRA_RENDER_DISTANCE; y++) {
 				glm::ivec2 cPos = glm::ivec2(x, y);
 
+				if (glm::length(glm::vec2(cPos - playerChunk)) > renderDistance) {
+					chunksMutex.unlock();
+					continue;
+				}
+
 				std::size_t chunkCh = hashPos(cPos);
 				chunksMutex.lock();
 				std::unordered_map<std::size_t, Chunk*>::iterator it = chunks.find(chunkCh);
 				if (it == chunks.end()) {
 					chunksMutex.unlock();
 					loadChunk(cPos);
-					continue;
-				}
-
-				if (glm::length(glm::vec2(cPos - playerChunk)) > renderDistance) {
-					chunksMutex.unlock();
 					continue;
 				}
 				Chunk* chunk = it->second;

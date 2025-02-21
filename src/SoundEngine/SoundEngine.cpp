@@ -20,6 +20,7 @@ SoundEngine::SoundEngine() {
 }
 
 SoundEngine::~SoundEngine() {
+	if (!m_loaded) return;
 	unloading.store(true);
 
 	ma_engine_uninit(engine);
@@ -43,11 +44,13 @@ SoundEngine::~SoundEngine() {
 }
 
 const char* SoundEngine::getSoundDeviceName() {
+	if (!m_loaded) return "not loaded";
 	ma_device* dev = ma_engine_get_device(engine);
 	return dev->playback.name;
 }
 
 void SoundEngine::loadSounds() {
+	if (!m_loaded) return;
 	// button
 	Sound button{};
 	button.type = SOUND_TYPE::BUTTON;
@@ -57,6 +60,7 @@ void SoundEngine::loadSounds() {
 }
 
 void SoundEngine::registerSound(Sound& sound) {
+	if (!m_loaded) return;
 	ESound* esound = new ESound();
 	esound->soundData = sound;
 
@@ -89,12 +93,14 @@ void SoundEngine::registerSound(Sound& sound) {
 }
 
 void SoundEngine::playSound(SOUND_TYPE soundType) {
+	if (!m_loaded) return;
 	queueMux.lock();
 	queue.push_back(soundType);
 	queueMux.unlock();
 }
 
 void SoundEngine::soundTick() {
+	if (!m_loaded) return;
 	while (!unloading.load()) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		if (queue.size() == 0) continue;

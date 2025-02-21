@@ -596,6 +596,8 @@ void Game::update() {
 	if (!m_gameWindow->isFocused()) {
 		m_gamePaused = true;
 		if (targetFps > 5 || targetFps == 0) targetFps = 5;
+	} else if (m_gamePaused) {
+		if (targetFps > 60 || targetFps == 0) targetFps = 60;
 	}
 
 	m_realDelta = static_cast<float>(glfwGetTime() - startTime);

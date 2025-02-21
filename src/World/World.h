@@ -135,7 +135,7 @@ private:
 	int m_instancesRendered = 0;
 	int m_blocksRendered = 0;
 
-	bool m_worldRenderModified = 0;
+	bool m_worldRenderModified = true;
 
 	struct Instance {
 		BlockStructureData* bStructData;

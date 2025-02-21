@@ -114,7 +114,7 @@ void World::dontRender() {
 		for (int y = -renderDistance + playerChunk.y - EXTRA_RENDER_DISTANCE; y < renderDistance + playerChunk.y + EXTRA_RENDER_DISTANCE; y++) {
 			glm::ivec2 cPos = glm::ivec2(x, y);
 
-			if (glm::length(glm::vec2(cPos - getPosChunk(player->pos))) <= Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE) continue;
+			if (glm::length(glm::vec2(cPos - getPosChunk(player->pos))) > Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE) continue;
 
 			std::size_t chunkCh = hashPos(cPos);
 			if (!chunksMutex.try_lock()) continue;

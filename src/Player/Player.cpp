@@ -274,8 +274,8 @@ void Player::checkInputs(float delta) {
 	}
 
 	glm::ivec2 size = Game::getInstance()->getGameWindow()->getSize();
-	float rotX = 100.0f * (float)(posY - size.y / 2) / size.y;
-	float rotY = 100.0f * (float)(posX - size.x / 2) / size.x;
+	float rotX = 120.0f * (float)(posY - size.y / 2) / size.y;
+	float rotY = 120.0f * (float)(posX - size.x / 2) / size.x;
 
 	float pitch = glm::degrees(glm::asin(glm::dot(orientation, up)));
 

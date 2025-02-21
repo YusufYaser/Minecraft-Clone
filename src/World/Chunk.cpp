@@ -165,7 +165,8 @@ void World::chunkUnloaderFunc() {
 			}
 			Player* player = Game::getInstance()->getPlayer();
 
-			if (!unloading.load() && player != nullptr && glm::length(glm::vec2(chunk->pos - getPosChunk(player->pos))) <= Game::getInstance()->getRenderDistance() + 2) continue;
+			if (!unloading.load() && player != nullptr &&
+				glm::length(glm::vec2(chunk->pos - getPosChunk(player->pos))) <= Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE) continue;
 
 			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 20)
 				|| unloading.load()) {
