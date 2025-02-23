@@ -139,9 +139,15 @@ void Player::checkInputs(float delta) {
 
 	glm::vec3 change = glm::vec3();
 
+#ifdef GAME_DEBUG
 	if (keyHandler->keyClicked(GLFW_KEY_F4)) {
 		freecam = !freecam;
+		freecamStartPos = pos;
+		freecamPos = pos;
+
+		debug(freecam ? "Enabled" : "Disabled", "debug freecam");
 	}
+#endif
 
 	if (keyHandler->keyHeld(GLFW_KEY_W)) {
 		change += glm::normalize(orientation2);
@@ -158,17 +164,26 @@ void Player::checkInputs(float delta) {
 	if (keyHandler->keyClicked(GLFW_KEY_F)) {
 		flying = !flying;
 	}
-	if (flying) {
-		verticalVelocity = 0;
-		if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
-			verticalVelocity += speed * 2.0f;
-		}
-		if (keyHandler->keyHeld(GLFW_KEY_LEFT_SHIFT)) {
-			verticalVelocity += -speed * 2.0f;
+	if (!freecam) {
+		if (flying) {
+			verticalVelocity = 0;
+			if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
+				verticalVelocity += speed * 2.0f;
+			}
+			if (keyHandler->keyHeld(GLFW_KEY_LEFT_SHIFT)) {
+				verticalVelocity += -speed * 2.0f;
+			}
+		} else {
+			if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
+				if (verticalVelocity == 0.0f && !freecam) verticalVelocity = 6.0f;
+			}
 		}
 	} else {
-		if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
-			if (verticalVelocity == 0.0f && !freecam) verticalVelocity = 6.0f;
+		if (keyHandler->keyHeld(GLFW_KEY_E)) {
+			change += glm::normalize(glm::cross(glm::cross(orientation2, up), orientation2));
+		}
+		if (keyHandler->keyHeld(GLFW_KEY_Q)) {
+			change += -glm::normalize(glm::cross(glm::cross(orientation2, up), orientation2));
 		}
 	}
 
@@ -206,7 +221,7 @@ void Player::checkInputs(float delta) {
 				}
 			}
 		} else {
-			change = glm::normalize(change) * delta * 15.0f;
+			change = glm::normalize(change) * delta * 30.0f;
 		}
 		if (!freecam) {
 			pos += change;
@@ -214,6 +229,13 @@ void Player::checkInputs(float delta) {
 		} else {
 			freecamPos += change;
 		}
+	}
+
+	if (freecam && keyHandler->keyClicked(GLFW_KEY_C)) {
+		pos = freecamPos;
+		orientation = freecamOrientation;
+
+		debug("Teleported player to freecam");
 	}
 
 	if (keyHandler->keyHeld(GLFW_KEY_LEFT_CONTROL) && change != glm::vec3(0, 0, 0)) {
@@ -396,6 +418,6 @@ glm::mat4 Player::getView() const {
 	if (!freecam) {
 		return glm::lookAt(glm::vec3(), orientation, up);
 	} else {
-		return glm::lookAt(freecamPos, freecamPos + freecamOrientation, up);
+		return glm::lookAt(freecamPos - (pos), freecamPos - (pos)+freecamOrientation, up);
 	}
 }

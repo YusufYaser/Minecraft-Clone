@@ -63,6 +63,9 @@ void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
 
 				Block* block = new Block(type, pos);
 				block->hiddenFaces = 63;
+#ifdef GAME_DEBUG
+				block->dPlacementMethod = FILL_BLOCKS;
+#endif
 				chunk->blocks[hashPosForChunk(pos)] = block;
 			}
 		}
@@ -166,20 +169,23 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 			} else if ((otherBlock->hiddenFaces & (1 << opposite)) == 0) {
 				otherBlock->hiddenFaces ^= 1 << opposite;
 			}
-			continue;
+		} else {
+			otherBlock->hiddenFaces |= 1 << opposite;
+			hiddenFaces |= 1 << i;
 		}
-		otherBlock->hiddenFaces |= 1 << opposite;
-		hiddenFaces |= 1 << i;
 		setRenderingGroup(otherBlock);
 	}
 
 	block->hiddenFaces = hiddenFaces;
+#ifdef GAME_DEBUG
+	block->dPlacementMethod = SET_BLOCK;
+#endif
 
 	chunk->blocksMutex.lock();
 	chunk->blocks[hashPosForChunk(pos)] = block;
 	chunk->blocksMutex.unlock();
 
-	if (block->hiddenFaces != 63) setRenderingGroup(block);
+	setRenderingGroup(block);
 
 	chunk->modified = true;
 	if (chunk->loaded) m_worldRenderModified = true;
@@ -193,28 +199,21 @@ void World::setRenderingGroup(Block* block) {
 	chunksMutex.lock();
 	Chunk* chunk = chunks[chunkCh];
 	chunksMutex.unlock();
-	if (chunk == nullptr) return;
 
 	BLOCK_TYPE type = block->getType();
-	std::vector<Block*>::iterator begin;
-	std::vector<Block*>::iterator end;
-	std::vector<Block*>::iterator it;
 	chunk->renderingGroupsMutex.lock();
-	std::vector<Block*>* renderingGroup = &(chunk->blocksToRender);
-	if (block == NULL || block->hiddenFaces == 63) {
-		begin = renderingGroup->begin();
-		end = renderingGroup->end();
-		it = std::find(begin, end, block);
+	if (block == nullptr || block->hiddenFaces == 63) {
+		std::vector<Block*>::iterator end = chunk->blocksToRender.end();
+		std::vector<Block*>::iterator it = std::find(chunk->blocksToRender.begin(), end, block);
 		if (it != end) {
-			renderingGroup->erase(it);
+			chunk->blocksToRender.erase(it);
 		}
 		chunk->renderingGroupsMutex.unlock();
 		return;
 	}
 
-	begin = renderingGroup->begin();
-	end = renderingGroup->end();
-	it = std::find(begin, end, block);
+	std::vector<Block*>::iterator end = chunk->blocksToRender.end();
+	std::vector<Block*>::iterator it = std::find(chunk->blocksToRender.begin(), end, block);
 	if (it != end) {
 		chunk->renderingGroupsMutex.unlock();
 		return;
@@ -225,6 +224,6 @@ void World::setRenderingGroup(Block* block) {
 	std::size_t ch = hashPos(pos);
 
 	chunk->renderingGroupsMutex.lock();
-	renderingGroup->push_back(block);
+	chunk->blocksToRender.push_back(block);
 	chunk->renderingGroupsMutex.unlock();
 }

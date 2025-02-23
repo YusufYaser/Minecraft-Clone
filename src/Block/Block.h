@@ -47,6 +47,14 @@ int getAnimationFrameCount(BLOCK_TYPE type);
 bool blockTypeHasCollision(BLOCK_TYPE type);
 bool isBlockTypeTransparent(BLOCK_TYPE type);
 
+#ifdef GAME_DEBUG
+enum BLOCK_PLACEMENT_METHOD {
+	UNKNOWN = 0,
+	SET_BLOCK,
+	FILL_BLOCKS
+};
+#endif
+
 class Block {
 public:
 	Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces = 0);
@@ -57,6 +65,10 @@ public:
 	BLOCK_TYPE getType() const { return type; };
 	bool hasCollision() const { return blockTypeHasCollision(type); };
 	bool hasTransparency() const { return isBlockTypeTransparent(type); };
+
+#ifdef GAME_DEBUG
+	BLOCK_PLACEMENT_METHOD dPlacementMethod = UNKNOWN;
+#endif
 
 private:
 	glm::ivec3 pos;

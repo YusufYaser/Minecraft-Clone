@@ -1,6 +1,7 @@
 #include <vector>
 #include <algorithm>
 #include "../Block/Block.h"
+#include "../Logging.h"
 #include "Textures.h"
 #include <stb/stb_image.h>
 
@@ -119,6 +120,8 @@ TextureAtlas* initializeTextures() {
 
 			atlasWidth += width;
 			atlasMaxHeight = std::max(height, atlasMaxHeight);
+
+			debug("Added texture to atlas:", name);
 			break;
 		}
 

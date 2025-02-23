@@ -17,6 +17,7 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #endif
+#include <thread>
 
 inline bool ctrlC = false;
 
@@ -47,6 +48,23 @@ std::string getAutoGotoWorld() {
 inline void* emergencyMemory;
 inline std::atomic<bool> oom = false;
 inline std::thread::id mainThread;
+
+#ifdef GAME_DEBUG
+thread_local struct ThreadLogger {
+	ThreadLogger() {
+		if (std::this_thread::get_id() == mainThread) {
+			debug("Main thread started");
+		} else {
+			debug("Thread started");
+		}
+	}
+	~ThreadLogger() {
+		if (std::this_thread::get_id() != mainThread) {
+			debug("Thread exited");
+		}
+	}
+} threadLogger;
+#endif
 
 void oomHandler() {
 	std::thread::id id = std::this_thread::get_id();
@@ -87,6 +105,15 @@ int main(int argc, char* argv[]) {
 	emergencyMemory = (char*)malloc(1024 * 1024 * 16);
 	mainThread = std::this_thread::get_id();
 	std::set_new_handler(oomHandler);
+
+#ifdef GAME_DEBUG
+	std::string params = "";
+	for (int i = 1; i < argc; i++) {
+		params += std::string(argv[i]) + " ";
+	}
+	debug("Launch Parameters:");
+	debug(params);
+#endif
 
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "--max-memory") == 0) {

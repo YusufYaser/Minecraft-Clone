@@ -144,7 +144,6 @@ private:
 		uint16_t offsetsCount;
 		glm::vec4 offsets[MAX_INSTANCE_OFFSETS];
 		bool transparent;
-		void* buff;
 	};
 
 	std::thread renderingThreads[RENDERER_THREAD_COUNT];

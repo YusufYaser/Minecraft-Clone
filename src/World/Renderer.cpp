@@ -159,8 +159,6 @@ void World::render() {
 	shader->setUniform("fogSize", 2.0f);
 	shader->setUniform("playerPos", pos);
 
-	float cosHalfFOV = std::cos(glm::radians(190.0f / 2.0f));
-
 	glm::ivec2 playerChunk = getPosChunk(player->pos);
 
 	shader->setUniform("ambientLight", getAmbientLight());
@@ -264,6 +262,8 @@ void World::render() {
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
 		glEnableVertexAttribArray(3);
 		glVertexAttribDivisor(3, 1);
+
+		//debug("Initialized new instance:", i, "Hidden faces:", int(i->hiddenFaces));
 	}
 
 	TextureAtlas* atlas = Game::getInstance()->getTexAtlas();

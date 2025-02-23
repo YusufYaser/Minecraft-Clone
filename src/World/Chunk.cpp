@@ -39,6 +39,8 @@ void World::chunkLoaderFunc() {
 			chunkFile.read(reinterpret_cast<char*>(saveData), sizeof(ChunkSaveData));
 			chunkFile.close();
 
+			debug("Loading chunk", chunk->pos, "from file:", path);
+
 			for (int y = 0; y < MAX_HEIGHT; y++) {
 				for (int x = 0; x < 16; x++) {
 					for (int z = 0; z < 16; z++) {
@@ -188,12 +190,15 @@ void World::chunkUnloaderFunc() {
 						}
 						chunk->blocksMutex.unlock();
 
-						std::ofstream chunkFile("worlds/" + name + "/c" + std::to_string(ch), std::ios::binary);
+						std::string path = "worlds/" + name + "/c" + std::to_string(ch);
+						std::ofstream chunkFile(path, std::ios::binary);
 						chunkFile.write(reinterpret_cast<const char*>(saveData), sizeof(ChunkSaveData));
 						chunk->modified = false;
 						chunkFile.close();
 
 						delete saveData;
+
+						debug("Saved chunk", chunk->pos, "at", path);
 					} catch (std::filesystem::filesystem_error e) {
 						error("FAILED TO SAVE CHUNK:", e.what());
 					}
