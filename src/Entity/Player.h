@@ -9,6 +9,7 @@
 #include "../World/World.h"
 #include <GLFW/glfw3.h>
 #include "../GUI/Components/Image.h"
+#include "Entity.h"
 
 constexpr auto PLAYER_SPEED = 5.0f;
 constexpr auto PLAYER_RUN_SPEED = 7.5f;
@@ -17,19 +18,15 @@ struct ItemStack {
 	BLOCK_TYPE block;
 };
 
-class Player {
+class Player : public Entity {
 public:
 	Player();
 	~Player();
 
-	glm::vec3 orientation = glm::vec3(1.0f, 0.0f, 0.0f);
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	glm::vec3 pos = glm::vec3();
 	float speed = PLAYER_SPEED;
 	float reachDistance = 7.0f;
 
-	void update(float delta);
+	void update() override;
 
 	void getTargetBlock(Block** block, BLOCK_FACE* face = nullptr);
 	glm::vec3 getCameraPos() const { return pos + up; };
@@ -40,15 +37,16 @@ public:
 	bool isFlying() const { return flying; }
 	void setFlying(bool nFlying) { flying = nFlying; }
 
+	bool inFreecam() const { return freecam; };
+	glm::vec3 getFreecamPos() const { return freecamPos; };
+	glm::vec3 getFreecamOrientation() const { return freecamOrientation; };
+
 private:
 	bool wasHidden = false;
 	bool freecam = false;
 	glm::vec3 freecamPos = glm::vec3();
 	glm::vec3 freecamStartPos = glm::vec3();
 	glm::vec3 freecamOrientation = glm::vec3(1.0f, 0, 0);
-
-	bool flying = false;
-	float verticalVelocity = 0.0f;
 
 	void checkInputs(float delta);
 

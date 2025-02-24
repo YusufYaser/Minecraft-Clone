@@ -85,11 +85,11 @@ void DebugText::render() {
 	text << "Sound Device: " << soundEngine->getSoundDeviceName() << "\n\n";
 
 	if (player != nullptr) {
-		text << "Position: " << round(player->pos.x * 100) / 100;
-		text << ", " << round(player->pos.y * 100) / 100;
-		text << ", " << round(player->pos.z * 100) / 100 << "\n";
+		text << "Position: " << round(player->getPos().x * 100) / 100;
+		text << ", " << round(player->getPos().y * 100) / 100;
+		text << ", " << round(player->getPos().z * 100) / 100 << "\n";
 
-		glm::ivec2 chunkPos = getPosChunk(player->pos);
+		glm::ivec2 chunkPos = getPosChunk(player->getPos());
 		if (l == 2) {
 			text << "\n=== Current Chunk ===\n";
 			text << " Chunk: " << round(chunkPos.x * 100) / 100;

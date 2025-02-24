@@ -8,6 +8,14 @@ const char* fragmentShaderFile = {
 #include "../Shaders/DefaultShader/Shader.frag"
 };
 
+const char* entityVertexShaderFile = {
+#include "../Shaders/Entity/Entity.vert"
+};
+
+const char* entityFragmentShaderFile = {
+#include "../Shaders/Entity/Entity.frag"
+};
+
 const char* guiVertexShaderFile = {
 #include "../Shaders/GUI/GUI.vert"
 };

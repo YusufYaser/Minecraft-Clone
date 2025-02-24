@@ -70,7 +70,7 @@ void Image::render() {
 	glBindTexture(GL_TEXTURE_2D, m_tex->id);
 	glBindVertexArray(VAO);
 
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	if (game->getDebugLevel() == 2) {
 		std::stringstream stream;

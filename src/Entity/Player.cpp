@@ -24,6 +24,8 @@ Player::Player() {
 		img->setCrop({ 1.0f / getAnimationFrameCount(item->block), 1.0f / 6.0f });
 		m_inventoryImages[i] = img;
 	}
+
+	type = ENTITY_TYPE::PLAYER;
 }
 
 Player::~Player() {
@@ -42,69 +44,9 @@ Player::~Player() {
 	}
 }
 
-void Player::update(float delta) {
-	World* world = Game::getInstance()->getWorld();
-
-	glm::ivec3 iPos = glm::round(pos);
-	iPos.y = static_cast<int>(floor(pos.y));
-
-	Block* aboveBlock = world->getBlock(iPos + glm::ivec3(0, 1, 0));
-
-	if (verticalVelocity > 0) {
-		verticalVelocity -= 20.0f * delta;
-	}
-
-	if (verticalVelocity <= 0 && !flying) {
-		verticalVelocity -= 20.0f * delta;
-		if (verticalVelocity < -98.0f) verticalVelocity = -98.0f;
-	}
-
-	if (verticalVelocity != 0 && !world->isChunkLoaded(getPosChunk(pos))) {
-		verticalVelocity = 0;
-	}
-
-	if (verticalVelocity < 0) {
-		for (int i = iPos.y; i > floor(iPos.y + verticalVelocity * delta); i--) {
-			Block* block = world->getBlock({ iPos.x, i, iPos.z });
-			if (block == nullptr) continue;
-			if (!block->hasCollision()) continue;
-
-			verticalVelocity = 0;
-			pos.y = block->getPos().y + 1.0f;
-
-			break;
-		}
-	}
-
-	if (verticalVelocity > 0) {
-		Block* headBlock = world->getBlock({ iPos.x, pos.y + 1, iPos.z });
-		Block* aboveBlock = world->getBlock({ iPos.x, pos.y + 1.8, iPos.z });
-		Block* feetBlock = world->getBlock(iPos);
-
-		if ((headBlock != nullptr && headBlock->hasCollision()) || (aboveBlock != nullptr && aboveBlock->hasCollision())) {
-			verticalVelocity = 0;
-			if ((feetBlock == nullptr || !feetBlock->hasCollision()) && !flying) verticalVelocity -= 9.8f * delta;
-		}
-	}
-
-	pos.y += verticalVelocity * delta;
-
-	iPos = glm::round(pos);
-	iPos.y = static_cast<int>(floor(pos.y));
-
-	if (verticalVelocity <= 0) {
-		Block* collBlock = world->getBlock(iPos);
-		if (collBlock != nullptr && collBlock->hasCollision()) {
-			verticalVelocity = 0;
-			pos.y = collBlock->getPos().y + 1.0f;
-			iPos = glm::floor(pos);
-			iPos.y = static_cast<int>(floor(pos.y));
-		}
-	}
-
-	if (pos.y < -20.0f) {
-		pos.y = 100.0f;
-	}
+void Player::update() {
+	float delta = Game::getInstance()->getSimDelta();
+	Entity::physicsUpdate(delta);
 
 	checkInputs(delta);
 
@@ -144,6 +86,7 @@ void Player::checkInputs(float delta) {
 		freecam = !freecam;
 		freecamStartPos = pos;
 		freecamPos = pos;
+		freecamOrientation = orientation;
 
 		debug(freecam ? "Enabled" : "Disabled", "debug freecam");
 	}

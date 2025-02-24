@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../World/World.h"
-#include "../Player/Player.h"
+#include "../Entity/Player.h"
 #include "../Shaders/Shaders.h"
 #include "../GUI/Components/Image.h"
 #include "../GameWindow/GameWindow.h"
@@ -60,6 +60,7 @@ public:
 	const GPUInfo* getGpuInfo();
 
 	Shader* getShader() const { return shader; };
+	Shader* getEntityShader() const { return entityShader; };
 	Shader* getGuiShader() const { return guiShader; };
 	Shader* getSkyboxShader() const { return skyboxShader; };
 
@@ -152,6 +153,7 @@ private:
 	bool m_successfullyLoaded = false;
 
 	Shader* shader = nullptr;
+	Shader* entityShader = nullptr;
 	Shader* guiShader = nullptr;
 	Shader* skyboxShader = nullptr;
 	Shader* postProcessingShader = nullptr;

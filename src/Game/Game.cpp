@@ -93,10 +93,11 @@ Game::Game() {
 	// initialize shaders
 	print("Intializing shaders");
 	shader = new Shader(vertexShaderFile, fragmentShaderFile, "DefaultShader");
+	entityShader = new Shader(entityVertexShaderFile, entityFragmentShaderFile, "Entity");
 	guiShader = new Shader(guiVertexShaderFile, guiFragmentShaderFile, "GUI");
 	skyboxShader = new Shader(skyboxVertexShaderFile, skyboxFragmentShaderFile, "Skybox");
 	postProcessingShader = new Shader(postProcessingVertexShaderFile, postProcessingFragmentShaderFile, "PostProcessing");
-	if (!shader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded() || !postProcessingShader->successfullyLoaded()) {
+	if (!shader->successfullyLoaded() || !entityShader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded() || !postProcessingShader->successfullyLoaded()) {
 		error("Failed to initialize shaders");
 		return;
 	}
@@ -366,9 +367,6 @@ void Game::update() {
 			return;
 		}
 	}
-#ifdef GAME_DEBUG
-	if (err) __debugbreak();
-#endif
 
 	m_keyHandler->update();
 
@@ -383,10 +381,11 @@ void Game::update() {
 		}
 
 		if (m_keyHandler->keyClicked(GLFW_KEY_R)) {
-			m_player->pos = { 0.0f, (float)MAX_HEIGHT, 0.0f };
+			m_player->setPos({ 0.0f, (float)MAX_HEIGHT, 0.0f });
 		}
 		if (m_keyHandler->keyClicked(GLFW_KEY_T)) {
-			m_player->pos.y = (float)MAX_HEIGHT;
+			glm::vec3 pos = m_player->getPos();
+			m_player->setPos({ pos.x, (float)MAX_HEIGHT, pos.z });
 		}
 		if (m_keyHandler->keyClicked(GLFW_KEY_Y)) {
 			m_world->setTick(0);
@@ -395,17 +394,20 @@ void Game::update() {
 		if (m_keyHandler->keyClicked(GLFW_KEY_U)) {
 			print("Reloading shaders");
 			Shader* shader = new Shader(vertexShaderFile, fragmentShaderFile, "DefaultShader");
+			Shader* entityShader = new Shader(entityVertexShaderFile, entityFragmentShaderFile, "Entity");
 			Shader* guiShader = new Shader(guiVertexShaderFile, guiFragmentShaderFile, "GUI");
 			Shader* skyboxShader = new Shader(skyboxVertexShaderFile, skyboxFragmentShaderFile, "Skybox");
 			Shader* postProcessingShader = new Shader(postProcessingVertexShaderFile, postProcessingFragmentShaderFile, "PostProcessing");
-			if (!shader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded() || !postProcessingShader->successfullyLoaded()) {
+			if (!shader->successfullyLoaded() || !entityShader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded() || !postProcessingShader->successfullyLoaded()) {
 				error("Failed to reload shaders");
 			} else {
 				delete this->shader;
+				delete this->entityShader;
 				delete this->guiShader;
 				delete this->skyboxShader;
 				delete this->postProcessingShader;
 				this->shader = shader;
+				this->entityShader = entityShader;
 				this->guiShader = guiShader;
 				this->skyboxShader = skyboxShader;
 				this->postProcessingShader = postProcessingShader;
@@ -532,7 +534,7 @@ void Game::update() {
 			postProcessingShader->setUniform("time", (float)glfwGetTime());
 			// uniform ivec2 resolution
 			postProcessingShader->setUniform("resolution", iSize);
-			Block* upBlock = m_world->getBlock(glm::ivec3(glm::round(m_player->pos)) + glm::ivec3(0, 1, 0));
+			Block* upBlock = m_world->getBlock(glm::ivec3(glm::round(m_player->getPos())) + glm::ivec3(0, 1, 0));
 			// uniform bool underWater
 			postProcessingShader->setUniform("underWater", upBlock != nullptr && upBlock->getType() == BLOCK_TYPE::WATER);
 
@@ -556,8 +558,8 @@ void Game::update() {
 
 	guiShader->activate();
 
-	if (m_player != nullptr && m_world != nullptr) {
-		glm::ivec3 iPos = glm::round(m_player->pos);
+	if (m_player != nullptr && m_world != nullptr && !m_player->inFreecam()) {
+		glm::ivec3 iPos = glm::round(m_player->getPos());
 
 		Block* upBlock = m_world->getBlock(iPos + glm::ivec3(0, 1, 0));
 		if (upBlock != nullptr) {
@@ -583,7 +585,7 @@ void Game::update() {
 		}
 	} else {
 		if (m_world != nullptr && m_player != nullptr) {
-			m_player->update(getSimDelta());
+			m_player->update();
 		}
 	}
 
@@ -674,9 +676,13 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos, glm::vec3 pla
 		if (playerPos.y == 0) {
 			playerPos.y = static_cast<float>(m_world->getHeight({ playerPos.x, playerPos.z }));
 		}
-		m_player->pos = playerPos;
-		m_player->orientation = playerOrientation;
+		m_player->teleport(playerPos, playerOrientation);
 		m_player->setFlying(playerFlying);
+
+		m_world->spawnEntity(m_player);
+
+		Player* testPlayer = new Player();
+		m_world->spawnEntity(testPlayer);
 
 		m_loadingWorld = false;
 		}, settings, playerPos, playerOrientation, playerFlying);

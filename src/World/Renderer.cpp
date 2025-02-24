@@ -103,7 +103,7 @@ void World::render() {
 	Shader* shader = Game::getInstance()->getShader();
 	Shader* skyboxShader = Game::getInstance()->getSkyboxShader();
 	skyboxShader->activate();
-	skyboxShader->setUniform("view", glm::lookAt(glm::vec3(), player->orientation, player->up));
+	skyboxShader->setUniform("view", glm::lookAt(glm::vec3(), !player->inFreecam() ? player->getOrientation() : player->getFreecamOrientation(), player->getUp()));
 	skyboxShader->setUniform("projection", playerProjection);
 	skyboxShader->setUniform("ambientLight", getAmbientLight());
 
@@ -132,7 +132,7 @@ void World::render() {
 
 	glBindTexture(GL_TEXTURE_2D, getTexture("clouds")->id);
 	skyboxShader->setUniform("blockPos", glm::vec3(0, .75f, 0));
-	skyboxShader->setUniform("playerPos", player->pos);
+	skyboxShader->setUniform("playerPos", player->getPos());
 	skyboxShader->setUniform("type", 1);
 	clouds->Render(nullptr, 47, false);
 
@@ -159,7 +159,7 @@ void World::render() {
 	shader->setUniform("fogSize", 2.0f);
 	shader->setUniform("playerPos", pos);
 
-	glm::ivec2 playerChunk = getPosChunk(player->pos);
+	glm::ivec2 playerChunk = getPosChunk(player->getPos());
 
 	shader->setUniform("ambientLight", getAmbientLight());
 
@@ -241,6 +241,15 @@ void World::render() {
 	} else {
 		m_chunksRendered = oldChunksRendered;
 	}
+
+	for (auto& entity : entities) {
+		if (entity == player) {
+			if (player->inFreecam()) player->render();
+		} else {
+			entity->render();
+		}
+	}
+	shader->activate();
 
 	std::partition(instances.begin(), instances.end(), [](const Instance* i) {
 		return !i->transparent;

@@ -33,7 +33,7 @@
     <ClCompile Include="src\World\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Player\Player.cpp">
+    <ClCompile Include="src\Entity\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\World\Chunk.cpp">
@@ -102,6 +102,9 @@
     <ClCompile Include="src\GUI\ScreenshotMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Entity\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Logging.h">
@@ -128,7 +131,7 @@
     <ClInclude Include="libraries\include\PerlinNoise\PerlinNoise.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Player\Player.h">
+    <ClInclude Include="src\Entity\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\World\Utils.h">
@@ -194,6 +197,9 @@
     <ClInclude Include="C:\Users\yusuf\Downloads\stb_image_write.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Entity\Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\DefaultShader\Shader.frag" />
@@ -204,6 +210,8 @@
     <None Include="src\Shaders\Skybox\Skybox.vert" />
     <None Include="src\Shaders\PostProcessing\PostProcessing.vert" />
     <None Include="src\Shaders\PostProcessing\PostProcessing.frag" />
+    <None Include="src\Shaders\Entity\Entity.vert" />
+    <None Include="src\Shaders\Entity\Entity.frag" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">

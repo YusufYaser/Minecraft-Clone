@@ -43,7 +43,7 @@ World::World(WorldSettings& settings) {
 			delta = currentTime - lastTick;
 
 			if (delta >= 1.0 / 20) {
-				tick();
+				tick(delta);
 				lastTick = currentTime;
 			}
 		}
@@ -114,7 +114,7 @@ void World::dontRender() {
 		for (int y = -renderDistance + playerChunk.y - EXTRA_RENDER_DISTANCE; y < renderDistance + playerChunk.y + EXTRA_RENDER_DISTANCE; y++) {
 			glm::ivec2 cPos = glm::ivec2(x, y);
 
-			if (glm::length(glm::vec2(cPos - getPosChunk(player->pos))) > Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE) continue;
+			if (glm::length(glm::vec2(cPos - getPosChunk(player->getPos()))) > Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE) continue;
 
 			std::size_t chunkCh = hashPos(cPos);
 			if (!chunksMutex.try_lock()) continue;
@@ -142,12 +142,12 @@ WorldSaveData* World::createWorldSaveData() {
 
 	Player* player = Game::getInstance()->getPlayer();
 
-	glm::vec3 pos = player->pos;
+	glm::vec3 pos = player->getPos();
 	data->playerPos[0] = pos.x;
 	data->playerPos[1] = pos.y;
 	data->playerPos[2] = pos.z;
 
-	glm::vec3 orientation = player->orientation;
+	glm::vec3 orientation = player->getOrientation();
 	data->playerOrientation[0] = orientation.x;
 	data->playerOrientation[1] = orientation.y;
 	data->playerOrientation[2] = orientation.z;
@@ -157,8 +157,15 @@ WorldSaveData* World::createWorldSaveData() {
 	return data;
 }
 
-void World::tick() {
+void World::tick(float delta) {
 	m_tick++;
+
+	Player* player = Game::getInstance()->getPlayer();
+
+	for (auto& entity : entities) {
+		if (entity == player) continue;
+		entity->physicsUpdate(delta);
+	}
 }
 
 float World::getAmbientLight() {

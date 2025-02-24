@@ -65,7 +65,6 @@ void main() {
         }
     } else {
         FragColor = lods[fBlockType][int(face)];
-        FragColor *= vec4(vec3(ambientLight), 1.0f);
     }
 
     float lightPercentage;

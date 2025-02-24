@@ -15,6 +15,7 @@
 #include "stdint.h"
 #include "../config.h"
 #include "../Mux.h"
+#include "../Entity/Entity.h"
 
 enum class Generator : uint8_t {
 	Default = 0,
@@ -81,6 +82,7 @@ public:
 
 	float getAmbientLight();
 
+	void spawnEntity(Entity* entity) { entities.push_back(entity); };
 
 private:
 	std::atomic<bool> unloading;
@@ -125,7 +127,7 @@ private:
 	std::thread chunkUnloader;
 	void chunkUnloaderFunc();
 	std::thread tickThread;
-	void tick();
+	void tick(float delta);
 	std::vector<Chunk*> chunkLoadQueue;
 	Mux chunkLoadQueueMutex;
 
@@ -162,4 +164,6 @@ private:
 
 	std::atomic<bool> rendering;
 	void renderer(int c);
+
+	std::vector<Entity*> entities;
 };
