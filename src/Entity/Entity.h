@@ -4,6 +4,8 @@
 
 struct EntityModel {
 	GLuint VAO;
+	GLuint VBO;
+	GLuint EBO;
 	size_t indicesCount;
 };
 

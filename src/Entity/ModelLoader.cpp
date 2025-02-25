@@ -51,16 +51,22 @@ EntityModel* createModel(std::vector<Vertex>& vertices, std::vector<GLuint>& ind
 
 	EntityModel* model = new EntityModel();
 	model->VAO = VAO;
+	model->VBO = VBO;
+	model->EBO = EBO;
 	model->indicesCount = indices.size();
 
 	return model;
 }
 
-inline bool modelsLoaded = false;
 void loadEntityModels() {
-	if (modelsLoaded) {
-		error("Entity models are already loaded");
-		return;
+	for (int i = 0; i < ENTITY_TYPES_COUNT; i++) {
+		EntityModel* model = models[i];
+		if (model == nullptr) continue;
+		glDeleteBuffers(1, &model->VBO);
+		glDeleteBuffers(1, &model->EBO);
+		glDeleteVertexArrays(1, &model->VAO);
+		delete model;
+		models[i] = nullptr;
 	}
 
 	for (int i = 0; i < ENTITY_TYPES_COUNT; i++) {

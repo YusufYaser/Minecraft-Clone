@@ -177,7 +177,7 @@ Q: Toggle 3D World Rendering
 R: Teleport to 0, )" + std::to_string(MAX_HEIGHT) + R"(, 0
 T: Teleport to height )" + std::to_string(MAX_HEIGHT) + R"(
 Y: Reset world time
-U: Reload shaders
+U: Reload textures, shaders, and models
 )");
 	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 7 });
 	m_commandsHelp->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
@@ -396,6 +396,12 @@ void Game::update() {
 		}
 
 		if (m_keyHandler->keyClicked(GLFW_KEY_U)) {
+			print("Reloading textures");
+			m_texAtlas = initializeTextures();
+
+			print("Reloading models");
+			loadEntityModels();
+
 			print("Reloading shaders");
 			Shader* shader = new Shader(vertexShaderFile, fragmentShaderFile, "DefaultShader");
 			Shader* entityShader = new Shader(entityVertexShaderFile, entityFragmentShaderFile, "Entity");
@@ -417,7 +423,7 @@ void Game::update() {
 				this->postProcessingShader = postProcessingShader;
 
 				shader->activate();
-				for (int i = 0; i < BLOCK_TYPE_COUNT; i++) {
+				for (int i = 2; i < BLOCK_TYPE_COUNT; i++) {
 					std::string name = "atlasRanges[" + std::to_string(i) + "]";
 					glUniform4fv(glGetUniformLocation(shader->getId(), name.c_str()), 1, glm::value_ptr(m_texAtlas->ranges[i]));
 
@@ -428,7 +434,7 @@ void Game::update() {
 					}
 				}
 
-				print("Reloaded shaders");
+				print("Reloaded assets");
 			}
 		}
 	}

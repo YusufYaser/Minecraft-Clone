@@ -13,6 +13,11 @@ using recursive_directory_iterator = std::filesystem::recursive_directory_iterat
 std::map<std::string, Texture*> textures = {};
 
 TextureAtlas* initializeTextures() {
+	for (auto& [name, tex] : textures) {
+		glDeleteTextures(1, &tex->id);
+		tex->id = 0;
+	}
+
 	stbi_set_flip_vertically_on_load(true);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -41,7 +46,8 @@ TextureAtlas* initializeTextures() {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, &invalidTexData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	Texture* tex = new Texture();
+	Texture* tex = textures["invalid"];
+	if (tex == nullptr) tex = new Texture();
 	tex->id = ID;
 	tex->height = 2;
 	tex->width = 2;
@@ -60,7 +66,8 @@ TextureAtlas* initializeTextures() {
 	}
 
 	TextureAtlas* atlas = new TextureAtlas();
-	Texture* atlasTex = new Texture();
+	Texture* atlasTex = textures["atlas"];
+	if (atlasTex == nullptr) atlasTex = new Texture();
 
 	glGenTextures(1, &ID);
 	glBindTexture(GL_TEXTURE_2D, ID);
@@ -137,7 +144,8 @@ TextureAtlas* initializeTextures() {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		Texture* tex = new Texture();
+		Texture* tex = textures[name];
+		if (tex == nullptr) tex = new Texture();
 		tex->id = ID;
 		tex->height = height;
 		tex->width = width;
