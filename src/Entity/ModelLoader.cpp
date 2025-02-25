@@ -125,7 +125,8 @@ void loadEntityModels() {
 				c++;
 				if (!f.is_object() ||
 					!f.contains("v") || !f["v"].is_array() ||
-					!f.contains("n") || !f["n"].is_array()) {
+					!f.contains("n") || !f["n"].is_array() ||
+					!f.contains("o") || !f["o"].is_array()) {
 					debug("Face", c, "is invalid");
 					error = true;
 					break;
@@ -140,6 +141,7 @@ void loadEntityModels() {
 
 				glm::vec3 normal = glm::normalize(glm::vec3(n[0], n[1], n[2]));
 
+				int start = -1;
 				int vi = -1;
 				for (const auto& v : f["v"]) {
 					vi++;
@@ -170,7 +172,17 @@ void loadEntityModels() {
 					vertex.normal = normal;
 
 					vertices.push_back(vertex);
-					indices.push_back(static_cast<unsigned int>(indices.size()));
+
+					if (start == -1) start = vertices.size() - 1;
+				}
+
+				for (auto& o : f["o"]) {
+					if (!o.is_number()) {
+						debug("Face", i, "order is invalid");
+						error = true;
+						break;
+					}
+					indices.push_back(start + o);
 				}
 				if (error) break;
 			}
