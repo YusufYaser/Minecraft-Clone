@@ -236,6 +236,10 @@ void World::render() {
 		}
 		rendering.store(false);
 
+		std::partition(instances.begin(), instances.end(), [](const Instance* i) {
+			return !i->transparent;
+			});
+
 		oldChunksRendered = m_chunksRendered;
 		m_worldRenderModified = false;
 	} else {
@@ -250,10 +254,6 @@ void World::render() {
 		}
 	}
 	shader->activate();
-
-	std::partition(instances.begin(), instances.end(), [](const Instance* i) {
-		return !i->transparent;
-		});
 
 	while (instancesToInit.size() != 0) {
 		Instance* i = instancesToInit.front();

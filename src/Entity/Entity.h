@@ -4,6 +4,7 @@
 
 struct EntityModel {
 	GLuint VAO;
+	size_t indicesCount;
 };
 
 enum ENTITY_TYPE {
@@ -11,8 +12,9 @@ enum ENTITY_TYPE {
 };
 
 EntityModel* getEntityModel(ENTITY_TYPE& type);
+void loadEntityModels();
 
-#define ENTITY_MODEL_COUNT 1
+#define ENTITY_TYPES_COUNT 1
 
 class Entity {
 public:

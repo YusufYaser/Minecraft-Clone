@@ -3,98 +3,6 @@
 #include "../Game/Game.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-inline EntityModel* models[ENTITY_MODEL_COUNT];
-
-EntityModel* createModel(GLfloat* vertices, size_t verticesSize, GLuint* indices, size_t indicesSize) {
-	GLuint VAO, VBO, EBO;
-
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	EntityModel* model = new EntityModel();
-	model->VAO = VAO;
-
-	return model;
-}
-
-EntityModel* getEntityModel(ENTITY_TYPE& type) {
-	if (models[(int)type] != nullptr) {
-		return models[(int)type];
-	}
-
-	switch (type) {
-	case ENTITY_TYPE::PLAYER:
-	{
-		GLfloat vertices[] = {
-			// front face
-			 0.3f, -0.5f,  0.3f,
-			-0.3f, -0.5f,  0.3f,
-			-0.3f,  1.5f,  0.3f,
-			 0.3f,  1.5f,  0.3f,
-
-			 // back face
-			 -0.3f, -0.5f, -0.3f,
-			 0.3f, -0.5f, -0.3f,
-			 0.3f,  1.5f, -0.3f,
-			 -0.3f,  1.5f, -0.3f,
-
-			 // right face
-			 0.3f, -0.5f, -0.3f,
-			 0.3f, -0.5f,  0.3f,
-			 0.3f,  1.5f,  0.3f,
-			 0.3f,  1.5f, -0.3f,
-
-			 // left face
-			 -0.3f, -0.5f,  0.3f,
-			 -0.3f, -0.5f, -0.3f,
-			 -0.3f,  1.5f, -0.3f,
-			 -0.3f,  1.5f,  0.3f,
-
-			 // bottom face
-			 -0.3f, -0.5f,  0.3f,
-			 0.3f, -0.5f,  0.3f,
-			 0.3f, -0.5f, -0.3f,
-			 -0.3f, -0.5f, -0.3f,
-
-			 // top face
-			 0.3f,  1.5f,  0.3f,
-			 -0.3f,  1.5f,  0.3f,
-			 -0.3f,  1.5f, -0.3f,
-			 0.3f,  1.5f, -0.3f,
-		};
-
-		GLuint indices[] = {
-			0, 1, 2, 0, 2, 3,
-			4, 5, 6, 4, 6, 7,
-			8, 9, 10, 8, 10, 11,
-			12, 13, 14, 12, 14, 15,
-			16, 17, 18, 16, 18, 19,
-			20, 21, 22, 20, 22, 23
-		};
-
-		models[(int)type] = createModel(vertices, sizeof(vertices), indices, sizeof(indices));
-	}
-
-	break;
-	}
-
-	return models[(int)type];
-}
-
 void Entity::render() {
 	EntityModel* entityModel = getEntityModel(Entity::type);
 	if (entityModel == nullptr) return;
@@ -122,7 +30,7 @@ void Entity::render() {
 	shader->setUniform("ambientLight", Game::getInstance()->getWorld()->getAmbientLight());
 
 	glBindVertexArray(entityModel->VAO);
-	glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, entityModel->indicesCount, GL_UNSIGNED_INT, 0);
 }
 
 void Entity::physicsUpdate(float delta) {

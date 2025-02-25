@@ -130,6 +130,10 @@ Game::Game() {
 	postProcessingShader->setUniform("tex0", 0);
 	print("Loaded textures");
 
+	print("Loading models");
+	loadEntityModels();
+	print("Loaded models");
+
 	print("Initializing sound engine");
 	m_soundEngine = new SoundEngine();
 	if (m_soundEngine->isLoaded()) {
