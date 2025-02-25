@@ -691,9 +691,6 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos, glm::vec3 pla
 
 		m_world->spawnEntity(m_player);
 
-		Player* testPlayer = new Player();
-		m_world->spawnEntity(testPlayer);
-
 		m_loadingWorld = false;
 		}, settings, playerPos, playerOrientation, playerFlying);
 

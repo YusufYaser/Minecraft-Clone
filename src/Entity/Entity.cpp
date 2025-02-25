@@ -3,6 +3,16 @@
 #include "../Game/Game.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+std::string getEntityName(ENTITY_TYPE& type) {
+	switch (type) {
+	case ENTITY_TYPE::PLAYER:
+		return "player";
+
+	default:
+		return "invalid";
+	}
+}
+
 void Entity::render() {
 	EntityModel* entityModel = getEntityModel(Entity::type);
 	if (entityModel == nullptr) return;
@@ -29,6 +39,7 @@ void Entity::render() {
 
 	shader->setUniform("ambientLight", Game::getInstance()->getWorld()->getAmbientLight());
 
+	glBindTexture(GL_TEXTURE_2D, getTexture(getEntityName(type))->id);
 	glBindVertexArray(entityModel->VAO);
 	glDrawElements(GL_TRIANGLES, entityModel->indicesCount, GL_UNSIGNED_INT, 0);
 }

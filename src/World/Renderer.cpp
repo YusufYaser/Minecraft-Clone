@@ -247,6 +247,8 @@ void World::render() {
 	}
 
 	for (auto& entity : entities) {
+		if (glm::length(pos - entity->getPos()) > (renderDistance - 1) * 16) continue;
+
 		if (entity == player) {
 			if (player->inFreecam()) player->render();
 		} else {
