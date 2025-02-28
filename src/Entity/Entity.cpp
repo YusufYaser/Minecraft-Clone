@@ -41,7 +41,7 @@ void Entity::render() {
 
 	glBindTexture(GL_TEXTURE_2D, getTexture(getEntityName(type))->id);
 	glBindVertexArray(entityModel->VAO);
-	glDrawElements(GL_TRIANGLES, entityModel->indicesCount, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(entityModel->indicesCount), GL_UNSIGNED_INT, 0);
 }
 
 void Entity::physicsUpdate(float delta) {

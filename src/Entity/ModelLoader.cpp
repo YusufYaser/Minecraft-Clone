@@ -173,7 +173,7 @@ void loadEntityModels() {
 
 					vertices.push_back(vertex);
 
-					if (start == -1) start = vertices.size() - 1;
+					if (start == -1) start = static_cast<int>(vertices.size()) - 1;
 				}
 
 				for (auto& o : f["o"]) {

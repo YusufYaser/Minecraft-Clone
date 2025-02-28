@@ -44,7 +44,7 @@ World::World(WorldSettings& settings) {
 			delta = currentTime - lastTick;
 
 			if (delta >= 1.0 / 20) {
-				tick(delta);
+				tick(static_cast<float>(delta));
 				lastTick = currentTime;
 			}
 		}
