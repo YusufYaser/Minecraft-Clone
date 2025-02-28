@@ -35,17 +35,20 @@ void World::renderer(int c) {
 
 			if (type == BLOCK_TYPE::NONE || type == BLOCK_TYPE::AIR) continue;
 			bool transparent = isBlockTypeTransparent(type);
+			BLOCK_STRUCTURE_TYPE structType = getStructureType(type);
 
 			const glm::ivec3& bPos = block->getPos();
 			const glm::vec3 diff = glm::vec3(bPos) - pos;
 			const float half = .5f;
 
 			uint8_t hiddenFaces = block->hiddenFaces;
+			if (structType == BLOCK_STRUCTURE_TYPE::PLANT) hiddenFaces = 0;
 
 			Instance* i = nullptr;
 			for (auto& inst : instancesCache[hiddenFaces]) {
 				if (inst->offsetsCount >= MAX_INSTANCE_OFFSETS) continue;
 				if (inst->transparent != transparent) continue;
+				if (inst->bStructType != structType) continue;
 				i = inst;
 				break;
 			}
@@ -54,6 +57,7 @@ void World::renderer(int c) {
 				i->offsetsCount = 0;
 				i->hiddenFaces = hiddenFaces;
 				i->transparent = transparent;
+				i->bStructType = structType;
 
 				instancesMutex.lock();
 				instances.push_back(i);
@@ -241,7 +245,6 @@ void World::render() {
 			});
 
 		oldChunksRendered = m_chunksRendered;
-		m_worldRenderModified = false;
 	} else {
 		m_chunksRendered = oldChunksRendered;
 	}
@@ -261,7 +264,7 @@ void World::render() {
 		Instance* i = instancesToInit.front();
 		instancesToInit.erase(instancesToInit.begin());
 
-		BlockStructureData* data = createBlockStructureData(i->hiddenFaces);
+		BlockStructureData* data = createBlockStructureData(i->bStructType, i->hiddenFaces);
 		i->bStructData = data;
 
 		glBindVertexArray(data->VAO);
@@ -297,7 +300,7 @@ void World::render() {
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBindVertexArray(i->bStructData->VAO);
 
-		glBufferSubData(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec4), i->offsets);
+		if (rerender || m_worldRenderModified) glBufferSubData(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec4), i->offsets);
 
 		glDrawElementsInstanced(GL_TRIANGLES, i->bStructData->faceCount * 6, GL_UNSIGNED_BYTE, 0, i->offsetsCount);
 
@@ -313,4 +316,6 @@ void World::render() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	if (m_worldRenderModified) m_worldRenderModified = false;
 }

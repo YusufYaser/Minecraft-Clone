@@ -2,7 +2,7 @@ R"END(
 #version 460 core
 layout(early_fragment_tests) in;
 
-#define BLOCK_TYPE_COUNT 11
+#define BLOCK_TYPE_COUNT 12
 
 in vec2 texCoord;
 flat in float face;
@@ -38,7 +38,7 @@ void main() {
     if (length(blockPosOffset) < 16 * 12) {
         vec2 tc = texCoord;
 
-        if (fBlockType == 3 && face == 5 || (fBlockType != 3 && fBlockType != 7)) {
+        if (fBlockType == 3 && face == 5 || (fBlockType != 3 && fBlockType != 7 && fBlockType != 11)) {
             vec3 p = fract((blockPosOffset + fPlayerPos) * 0.1031);
             p += dot(p, p.yxz + 19.19);
             if (fract((p.x + p.y) * p.z) > 0.5f) {
@@ -51,11 +51,16 @@ void main() {
         vec4 range = atlasRanges[fBlockType];
         vec2 size = vec2(range.z - range.x, range.w - range.y);
 
-        int animationFrameCount = int(round(size.x / (size.y / 6.0f)));
+        if ((range.x == 0 && range.y == 0) || (range.z == 0 || range.w == 0)) {
+            FragColor = vec4(texCoord.x > .5f != texCoord.y > .5f ? 0 : 1.0f, 0, 0, 1.0f);
+        } else {
+            int animationFrameCount = int(round(size.x / (size.y / 6.0f)));
 
-        vec2 tc2 = vec2((tc.x + float(int(time) % animationFrameCount)) / float(animationFrameCount), (tc.y + float(face)) / 6.0f);
-        tc2 = range.xy + (tc2 * size);
-        FragColor = texture(tex0, tc2);
+            vec2 tc2 = vec2((tc.x + float(int(time) % animationFrameCount)) / float(animationFrameCount), (tc.y + float(face)) / 6.0f);
+            tc2 = range.xy + (tc2 * size);
+
+            FragColor = texture(tex0, tc2);
+        }
 
         if (ivec3(blockPosOffset + fPlayerPos) == highlighted && !(tc.x < (1 - BORDER_SIZE) && tc.x > BORDER_SIZE &&
            tc.y < (1 - BORDER_SIZE) && tc.y > BORDER_SIZE)) {

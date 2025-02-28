@@ -2,8 +2,9 @@
 #include "CubeVertices.h"
 
 inline BlockStructureData* blockStructures[64];
+inline BlockStructureData* plantBlockStructure;
 
-BlockStructureData* createBlockStructureData(uint8_t hiddenFaces) {
+BlockStructureData* createBlockStructureData(BLOCK_STRUCTURE_TYPE type, uint8_t hiddenFaces) {
 	BlockStructureData* data = new BlockStructureData();
 
 	GLuint VBO, VAO, EBO;
@@ -12,17 +13,40 @@ BlockStructureData* createBlockStructureData(uint8_t hiddenFaces) {
 	GLfloat* vertices = new GLfloat[6 * VERTEX_SIZE * 6];
 	uint8_t* indices = new uint8_t[6 * 6];
 
-	for (int i = 0; i < 6; i++) {
-		if ((hiddenFaces & (1 << i)) != 0) continue;
+	switch (type) {
+	case BLOCK_STRUCTURE_TYPE::FULL_BLOCK:
+		for (int i = 0; i < 6; i++) {
+			if ((hiddenFaces & (1 << i)) != 0) continue;
 
-		for (int j = 0; j < VERTEX_SIZE * 4; j++) {
-			vertices[(faceCount * VERTEX_SIZE * 4) + j] = blockVertices[(i * VERTEX_SIZE * 4) + j];
+			for (int j = 0; j < VERTEX_SIZE * 4; j++) {
+				vertices[(faceCount * VERTEX_SIZE * 4) + j] = blockVertices[(i * VERTEX_SIZE * 4) + j];
+			}
+			for (int j = 0; j < 6; j++) {
+				indices[(faceCount * 6) + j] = blockIndices[j] + (faceCount * 4);
+			}
+
+			faceCount++;
 		}
-		for (int j = 0; j < 6; j++) {
-			indices[(faceCount * 6) + j] = blockIndices[j] + (faceCount * 4);
+		break;
+	case BLOCK_STRUCTURE_TYPE::PLANT:
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < VERTEX_SIZE * 4; j++) {
+				int index = j;
+				int v = j / VERTEX_SIZE;
+				int offset = 0;
+				if ((v == 0 || v == 3) && ((i < 2 && j % VERTEX_SIZE == 2) || (i >= 2 && j % VERTEX_SIZE == 0))) {
+					offset = i % 2 == 0 ? -1 : 1;
+				}
+				vertices[(faceCount * VERTEX_SIZE * 4) + j] = blockVertices[(i * VERTEX_SIZE * 4) + index] + offset;
+			}
+			for (int j = 0; j < 6; j++) {
+				indices[(faceCount * 6) + j] = blockIndices[j] + (faceCount * 4);
+			}
+
+			faceCount++;
 		}
 
-		faceCount++;
+		break;
 	}
 
 	glGenVertexArrays(1, &VAO);
@@ -58,17 +82,27 @@ BlockStructureData* createBlockStructureData(uint8_t hiddenFaces) {
 	return data;
 }
 
-BlockStructureData* getBlockStructureData(uint8_t hiddenFaces) {
+BlockStructureData* getBlockStructureData(BLOCK_STRUCTURE_TYPE type, uint8_t hiddenFaces) {
 	BlockStructureData* data = blockStructures[hiddenFaces];
+	if (type == BLOCK_STRUCTURE_TYPE::PLANT) data = plantBlockStructure;
 
 	if (data != nullptr) {
 		return data;
 	}
 
-	data = createBlockStructureData(hiddenFaces);
+	data = createBlockStructureData(type, hiddenFaces);
 	blockStructures[hiddenFaces] = data;
 
 	return data;
+}
+
+BLOCK_STRUCTURE_TYPE getStructureType(BLOCK_TYPE type) {
+	switch (type) {
+	case BLOCK_TYPE::FLOWER:
+		return BLOCK_STRUCTURE_TYPE::PLANT;
+	default:
+		return BLOCK_STRUCTURE_TYPE::FULL_BLOCK;
+	}
 }
 
 glm::ivec3 getBlockFaceDirection(BLOCK_FACE face) {
@@ -128,6 +162,9 @@ const char* getTextureName(BLOCK_TYPE type) {
 	case BLOCK_TYPE::OAK_PLANKS:
 		return "oak_planks";
 
+	case BLOCK_TYPE::FLOWER:
+		return "flower";
+
 	default:
 		return "invalid";
 	}
@@ -141,6 +178,7 @@ int getAnimationFrameCount(BLOCK_TYPE type) {
 bool blockTypeHasCollision(BLOCK_TYPE type) {
 	switch (type) {
 	case BLOCK_TYPE::WATER:
+	case BLOCK_TYPE::FLOWER:
 		return false;
 
 	default:
@@ -152,6 +190,7 @@ bool isBlockTypeTransparent(BLOCK_TYPE type) {
 	switch (type) {
 	case BLOCK_TYPE::WATER:
 	case BLOCK_TYPE::OAK_LEAVES:
+	case BLOCK_TYPE::FLOWER:
 		return true;
 
 	default:
@@ -170,7 +209,7 @@ void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTextu
 
 	if (hiddenFaces == 63) return;
 
-	BlockStructureData* data = getBlockStructureData(hiddenFaces);
+	BlockStructureData* data = getBlockStructureData(getStructureType(type), hiddenFaces);
 
 	if (data->faceCount == 0) return;
 

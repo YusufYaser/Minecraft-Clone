@@ -16,10 +16,11 @@ enum class BLOCK_TYPE : uint8_t {
 	WATER,
 	BEDROCK,
 	SAND,
-	OAK_PLANKS
+	OAK_PLANKS,
+	FLOWER
 };
 
-#define BLOCK_TYPE_COUNT 11
+#define BLOCK_TYPE_COUNT 12
 
 enum class BLOCK_FACE : uint8_t {
 	FRONT = 0,
@@ -30,6 +31,11 @@ enum class BLOCK_FACE : uint8_t {
 	TOP,
 };
 
+enum BLOCK_STRUCTURE_TYPE : uint8_t {
+	FULL_BLOCK = 0,
+	PLANT
+};
+
 struct BlockStructureData {
 	GLuint VAO;
 	GLuint VBO;
@@ -38,8 +44,10 @@ struct BlockStructureData {
 	uint8_t faceCount;
 };
 
-BlockStructureData* getBlockStructureData(uint8_t hiddenFaces);
-BlockStructureData* createBlockStructureData(uint8_t hiddenFaces);
+BlockStructureData* getBlockStructureData(BLOCK_STRUCTURE_TYPE type, uint8_t hiddenFaces = 0);
+BlockStructureData* createBlockStructureData(BLOCK_STRUCTURE_TYPE type, uint8_t hiddenFaces = 0);
+
+BLOCK_STRUCTURE_TYPE getStructureType(BLOCK_TYPE type);
 
 glm::ivec3 getBlockFaceDirection(BLOCK_FACE face);
 const char* getTextureName(BLOCK_TYPE type);

@@ -111,6 +111,11 @@ void World::chunkLoaderFunc() {
 					for (int y = height; y < seaLevel; y++) {
 						setBlock(glm::ivec3(x, y, z), BLOCK_TYPE::WATER, false);
 					}
+				} else {
+					const double random = perlin2.octave2D_01((x * 0.025), (z * 0.025), 4);
+					if (random > 0.95) {
+						setBlock(glm::ivec3(x, height, z), BLOCK_TYPE::FLOWER, false);
+					}
 				}
 
 				int MAX_STRUCTURE_HEIGHT = 0;

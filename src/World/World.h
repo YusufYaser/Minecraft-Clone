@@ -132,6 +132,7 @@ private:
 	Mux chunkLoadQueueMutex;
 
 	siv::PerlinNoise perlin;
+	siv::PerlinNoise perlin2;
 
 	int m_chunksRendered = 0;
 	int m_instancesRendered = 0;
@@ -140,6 +141,7 @@ private:
 	bool m_worldRenderModified = true;
 
 	struct Instance {
+		BLOCK_STRUCTURE_TYPE bStructType;
 		BlockStructureData* bStructData;
 		uint8_t hiddenFaces;
 		GLuint VBO;

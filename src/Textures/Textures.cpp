@@ -150,6 +150,10 @@ TextureAtlas* initializeTextures() {
 		tex->height = height;
 		tex->width = width;
 
+		for (auto& l : tex->lod) {
+			l = glm::vec4();
+		}
+
 		if (height == 96) {
 			for (int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
