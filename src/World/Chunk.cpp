@@ -7,7 +7,13 @@ void World::chunkLoaderFunc() {
 
 	while (!unloading.load()) {
 		chunkLoadQueueMutex.lock();
-		if (chunkLoadQueue.size() == 0) {
+		Chunk* chunk = nullptr;
+		if (!chunkLoadQueue.empty()) {
+			chunk = chunkLoadQueue.front();
+			chunkLoadQueue.pop_front();
+		}
+
+		if (chunk == nullptr || chunk->loaded) {
 			chunkLoadQueueMutex.unlock();
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 			continue;
@@ -15,12 +21,9 @@ void World::chunkLoaderFunc() {
 
 		Player* player = Game::getInstance()->getPlayer();
 
-		Chunk* chunk = chunkLoadQueue.front();
-		chunkLoadQueue.erase(chunkLoadQueue.begin());
-		chunkLoadQueueMutex.unlock();
-
 		glm::ivec2 pos = chunk->pos;
 		std::size_t chunkCh = hashPos(pos);
+		chunkLoadQueueMutex.unlock();
 
 		if (time(0) - chunk->lastRendered > 10 &&
 			(player == nullptr || glm::length(glm::vec2(chunk->pos - getPosChunk(player->getPos()))) > Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE)
@@ -39,7 +42,7 @@ void World::chunkLoaderFunc() {
 			chunkFile.read(reinterpret_cast<char*>(saveData), sizeof(ChunkSaveData));
 			chunkFile.close();
 
-			debug("Loading chunk", chunk->pos, "from file:", path);
+			debug("Loading chunk", chunk->pos, "from file:", path, chunk);
 
 			for (int y = 0; y < MAX_HEIGHT; y++) {
 				for (int x = 0; x < 16; x++) {
@@ -69,6 +72,7 @@ void World::chunkLoaderFunc() {
 				setBlock({ 0, 0, 0 }, BLOCK_TYPE::BEDROCK);
 			}
 			chunk->loaded = true;
+			chunk->modified = false;
 			continue;
 		}
 
@@ -235,6 +239,14 @@ void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
 	}
 	chunksMutex.unlock();
 
+	chunkLoadQueueMutex.lock();
+	for (auto& c : chunkLoadQueue) {
+		if (c->pos == pos) {
+			chunkLoadQueueMutex.unlock();
+			return;
+		}
+	}
+
 	Chunk* chunk = new Chunk();
 	chunk->permanentlyLoaded = permanentlyLoaded;
 	chunk->lastRendered = time(nullptr);
@@ -243,7 +255,6 @@ void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
 	chunks[chunkCh] = chunk;
 	chunksMutex.unlock();
 
-	chunkLoadQueueMutex.lock();
 	chunkLoadQueue.push_back(chunk);
 
 	Player* player = Game::getInstance()->getPlayer();

@@ -128,7 +128,7 @@ private:
 	void chunkUnloaderFunc();
 	std::thread tickThread;
 	void tick(float delta);
-	std::vector<Chunk*> chunkLoadQueue;
+	std::deque<Chunk*> chunkLoadQueue;
 	Mux chunkLoadQueueMutex;
 
 	siv::PerlinNoise perlin;

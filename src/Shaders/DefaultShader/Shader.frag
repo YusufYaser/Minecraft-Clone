@@ -51,7 +51,7 @@ void main() {
         vec4 range = atlasRanges[fBlockType];
         vec2 size = vec2(range.z - range.x, range.w - range.y);
 
-        if ((range.x == 0 && range.y == 0) || (range.z == 0 || range.w == 0)) {
+        if ((range.x == range.z) || (range.y == range.w)) {
             FragColor = vec4(texCoord.x > .5f != texCoord.y > .5f ? 0 : 1.0f, 0, 0, 1.0f);
         } else {
             int animationFrameCount = int(round(size.x / (size.y / 6.0f)));
