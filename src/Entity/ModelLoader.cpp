@@ -182,7 +182,7 @@ void loadEntityModels() {
 						error = true;
 						break;
 					}
-					indices.push_back(start + o);
+					indices.push_back(start + o.get<int>());
 				}
 				if (error) break;
 			}

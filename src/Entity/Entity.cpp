@@ -26,7 +26,7 @@ void Entity::render() {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, pos);
 	glm::vec3 lookDir = glm::normalize(glm::vec3(orientation.x, 0.0f, orientation.z));
-	model = glm::rotate(model, atan2(lookDir.x, lookDir.z), { 0, 1.0f, 0 });
+	model = glm::rotate(model, static_cast<float>(atan2(lookDir.x, lookDir.z)), glm::vec3(0, 1.0f, 0));
 
 	glm::mat4 view = glm::lookAt(player->getCameraPos(), player->getCameraPos() + player->getOrientation(), player->getUp());
 	if (player->inFreecam()) {
