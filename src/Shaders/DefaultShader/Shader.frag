@@ -38,7 +38,7 @@ void main() {
     if (length(blockPosOffset) < 16 * 12) {
         vec2 tc = texCoord;
 
-        if (fBlockType == 3 && face == 5 || (fBlockType != 3 && fBlockType != 7 && fBlockType != 11)) {
+        if (fBlockType == 3 && face == 5 || (fBlockType != 3 && fBlockType != 7 && fBlockType != 10 && fBlockType != 11)) {
             vec3 p = fract((blockPosOffset + fPlayerPos) * 0.1031);
             p += dot(p, p.yxz + 19.19);
             if (fract((p.x + p.y) * p.z) > 0.5f) {
