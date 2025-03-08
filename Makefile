@@ -17,7 +17,7 @@ setup:
 
 build: setup $(BUILD_DIR)/game
 
-run:
+run: $(BUILD_DIR)/game
 	./$(BUILD_DIR)/game
 
 $(INTERMEDIATES_DIR)/%.o: $(SRC_DIR)/%.cpp
