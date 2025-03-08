@@ -10,17 +10,21 @@ ScreenshotMenu::ScreenshotMenu() {
 
 	screenshot = new Button();
 	screenshot->setText("Take Photo");
-	screenshot->setPosition({ 0, 150, 0, 140 });
+	screenshot->setPosition({ 0, 150, 0, 180 });
+
+	changeMode = new Button();
+	changeMode->setText("Change Mode");
+	changeMode->setPosition({ 0, 150, 0, 100 });
 
 	togglePostProcessed = new Button();
 	togglePostProcessed->setText("Toggle Post Processing");
-	togglePostProcessed->setPosition({ 0, 150, 0, 100 });
+	togglePostProcessed->setPosition({ 0, 150, 0, 140 });
 
 	resolution = new Text();
-	resolution->setPosition({ 0, 22, 0, 160 });
+	resolution->setPosition({ 0, 22, 0, 200 });
 
 	fileName = new Text();
-	fileName->setPosition({ 0, 22, 0, 180 });
+	fileName->setPosition({ 0, 22, 0, 220 });
 
 	back = new Button();
 	back->setText("Back");
@@ -73,6 +77,7 @@ ScreenshotMenu::~ScreenshotMenu() {
 
 void ScreenshotMenu::render() {
 	Game* game = Game::getInstance();
+	Player* player = game->getPlayer();
 	double currentTime = glfwGetTime();
 
 	Image* img = nullptr;
@@ -142,7 +147,31 @@ void ScreenshotMenu::render() {
 			tookPhoto = -10;
 		}
 
+		changeMode->render();
 		togglePostProcessed->render();
+
+		static bool forceRerendered = false;
+		static bool wasPerspective = false;
+
+		if (changeMode->isClicked()) {
+			if (mode == SCREENSHOT_MODE::DEFAULT) {
+				mode = SCREENSHOT_MODE::ORTHO;
+			} else if (mode == SCREENSHOT_MODE::ORTHO) {
+				mode = SCREENSHOT_MODE::DEFAULT;
+			}
+
+			if (mode == SCREENSHOT_MODE::ORTHO) {
+				wasPerspective = player->isPerspective();
+				player->setPerspective(false);
+			}
+
+			game->forceRender();
+			forceRerendered = true;
+		} else if (forceRerendered) {
+			if (mode == SCREENSHOT_MODE::ORTHO) {
+				player->setPerspective(wasPerspective);
+			}
+		}
 
 		if (togglePostProcessed->isClicked()) {
 			m_postProcessed = !m_postProcessed;

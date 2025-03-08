@@ -16,6 +16,7 @@ public:
 private:
 	Text* title;
 	Button* screenshot;
+	Button* changeMode;
 	Button* togglePostProcessed;
 	Button* back;
 
@@ -29,6 +30,12 @@ private:
 
 	double tookPhoto = -10;
 
+	enum SCREENSHOT_MODE : uint8_t {
+		DEFAULT = 0,
+		ORTHO
+	};
+
+	SCREENSHOT_MODE mode = SCREENSHOT_MODE::DEFAULT;
 	bool m_postProcessed = true;
 
 	bool m_isClosing = false;

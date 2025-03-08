@@ -325,14 +325,23 @@ void Player::getTargetBlock(Block** block, BLOCK_FACE* face) {
 }
 
 glm::mat4 Player::getProjection() const {
+	Game* game = Game::getInstance();
+	KeyHandler* keyHandler = game->getKeyHandler();
+	glm::vec2 size = game->getGameWindow()->getSize();
+	int renderDistance = game->getRenderDistance();
+	float d = sqrt(2 * ((renderDistance * 8.0f) * (renderDistance * 8.0f))) + 4.0f;
+
+	float zFar = d > 1000.0f ? d : 1000.0f;
+
+	if (!m_isPerspective) {
+		float orthoSize = 15.0f;
+
+		return glm::ortho(-(size.x / size.y) * orthoSize, (size.x / size.y) * orthoSize, -1.0f * orthoSize, 1.0f * orthoSize, .1f, zFar);
+	}
+
 	static bool wasRunning = false;
 	static double toggledRunning;
 	double currentTime = glfwGetTime();
-
-	Game* game = Game::getInstance();
-
-	glm::vec2 size = game->getGameWindow()->getSize();
-	int renderDistance = game->getRenderDistance();
 
 	bool isRunning = speed == PLAYER_RUN_SPEED;
 	if (isRunning && !wasRunning) {
@@ -353,13 +362,18 @@ glm::mat4 Player::getProjection() const {
 		FOV -= static_cast<float>(currentTime - toggledRunning) * (7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
 	}
 
-	float d = sqrt(2 * ((renderDistance * 8.0f) * (renderDistance * 8.0f))) + 4.0f;
-	return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, d > 1000.0f ? d : 1000.0f);
+	return glm::perspective(glm::radians(FOV), size.x / size.y, .1f, zFar);
 }
 
 glm::mat4 Player::getView() const {
+	Game* game = Game::getInstance();
+
 	if (!freecam) {
-		return glm::lookAt(glm::vec3(), orientation, up);
+		if (m_isPerspective) {
+			return glm::lookAt(glm::vec3(), orientation, up);
+		} else {
+			return glm::lookAt(glm::vec3(100.0f), glm::vec3(), up);
+		}
 	} else {
 		return glm::lookAt(freecamPos - (pos), freecamPos - (pos)+freecamOrientation, up);
 	}

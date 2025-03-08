@@ -90,6 +90,8 @@ public:
 	float getWorldResolution() const { return m_worldRes; };
 	void setWorldResolution(float newWorldRes) { m_worldRes = newWorldRes; };
 
+	void forceRender() { m_forceRender = true; };
+
 	void loadWorld(WorldSettings& settings, glm::vec3 playerPos = { 0, 0, 0 }, glm::vec3 playerOrientation = { 1, 0, 0 }, bool playerFlying = false);
 	void unloadWorld();
 	bool loadingWorld() const { return m_loadingWorld; };
@@ -137,6 +139,7 @@ private:
 	Texture* worldTexp = nullptr;
 	Image* worldImg = nullptr;
 	bool worldRenderingEnabled = true;
+	bool m_forceRender = false;
 
 	bool m_guiEnabled = true;
 

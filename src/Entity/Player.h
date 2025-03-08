@@ -37,6 +37,9 @@ public:
 	bool isFlying() const { return flying; }
 	void setFlying(bool nFlying) { flying = nFlying; }
 
+	bool isPerspective() const { return m_isPerspective; };
+	void setPerspective(bool mPerspective) { m_isPerspective = mPerspective; };
+
 	bool inFreecam() const { return freecam; };
 	glm::vec3 getFreecamPos() const { return freecamPos; };
 	glm::vec3 getFreecamOrientation() const { return freecamOrientation; };
@@ -47,6 +50,8 @@ private:
 	glm::vec3 freecamPos = glm::vec3();
 	glm::vec3 freecamStartPos = glm::vec3();
 	glm::vec3 freecamOrientation = glm::vec3(1.0f, 0, 0);
+
+	bool m_isPerspective = true;
 
 	void checkInputs(float delta);
 

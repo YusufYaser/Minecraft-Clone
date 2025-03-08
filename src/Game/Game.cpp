@@ -485,7 +485,9 @@ void Game::update() {
 		bool changed = prevSize.x != iSize.x || prevSize.y != iSize.y || prevWorld != m_world;
 		static double lastChanged = 0;
 
-		if ((!m_gamePaused || changed) && worldRenderingEnabled) {
+		if ((!m_gamePaused || changed) && worldRenderingEnabled || m_forceRender) {
+			m_forceRender = false;
+
 			glBindTexture(GL_TEXTURE_2D, worldTex->id);
 			glBindFramebuffer(GL_FRAMEBUFFER, worldFBO);
 			glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
