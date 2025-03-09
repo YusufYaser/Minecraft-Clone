@@ -189,6 +189,7 @@ U: Reload textures, shaders, and models
 
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_CLAMP);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glFrontFace(GL_CW);

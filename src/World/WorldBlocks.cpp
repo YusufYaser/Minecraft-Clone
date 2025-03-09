@@ -197,8 +197,13 @@ void World::setRenderingGroup(Block* block) {
 	std::size_t chunkCh = hashPos(getPosChunk(block->getPos()));
 
 	chunksMutex.lock();
-	Chunk* chunk = chunks[chunkCh];
+	auto cit = chunks.find(chunkCh);
 	chunksMutex.unlock();
+	if (cit == chunks.end()) {
+		return; // chunk not loaded
+	}
+
+	Chunk* chunk = cit->second;
 
 	BLOCK_TYPE type = block->getType();
 	chunk->renderingGroupsMutex.lock();

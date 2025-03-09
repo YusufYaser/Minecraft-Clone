@@ -160,17 +160,14 @@ void ScreenshotMenu::render() {
 				mode = SCREENSHOT_MODE::DEFAULT;
 			}
 
-			if (mode == SCREENSHOT_MODE::ORTHO) {
-				wasPerspective = player->isPerspective();
-				player->setPerspective(false);
-			}
+			wasPerspective = player->isPerspective();
+			player->setPerspective(mode == SCREENSHOT_MODE::DEFAULT);
 
 			game->forceRender();
 			forceRerendered = true;
 		} else if (forceRerendered) {
-			if (mode == SCREENSHOT_MODE::ORTHO) {
-				player->setPerspective(wasPerspective);
-			}
+			player->setPerspective(wasPerspective);
+			forceRerendered = false;
 		}
 
 		if (togglePostProcessed->isClicked()) {

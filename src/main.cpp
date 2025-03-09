@@ -61,8 +61,6 @@ thread_local struct ThreadLogger {
 	~ThreadLogger() {
 		try {
 			if (std::this_thread::get_id() != mainThread) {
-				debug("Main thread exited");
-			} else {
 				debug("Thread exited");
 			}
 		} catch (std::exception e) {
