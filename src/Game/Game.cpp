@@ -187,12 +187,13 @@ U: Reload textures, shaders, and models
 	m_pauseMenu = new PauseMenu();
 	m_mainMenu = new MainMenu();
 
-	glEnable(GL_DEPTH_TEST);
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glDepthRange(0, 1.0);
 	glEnable(GL_DEPTH_CLAMP);
 	glDisable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
 	glFrontFace(GL_CW);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0, 0, 0, 1.0f);
 
 	glGenFramebuffers(1, &worldFBO);
@@ -207,6 +208,16 @@ U: Reload textures, shaders, and models
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 854, 480, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, worldTex->id, 0);
+
+	worldDepthTex = new Texture();
+	glGenTextures(1, &worldDepthTex->id);
+	glBindTexture(GL_TEXTURE_2D, worldDepthTex->id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, 854, 480, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, worldDepthTex->id, 0);
 
 	glGenFramebuffers(1, &worldFBOp);
 	glBindFramebuffer(GL_FRAMEBUFFER, worldFBOp);
@@ -312,12 +323,13 @@ Game::~Game() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glDeleteFramebuffers(1, &worldFBO);
-	glDeleteRenderbuffers(1, &worldRBO);
 	glDeleteFramebuffers(1, &worldFBOp);
-	glDeleteRenderbuffers(1, &worldRBOp);
 
 	delete worldTex;
 	worldTex = nullptr;
+
+	delete worldDepthTex;
+	worldDepthTex = nullptr;
 
 	delete worldTexp;
 	worldTexp = nullptr;
@@ -491,40 +503,21 @@ void Game::update() {
 
 			glBindTexture(GL_TEXTURE_2D, worldTex->id);
 			glBindFramebuffer(GL_FRAMEBUFFER, worldFBO);
-			glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
 
 			if (changed) {
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iSize.x, iSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 				worldTex->width = iSize.x;
 				worldTex->height = iSize.y;
 
+				glBindTexture(GL_TEXTURE_2D, worldDepthTex->id);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, iSize.x, iSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+				worldDepthTex->width = iSize.x;
+				worldDepthTex->height = iSize.y;
+
 				glBindTexture(GL_TEXTURE_2D, worldTexp->id);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iSize.x, iSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 				worldTexp->width = iSize.x;
 				worldTexp->height = iSize.y;
-
-				// texture
-				glBindTexture(GL_TEXTURE_2D, worldTex->id);
-				if (worldRBO != 0) glDeleteRenderbuffers(1, &worldRBO);
-				glGenRenderbuffers(1, &worldRBO);
-				glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
-
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, iSize.x, iSize.y);
-				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, worldRBO);
-
-				glBindTexture(GL_TEXTURE_2D, worldTexp->id);
-				glBindFramebuffer(GL_FRAMEBUFFER, worldFBOp);
-				if (worldRBOp != 0) glDeleteRenderbuffers(1, &worldRBOp);
-				glGenRenderbuffers(1, &worldRBOp);
-				glBindRenderbuffer(GL_RENDERBUFFER, worldRBOp);
-
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, iSize.x, iSize.y);
-				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, worldRBOp);
-
-
-				glBindTexture(GL_TEXTURE_2D, worldTex->id);
-				glBindFramebuffer(GL_FRAMEBUFFER, worldFBO);
-				glBindRenderbuffer(GL_RENDERBUFFER, worldRBO);
 
 				if (m_pauseMenu->onSettings()) lastChanged = startTime;
 				prevSize = iSize;
@@ -537,12 +530,19 @@ void Game::update() {
 			m_world->render();
 
 			glBindFramebuffer(GL_FRAMEBUFFER, worldFBOp);
-			glBindRenderbuffer(GL_RENDERBUFFER, worldRBOp);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			postProcessingShader->activate();
 
-			// uniform sampler2D tex0
+			// uniform sampler2D colorTex
 			glBindTexture(GL_TEXTURE_2D, worldTex->id);
+			// uniform sampler2D depthTex
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, worldDepthTex->id);
+			glActiveTexture(GL_TEXTURE0);
+			// uniform float zNear
+			postProcessingShader->setUniform("zNear", 0.001f);
+			// uniform float zFar
+			postProcessingShader->setUniform("zFar", m_renderDistance * 16.0f);
 			// uniform float time
 			postProcessingShader->setUniform("time", (float)glfwGetTime());
 			// uniform ivec2 resolution

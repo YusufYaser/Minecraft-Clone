@@ -111,14 +111,10 @@ void World::render() {
 	skyboxShader->setUniform("projection", playerProjection);
 	skyboxShader->setUniform("ambientLight", getAmbientLight());
 
-	glDepthRange(0.99, 1.0);
-
 	glBindTexture(GL_TEXTURE_2D, getTexture("skybox")->id);
 	skyboxShader->setUniform("blockPos", glm::vec3(0, 0, 0));
 	skyboxShader->setUniform("type", 0);
 	skybox->Render(nullptr, 0, false);
-
-	glDepthRange(0.95, 0.99);
 
 	glBindTexture(GL_TEXTURE_2D, getTexture("sun")->id);
 	skyboxShader->setUniform("blockPos", glm::vec3(0, .9f, 0));
@@ -132,15 +128,11 @@ void World::render() {
 	skyboxShader->setUniform("model", model);
 	moon->Render(nullptr, 47, false);
 
-	glDepthRange(0.9, .95);
-
 	glBindTexture(GL_TEXTURE_2D, getTexture("clouds")->id);
 	skyboxShader->setUniform("blockPos", glm::vec3(0, .75f, 0));
 	skyboxShader->setUniform("playerPos", player->getPos());
 	skyboxShader->setUniform("type", 1);
 	clouds->Render(nullptr, 47, false);
-
-	glDepthRange(0, 0.9);
 
 	shader->activate();
 	shader->setUniform("view", playerView);
@@ -249,6 +241,7 @@ void World::render() {
 		m_chunksRendered = oldChunksRendered;
 	}
 
+	glEnable(GL_DEPTH_TEST);
 	for (auto& entity : entities) {
 		if (glm::length(pos - entity->getPos()) > (renderDistance - 1) * 16) continue;
 
@@ -308,6 +301,7 @@ void World::render() {
 		m_blocksRendered += i->offsetsCount;
 	}
 	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
 
 	if (!blend) {
 		glEnable(GL_BLEND);

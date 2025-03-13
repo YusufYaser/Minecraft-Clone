@@ -130,12 +130,11 @@ private:
 
 	World* m_world = nullptr;
 	GLuint worldFBO = 0;
-	GLuint worldRBO = 0;
 	GLuint worldVAO = 0;
 	GLuint worldVBO = 0;
 	GLuint worldFBOp = 0;
-	GLuint worldRBOp = 0;
 	Texture* worldTex = nullptr;
+	Texture* worldDepthTex = nullptr;
 	Texture* worldTexp = nullptr;
 	Image* worldImg = nullptr;
 	bool worldRenderingEnabled = true;

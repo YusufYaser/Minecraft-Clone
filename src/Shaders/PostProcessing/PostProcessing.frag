@@ -7,10 +7,11 @@ in vec2 texCoord;
 
 out vec4 FragColor;
 
-uniform sampler2D tex0;
+layout(binding = 0) uniform sampler2D colorTex;
+layout(binding = 1) uniform sampler2D depthTex;
 
 void main() {
-    FragColor = texture(tex0, texCoord);
+    FragColor = texture(colorTex, texCoord);
 
     FragColor *= (sin(texCoord.x * PI) * .175f) + .825f;
     FragColor *= (sin(texCoord.y * PI) * .175f) + .825f;
