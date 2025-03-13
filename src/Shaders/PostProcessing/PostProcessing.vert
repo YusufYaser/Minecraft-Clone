@@ -1,14 +1,11 @@
 R"END(
 #version 460 core
 
-layout(location = 0) in vec2 position;
-layout(location = 1) in vec2 inTexCoord;
-
-out vec2 texCoord;
-
 void main() {
-	gl_Position = vec4(position, 0, 1.0f);
-	
-	texCoord = inTexCoord;
+	gl_Position = vec4(
+		gl_VertexID % 2 == 0 ? -1.0f : 1.0f,
+		gl_VertexID < 2 || gl_VertexID == 5 ? -1.0f : 1.0f,
+		0, 1.0f
+	);
 }
 )END"

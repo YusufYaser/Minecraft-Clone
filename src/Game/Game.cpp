@@ -237,26 +237,7 @@ U: Reload textures, shaders, and models
 	worldImg->setSize({ 1.0f, 0, 1.0f, 0 });
 	worldImg->setPosition({ .5f, 0, .5f, 0 });
 
-	GLfloat vertices[] = {
-		-1.0f, -1.0f,		0.0f, 0.0f,
-		 1.0f, -1.0f,		1.0f, 0.0f,
-		 1.0f,  1.0f,		1.0f, 1.0f,
-		-1.0f, -1.0f,		0.0f, 0.0f,
-		 1.0f,  1.0f,		1.0f, 1.0f,
-		 -1.0f,  1.0f,		0.0f, 1.0f,
-	};
-
-	glGenVertexArrays(1, &worldVAO);
-	glBindVertexArray(worldVAO);
-
-	glGenBuffers(1, &worldVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+	glGenVertexArrays(1, &emptyVAO);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -337,8 +318,7 @@ Game::~Game() {
 	delete worldImg;
 	worldImg = nullptr;
 
-	glDeleteBuffers(1, &worldVBO);
-	glDeleteVertexArrays(1, &worldVAO);
+	glDeleteVertexArrays(1, &emptyVAO);
 
 	DebugText::cleanup();
 
@@ -552,7 +532,7 @@ void Game::update() {
 			postProcessingShader->setUniform("underWater", upBlock != nullptr && upBlock->getType() == BLOCK_TYPE::WATER);
 
 
-			glBindVertexArray(worldVAO);
+			glBindVertexArray(emptyVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 
 			if (m_worldRes != 1.0f) glViewport(0, 0, int(size.x), int(size.y));

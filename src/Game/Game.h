@@ -130,8 +130,7 @@ private:
 
 	World* m_world = nullptr;
 	GLuint worldFBO = 0;
-	GLuint worldVAO = 0;
-	GLuint worldVBO = 0;
+	GLuint emptyVAO = 0;
 	GLuint worldFBOp = 0;
 	Texture* worldTex = nullptr;
 	Texture* worldDepthTex = nullptr;
