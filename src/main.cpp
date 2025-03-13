@@ -12,6 +12,7 @@
 #if defined(__linux__) || defined(__APPLE__)
 #include <sys/resource.h>
 #include <sys/sysinfo.h>
+#include <dlfcn.h>
 #endif
 #ifdef __APPLE__
 #include <sys/types.h>
@@ -64,7 +65,7 @@ thread_local struct ThreadLogger {
 				debug("Thread exited");
 			}
 		} catch (std::exception e) {
-			
+
 		}
 	}
 } threadLogger;
@@ -137,6 +138,29 @@ int main(int argc, char* argv[]) {
 			}
 
 			autoGotoWorld = std::string(argv[++i]);
+		} else if (strcmp(argv[i], "--load-library") == 0) {
+			if (i + 1 >= argc) {
+				error("No library path provided with --load-library");
+				return 1;
+			}
+
+			std::string path = std::string(argv[++i]);
+
+			print("Loading library", path);
+#ifdef _WIN32
+			HMODULE lib = LoadLibraryA(path.c_str());
+			if (!lib) {
+				error("Failed to load requested library:", GetLastError());
+				return 1;
+			}
+#endif
+#if defined(__linux__) || defined(__APPLE__)
+			void* lib = dlopen(path.c_str(), RTLD_LAZY);
+			if (!lib) {
+				error("Failed to load requested library:", dlerror());
+				return 1;
+			}
+#endif
 		}
 	}
 
