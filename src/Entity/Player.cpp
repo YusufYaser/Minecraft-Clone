@@ -336,7 +336,7 @@ glm::mat4 Player::getProjection() const {
 	if (!m_isPerspective) {
 		float orthoSize = 15.0f;
 
-		return glm::ortho(-(size.x / size.y) * orthoSize, (size.x / size.y) * orthoSize, -1.0f * orthoSize, 1.0f * orthoSize, 0.001f, zFar);
+		return glm::ortho(-(size.x / size.y) * orthoSize, (size.x / size.y) * orthoSize, -1.0f * orthoSize, 1.0f * orthoSize, 0.01f, zFar);
 	}
 
 	static bool wasRunning = false;
@@ -362,7 +362,7 @@ glm::mat4 Player::getProjection() const {
 		FOV -= static_cast<float>(currentTime - toggledRunning) * (7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
 	}
 
-	return glm::perspective(glm::radians(FOV), size.x / size.y, 0.001f, zFar);
+	return glm::perspective(glm::radians(FOV), size.x / size.y, 0.01f, zFar);
 }
 
 glm::mat4 Player::getView() const {

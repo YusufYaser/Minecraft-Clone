@@ -540,7 +540,7 @@ void Game::update() {
 			glBindTexture(GL_TEXTURE_2D, worldDepthTex->id);
 			glActiveTexture(GL_TEXTURE0);
 			// uniform float zNear
-			postProcessingShader->setUniform("zNear", 0.001f);
+			postProcessingShader->setUniform("zNear", 0.01f);
 			// uniform float zFar
 			postProcessingShader->setUniform("zFar", m_renderDistance * 16.0f);
 			// uniform float time

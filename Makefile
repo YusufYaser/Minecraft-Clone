@@ -7,6 +7,8 @@ LDFLAGS = -lglfw -ldl -pthread
 
 SRCS := $(shell find $(SRC_DIR) libraries -type f -name '*.cpp' -or -name '*.c')
 
+build: setup $(BUILD_DIR)/game
+
 clean:
 	rm -rf build/
 
@@ -15,9 +17,7 @@ setup:
 	mkdir -p $(INTERMEDIATES_DIR)
 	mkdir -p $(INTERMEDIATES_DIR)/libs
 
-build: setup $(BUILD_DIR)/game
-
-run: $(BUILD_DIR)/game
+run: build
 	./$(BUILD_DIR)/game
 
 $(INTERMEDIATES_DIR)/%.o: $(SRC_DIR)/%.cpp
