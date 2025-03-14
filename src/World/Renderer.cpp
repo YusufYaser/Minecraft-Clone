@@ -276,7 +276,6 @@ void World::render() {
 	TextureAtlas* atlas = Game::getInstance()->getTexAtlas();
 	glBindTexture(GL_TEXTURE_2D, atlas->tex->id);
 
-	glEnable(GL_CULL_FACE);
 	static bool blend = true;
 
 	m_blocksRendered = 0;
@@ -284,9 +283,11 @@ void World::render() {
 		if (i->offsetsCount == 0 || i->bStructData == nullptr) continue;
 		if (i->transparent && !blend) {
 			glEnable(GL_BLEND);
+			glDisable(GL_CULL_FACE);
 			blend = true;
 		} else if (!i->transparent && blend) {
 			glDisable(GL_BLEND);
+			glEnable(GL_CULL_FACE);
 			blend = false;
 		}
 
@@ -300,11 +301,11 @@ void World::render() {
 		m_instancesRendered++;
 		m_blocksRendered += i->offsetsCount;
 	}
-	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 
 	if (!blend) {
 		glEnable(GL_BLEND);
+		glDisable(GL_CULL_FACE);
 		blend = true;
 	}
 

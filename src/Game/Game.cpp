@@ -520,7 +520,12 @@ void Game::update() {
 			glBindTexture(GL_TEXTURE_2D, worldDepthTex->id);
 			// uniform sampler3D colorLUT
 			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_3D, getTexture("color_grading")->id);
+			Block* upBlock = m_world->getBlock(glm::ivec3(glm::round(m_player->getPos())) + glm::ivec3(0, 1, 0));
+			if (upBlock != nullptr && upBlock->getType() == BLOCK_TYPE::WATER) {
+				glBindTexture(GL_TEXTURE_3D, getTexture("water.lut")->id);
+			} else {
+				glBindTexture(GL_TEXTURE_3D, getTexture("default.lut")->id);
+			}
 			glActiveTexture(GL_TEXTURE0);
 			// uniform float zNear
 			postProcessingShader->setUniform("zNear", 0.01f);
@@ -530,9 +535,8 @@ void Game::update() {
 			postProcessingShader->setUniform("time", (float)glfwGetTime());
 			// uniform ivec2 resolution
 			postProcessingShader->setUniform("resolution", iSize);
-			Block* upBlock = m_world->getBlock(glm::ivec3(glm::round(m_player->getPos())) + glm::ivec3(0, 1, 0));
-			// uniform bool underWater
-			postProcessingShader->setUniform("underWater", upBlock != nullptr && upBlock->getType() == BLOCK_TYPE::WATER);
+			// uniform bool guiEnabled
+			postProcessingShader->setUniform("guiEnabled", m_guiEnabled);
 
 
 			glBindVertexArray(emptyVAO);
@@ -558,7 +562,7 @@ void Game::update() {
 		glm::ivec3 iPos = glm::round(m_player->getPos());
 
 		Block* upBlock = m_world->getBlock(iPos + glm::ivec3(0, 1, 0));
-		if (upBlock != nullptr) {
+		if (upBlock != nullptr && upBlock->getType() != BLOCK_TYPE::WATER) {
 			m_collOverlay->setTexture(getTexture(upBlock->getName()));
 			m_collOverlay->setCrop({ 1.0f / getAnimationFrameCount(upBlock->getType()), 1.0f / 6.0f });
 			if (!m_gamePaused) {

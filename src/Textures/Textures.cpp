@@ -132,9 +132,9 @@ TextureAtlas* initializeTextures() {
 			break;
 		}
 
-		if (name == "color_grading") {
+		if (name.ends_with(".lut")) {
 			if (width != height) {
-				error("Width must be the same as height in color_grading.png");
+				error("Width must be the same as height in", name);
 
 				stbi_image_free(data);
 				continue;
