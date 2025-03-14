@@ -132,17 +132,62 @@ TextureAtlas* initializeTextures() {
 			break;
 		}
 
-		glGenTextures(1, &ID);
-		glBindTexture(GL_TEXTURE_2D, ID);
+		if (name == "color_grading") {
+			if (width != height) {
+				error("Width must be the same as height in color_grading.png");
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+				stbi_image_free(data);
+				continue;
+			}
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glGenTextures(1, &ID);
+			glBindTexture(GL_TEXTURE_3D, ID);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			unsigned char* lutData = new unsigned char[width * height * numCh];
+
+			int gridSize = width / 8;
+
+			for (int b = 0; b < gridSize; b++) {
+				int gridX = b % 8;
+				int gridY = b / 8;
+
+				for (int r = 0; r < gridSize; r++) {
+					for (int g = 0; g < gridSize; g++) {
+						int srcIndex = ((gridY * width * gridSize) + (g * width) + ((8 - gridX - 1) * gridSize) + (r)) * numCh;
+						int dstIndex = (((gridSize - b - 1) * gridSize * gridSize) + ((gridSize - g - 1) * gridSize) + r) * numCh;
+
+						lutData[dstIndex] = data[srcIndex];
+						lutData[dstIndex + 1] = data[srcIndex + 1];
+						lutData[dstIndex + 2] = data[srcIndex + 2];
+						if (numCh == 4) lutData[dstIndex + 3] = data[srcIndex + 3];
+					}
+				}
+			}
+
+			glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB8, gridSize, gridSize, gridSize, 0, GL_RGB, GL_UNSIGNED_BYTE, lutData);
+			glGenerateMipmap(GL_TEXTURE_3D);
+
+			delete[] lutData;
+		} else {
+			glGenTextures(1, &ID);
+			glBindTexture(GL_TEXTURE_2D, ID);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
 
 		Texture* tex = textures[name];
 		if (tex == nullptr) tex = new Texture();

@@ -336,7 +336,7 @@ glm::mat4 Player::getProjection() const {
 	if (!m_isPerspective) {
 		float orthoSize = 15.0f;
 
-		return glm::ortho(-(size.x / size.y) * orthoSize, (size.x / size.y) * orthoSize, -1.0f * orthoSize, 1.0f * orthoSize, 0.01f, zFar);
+		return glm::ortho(-(size.x / size.y) * orthoSize, (size.x / size.y) * orthoSize, -1.0f * orthoSize, 1.0f * orthoSize, 0.01f, zFar * 10.0f);
 	}
 
 	static bool wasRunning = false;

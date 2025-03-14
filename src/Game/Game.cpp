@@ -518,6 +518,9 @@ void Game::update() {
 			// uniform sampler2D depthTex
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, worldDepthTex->id);
+			// uniform sampler3D colorLUT
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_3D, getTexture("color_grading")->id);
 			glActiveTexture(GL_TEXTURE0);
 			// uniform float zNear
 			postProcessingShader->setUniform("zNear", 0.01f);
