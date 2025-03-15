@@ -1,5 +1,5 @@
 R"END(
-#version 460 core
+#version 450 core
 precision highp float;
 
 #define PI (acos(0) * 2)

@@ -1,5 +1,5 @@
 R"END(
-#version 460 core
+#version 450 core
 
 in vec2 texCoord;
 flat in float face;
