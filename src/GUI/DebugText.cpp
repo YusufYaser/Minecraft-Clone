@@ -91,10 +91,28 @@ void DebugText::render() {
 
 		glm::ivec2 chunkPos = getPosChunk(player->getPos());
 		if (l == 2) {
+			Chunk* chunk = world->getChunk(chunkPos);
 			text << "\n=== Current Chunk ===\n";
 			text << " Chunk: " << round(chunkPos.x * 100) / 100;
 			text << ", " << round(chunkPos.y * 100) / 100 << "\n";
 			text << " ID: " << hashPos(chunkPos) << "\n";
+			text << " Permanently Loaded: " << (chunk->permanentlyLoaded ? "true" : "false") << "\n";
+			text << " Modified: " << (chunk->modified ? "true" : "false") << "\n";
+#ifdef GAME_DEBUG
+			text << " Load Method: ";
+			switch (chunk->dLoadMethod) {
+			case CHUNK_LOAD_METHOD::GENERATED:
+				text << "GENERATED";
+				break;
+			case CHUNK_LOAD_METHOD::FILE:
+				text << "FILE";
+				break;
+			default:
+				text << "UNKNOWN";
+				break;
+			}
+			text << "\n";
+#endif
 			text << "====================\n\n";
 		} else {
 			text << "Chunk: " << round(chunkPos.x * 100) / 100;
@@ -153,6 +171,22 @@ void DebugText::render() {
 			text << ", " << round(bPos.y * 100) / 100;
 			text << ", " << round(bPos.z * 100) / 100 << "\n";
 			text << " Ambient Light: " << world->getAmbientLight() << "\n";
+
+#ifdef GAME_DEBUG
+			text << " Placement Method: ";
+			switch (targetBlock->dPlacementMethod) {
+			case BLOCK_PLACEMENT_METHOD::SET_BLOCK:
+				text << "SET_BLOCK";
+				break;
+			case BLOCK_PLACEMENT_METHOD::FILL_BLOCKS:
+				text << "FILL_BLOCKS";
+				break;
+			default:
+				text << "UNKNOWN";
+				break;
+			}
+			text << "\n";
+#endif
 			text << "==================\n";
 		}
 	}

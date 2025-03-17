@@ -31,7 +31,7 @@ enum class BLOCK_FACE : uint8_t {
 	TOP,
 };
 
-enum BLOCK_STRUCTURE_TYPE : uint8_t {
+enum class BLOCK_STRUCTURE_TYPE : uint8_t {
 	FULL_BLOCK = 0,
 	PLANT
 };
@@ -56,7 +56,7 @@ bool blockTypeHasCollision(BLOCK_TYPE type);
 bool isBlockTypeTransparent(BLOCK_TYPE type);
 
 #ifdef GAME_DEBUG
-enum BLOCK_PLACEMENT_METHOD {
+enum class BLOCK_PLACEMENT_METHOD {
 	UNKNOWN = 0,
 	SET_BLOCK,
 	FILL_BLOCKS
@@ -75,7 +75,7 @@ public:
 	bool hasTransparency() const { return isBlockTypeTransparent(type); };
 
 #ifdef GAME_DEBUG
-	BLOCK_PLACEMENT_METHOD dPlacementMethod = UNKNOWN;
+	BLOCK_PLACEMENT_METHOD dPlacementMethod = BLOCK_PLACEMENT_METHOD::UNKNOWN;
 #endif
 
 private:

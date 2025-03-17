@@ -45,6 +45,42 @@ struct WorldSettings {
 	int initialTick = 0;
 };
 
+#ifdef GAME_DEBUG
+enum class CHUNK_LOAD_METHOD {
+	UNKNOWN = 0,
+	GENERATED,
+	FILE
+};
+#endif
+
+struct Chunk {
+	bool loaded : 1 = false;
+	bool permanentlyLoaded : 1 = false;
+	bool modified : 1 = false;
+	bool reserved : 5;
+	Mux blocksMutex;
+	Mux renderingGroupsMutex;
+	time_t lastRendered = 0;
+	Block* blocks[16 * 16 * MAX_HEIGHT];
+	std::vector<Block*> blocksToRender;
+	glm::ivec2 pos;
+
+#ifdef GAME_DEBUG
+	CHUNK_LOAD_METHOD dLoadMethod = CHUNK_LOAD_METHOD::UNKNOWN;
+#endif
+
+	~Chunk() {
+		blocksMutex.lock();
+		for (auto& block : blocks) {
+			delete block;
+		}
+		blocksMutex.unlock();
+		renderingGroupsMutex.lock();
+		blocksToRender.clear();
+		renderingGroupsMutex.unlock();
+	}
+};
+
 class World {
 public:
 	World(WorldSettings& settings);
@@ -70,6 +106,7 @@ public:
 	int blocksRendered() const { return m_blocksRendered; };
 	int totalInstances() const { return static_cast<int>(instances.size()); };
 	bool isChunkLoaded(glm::ivec2 cPos);
+	Chunk* getChunk(glm::ivec2 cPos);
 
 	// Get the height at a position from the world generator
 	int getHeight(glm::ivec2 pos);
@@ -93,30 +130,6 @@ private:
 	Generator generator;
 
 	std::vector<Structure*> structures;
-
-	struct Chunk {
-		bool loaded : 1 = false;
-		bool permanentlyLoaded : 1 = false;
-		bool modified : 1 = false;
-		bool reserved : 5;
-		Mux blocksMutex;
-		Mux renderingGroupsMutex;
-		time_t lastRendered = 0;
-		Block* blocks[16 * 16 * MAX_HEIGHT];
-		std::vector<Block*> blocksToRender;
-		glm::ivec2 pos;
-
-		~Chunk() {
-			blocksMutex.lock();
-			for (auto& block : blocks) {
-				delete block;
-			}
-			blocksMutex.unlock();
-			renderingGroupsMutex.lock();
-			blocksToRender.clear();
-			renderingGroupsMutex.unlock();
-		}
-	};
 
 	std::unordered_map<std::size_t, Chunk*> chunks;
 	Mux chunksMutex;

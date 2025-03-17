@@ -64,7 +64,7 @@ void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
 				Block* block = new Block(type, pos);
 				block->hiddenFaces = 63;
 #ifdef GAME_DEBUG
-				block->dPlacementMethod = FILL_BLOCKS;
+				block->dPlacementMethod = BLOCK_PLACEMENT_METHOD::FILL_BLOCKS;
 #endif
 				chunk->blocks[hashPosForChunk(pos)] = block;
 			}
@@ -178,7 +178,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 
 	block->hiddenFaces = hiddenFaces;
 #ifdef GAME_DEBUG
-	block->dPlacementMethod = SET_BLOCK;
+	block->dPlacementMethod = BLOCK_PLACEMENT_METHOD::SET_BLOCK;
 #endif
 
 	chunk->blocksMutex.lock();

@@ -64,6 +64,10 @@ void World::chunkLoaderFunc() {
 
 			chunk->loaded = true;
 			chunk->modified = false;
+
+#ifdef GAME_DEBUG
+			chunk->dLoadMethod = CHUNK_LOAD_METHOD::FILE;
+#endif
 			continue;
 		}
 
@@ -156,6 +160,9 @@ void World::chunkLoaderFunc() {
 
 		chunk->loaded = true;
 		chunk->modified = false;
+#ifdef GAME_DEBUG
+		chunk->dLoadMethod = CHUNK_LOAD_METHOD::GENERATED;
+#endif
 	}
 }
 
@@ -290,4 +297,17 @@ bool World::isChunkLoaded(glm::ivec2 cPos) {
 	auto it = chunks.find(hashPos(cPos));
 	if (it == chunks.end()) return false;
 	return it->second->loaded;
+}
+
+Chunk* World::getChunk(glm::ivec2 cPos) {
+	std::size_t chunkCh = hashPos(cPos);
+
+	chunksMutex.lock();
+	auto cit = chunks.find(chunkCh);
+	chunksMutex.unlock();
+	if (cit == chunks.end()) {
+		return nullptr; // chunk not loaded
+	}
+
+	return cit->second;
 }
