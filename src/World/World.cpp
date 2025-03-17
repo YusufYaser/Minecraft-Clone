@@ -189,11 +189,9 @@ void World::tick(float delta) {
 }
 
 float World::getAmbientLight() {
-	const double halfPi = acos(0.0); // 3.14 / 2
+	float light = static_cast<float>((sin(((getTime() / 6000.0f) + 1) * acos(0.0)) + 1.0f) / 2.0f);
 
-	float light = static_cast<float>((sin(((getTime() / 6000.0f) + 1) * halfPi) + 1.0f) / 2.0f);
-	light *= 1 - .1f;
-	return light + .1f;
+	return std::clamp((light - .5f) * 2.0f * 10.0f, .1f, 1.0f);
 }
 
 int World::getTime() {

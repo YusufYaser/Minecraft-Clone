@@ -161,12 +161,11 @@ TextureAtlas* initializeTextures() {
 				for (int r = 0; r < gridSize; r++) {
 					for (int g = 0; g < gridSize; g++) {
 						int srcIndex = ((gridY * width * gridSize) + (g * width) + ((8 - gridX - 1) * gridSize) + (r)) * numCh;
-						int dstIndex = (((gridSize - b - 1) * gridSize * gridSize) + ((gridSize - g - 1) * gridSize) + r) * numCh;
+						int dstIndex = (((gridSize - b - 1) * gridSize * gridSize) + ((gridSize - g - 1) * gridSize) + r) * 3;
 
 						lutData[dstIndex] = data[srcIndex];
 						lutData[dstIndex + 1] = data[srcIndex + 1];
 						lutData[dstIndex + 2] = data[srcIndex + 2];
-						if (numCh == 4) lutData[dstIndex + 3] = data[srcIndex + 3];
 					}
 				}
 			}

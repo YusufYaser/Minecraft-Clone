@@ -148,11 +148,13 @@ void DebugText::render() {
 
 
 		text << "World Name: " << game->getLoadedWorldName() << "\n";
+		int day = (float)floor((world->getTime() - 6000.0f) / 24000.0f);
+		if (day < 0) day = 0;
 		if (l == 2) {
 			text << "World Time: " << world->getTime();
-			text << " ticks (" << floor(world->getTime() / 24000.0f) << " days)\n";
+			text << " ticks (" << day << " days)\n";
 		} else {
-			text << "World Time: " << floor(world->getTime() / 24000.0f) << " days\n";
+			text << "World Time: " << day << " days\n";
 		}
 		text << "World Seed: " << world->getSeed() << "\n\n";
 	}

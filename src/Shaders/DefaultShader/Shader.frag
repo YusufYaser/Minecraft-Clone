@@ -26,7 +26,7 @@ uniform vec4 lods[BLOCK_TYPE_COUNT][6];
 const float BORDER_SIZE = .02f;
 
 void main() {
-    vec4 SkyColor = vec4(vec3(78.0f / 255.0f, 78.0f / 255.0f, 251.0f / 255.0f) * ambientLight, 1.0f);
+    vec4 SkyColor = vec4(vec3(78.0f / 255.0f, 78.0f / 255.0f, 251.0f / 255.0f), 1.0f);
 
     float dist = length(blockPosOffset) - ((fRenderDistance * 2 - fFogSize * 2) * 8.0f);
     float val = min(max(dist / ((fFogSize * 2 - 0.5f) * (16.0f / 2.0f)), 0.0f), 1.0f);
@@ -82,8 +82,8 @@ void main() {
         lightPercentage = .75f;
     }
 
-    FragColor *= vec4(vec3(ambientLight * lightPercentage), 1.0f);
-
     FragColor = mix(FragColor, SkyColor, val);
+
+    FragColor *= vec4(vec3(ambientLight * lightPercentage), 1.0f);
 }
 )END"

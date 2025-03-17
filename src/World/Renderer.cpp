@@ -111,7 +111,10 @@ void World::render() {
 	skyboxShader->setUniform("projection", playerProjection);
 	skyboxShader->setUniform("ambientLight", getAmbientLight());
 
-	glBindTexture(GL_TEXTURE_2D, getTexture("skybox")->id);
+	glBindTexture(GL_TEXTURE_2D, getTexture("skybox_day")->id);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, getTexture("skybox_night")->id);
+	glActiveTexture(GL_TEXTURE0);
 	skyboxShader->setUniform("blockPos", glm::vec3(0, 0, 0));
 	skyboxShader->setUniform("type", 0);
 	skybox->Render(nullptr, 0, false);
