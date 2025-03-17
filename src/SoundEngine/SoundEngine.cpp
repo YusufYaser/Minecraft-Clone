@@ -1,5 +1,8 @@
 #include "SoundEngine.h"
 #include "../Logging.h"
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 bool enableSound();
 
@@ -20,6 +23,10 @@ SoundEngine::SoundEngine() {
 	print("Using sound device:", dev->playback.name);
 
 	t = std::thread([this]() {
+#ifdef _WIN32
+		SetThreadDescription(GetCurrentThread(), L"Sound Engine");
+#endif
+
 		soundTick();
 		});
 

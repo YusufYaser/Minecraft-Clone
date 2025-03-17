@@ -53,6 +53,8 @@ inline std::thread::id mainThread;
 #ifdef GAME_DEBUG
 thread_local struct ThreadLogger {
 	ThreadLogger() {
+		if (oom.load()) return;
+
 		if (std::this_thread::get_id() == mainThread) {
 			debug("Main thread started");
 		} else {
@@ -60,13 +62,17 @@ thread_local struct ThreadLogger {
 		}
 	}
 	~ThreadLogger() {
-		try {
-			if (std::this_thread::get_id() != mainThread) {
-				debug("Thread exited");
-			}
-		} catch (std::exception e) {
+		if (oom.load()) return;
 
-		}
+#ifdef _WIN32
+		PWSTR desc;
+		GetThreadDescription(GetCurrentThread(), &desc);
+		std::wstring wstr;
+		wstr.append(&desc[0]);
+		debug("Thread exited:", std::string(wstr.begin(), wstr.end()));
+#else
+		debug("Thread exited");
+#endif
 	}
 } threadLogger;
 #endif
@@ -104,6 +110,8 @@ int main(int argc, char* argv[]) {
 			SetConsoleMode(hOut, dwMode);
 		}
 	}
+
+	SetThreadDescription(GetCurrentThread(), L"Main and Renderer Thread");
 #endif
 
 	std::signal(SIGINT, signalHandler);

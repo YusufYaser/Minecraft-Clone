@@ -2,6 +2,9 @@
 #include "Utils.h"
 #include "../Game/Game.h"
 #include <glad/gl.h>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 World::World(WorldSettings& settings) {
 	World::seed = settings.seed;
@@ -23,10 +26,18 @@ World::World(WorldSettings& settings) {
 	unloading.store(false);
 
 	chunkUnloader = std::thread([this]() {
+#ifdef _WIN32
+		SetThreadDescription(GetCurrentThread(), L"Chunk Unloader");
+#endif
+
 		chunkUnloaderFunc();
 		});
 
 	tickThread = std::thread([this]() {
+#ifdef _WIN32
+		SetThreadDescription(GetCurrentThread(), L"World Tick");
+#endif
+
 		Game* game = Game::getInstance();
 
 		double lastTick = glfwGetTime();
@@ -52,12 +63,20 @@ World::World(WorldSettings& settings) {
 
 	for (int c = 0; c < RENDERER_THREAD_COUNT; c++) {
 		renderingThreads[c] = std::thread([this](int c) {
+#ifdef _WIN32
+			SetThreadDescription(GetCurrentThread(), L"Instances Preparer");
+#endif
+
 			renderer(c);
 			}, c);
 	}
 
 	for (int c = 0; c < CHUNK_LOADER_THREAD_COUNT; c++) {
 		chunkLoaderThreads[c] = std::thread([this]() {
+#ifdef _WIN32
+			SetThreadDescription(GetCurrentThread(), L"Chunk Loader");
+#endif
+
 			chunkLoaderFunc();
 			});
 	}
