@@ -130,11 +130,11 @@ void World::dontRender() {
 	int renderDistance = Game::getInstance()->getRenderDistance();
 	Player* player = Game::getInstance()->getPlayer();
 
-	for (int x = -renderDistance + playerChunk.x - EXTRA_RENDER_DISTANCE; x < renderDistance + playerChunk.x + EXTRA_RENDER_DISTANCE; x++) {
-		for (int y = -renderDistance + playerChunk.y - EXTRA_RENDER_DISTANCE; y < renderDistance + playerChunk.y + EXTRA_RENDER_DISTANCE; y++) {
+	for (int x = -renderDistance + playerChunk.x - PRELOAD_DISTANCE; x < renderDistance + playerChunk.x + PRELOAD_DISTANCE; x++) {
+		for (int y = -renderDistance + playerChunk.y - PRELOAD_DISTANCE; y < renderDistance + playerChunk.y + PRELOAD_DISTANCE; y++) {
 			glm::ivec2 cPos = glm::ivec2(x, y);
 
-			if (glm::length(glm::vec2(cPos - getPosChunk(player->getPos()))) > Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE) continue;
+			if (glm::length(glm::vec2(cPos - getPosChunk(player->getPos()))) > Game::getInstance()->getRenderDistance() + PRELOAD_DISTANCE) continue;
 
 			std::size_t chunkCh = hashPos(cPos);
 			if (!chunksMutex.try_lock()) continue;
@@ -191,7 +191,7 @@ void World::tick(float delta) {
 float World::getAmbientLight() {
 	float light = static_cast<float>((sin(((getTime() / 6000.0f) + 1) * acos(0.0)) + 1.0f) / 2.0f);
 
-	return std::clamp((light - .5f) * 2.0f * 10.0f, .1f, 1.0f);
+	return std::clamp((light - .5f) * 2.0f * 9.0f, .1f, 1.0f);
 }
 
 int World::getTime() {

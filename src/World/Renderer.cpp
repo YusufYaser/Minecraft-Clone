@@ -86,6 +86,7 @@ void World::render() {
 
 	glm::mat4 playerView = player->getView();
 	glm::mat4 playerProjection = player->getProjection();
+	glm::vec3 pos = player->getCameraPos();
 
 	static Block* skybox;
 	static Block* clouds;
@@ -132,7 +133,7 @@ void World::render() {
 	moon->Render(nullptr, 47, false);
 
 	glBindTexture(GL_TEXTURE_2D, getTexture("clouds")->id);
-	skyboxShader->setUniform("blockPos", glm::vec3(0, .75f, 0));
+	skyboxShader->setUniform("blockPos", glm::vec3(0, .75f - (pos.y / (MAX_HEIGHT + 32) / 4), 0));
 	skyboxShader->setUniform("playerPos", player->getPos());
 	skyboxShader->setUniform("type", 1);
 	clouds->Render(nullptr, 47, false);
@@ -152,8 +153,6 @@ void World::render() {
 		shader->setUniform("highlighted", glm::ivec3(0, -1, 0));
 	}
 
-	// Camera Position
-	glm::vec3 pos = player->getCameraPos();
 	int renderDistance = Game::getInstance()->getRenderDistance();
 	shader->setUniform("fogSize", 2.0f);
 	shader->setUniform("playerPos", pos);
@@ -174,11 +173,11 @@ void World::render() {
 	if (oldPlayerChunk != playerChunk || oldChunksLoaded < chunksLoaded || m_worldRenderModified) {
 		chunksToRender.clear();
 
-		for (int x = -renderDistance + playerChunk.x - EXTRA_RENDER_DISTANCE; x < renderDistance + playerChunk.x + EXTRA_RENDER_DISTANCE; x++) {
-			for (int y = -renderDistance + playerChunk.y - EXTRA_RENDER_DISTANCE; y < renderDistance + playerChunk.y + EXTRA_RENDER_DISTANCE; y++) {
+		for (int x = -renderDistance + playerChunk.x - PRELOAD_DISTANCE; x < renderDistance + playerChunk.x + PRELOAD_DISTANCE; x++) {
+			for (int y = -renderDistance + playerChunk.y - PRELOAD_DISTANCE; y < renderDistance + playerChunk.y + PRELOAD_DISTANCE; y++) {
 				glm::ivec2 cPos = glm::ivec2(x, y);
 
-				if (glm::length(glm::vec2(cPos - playerChunk)) > renderDistance) {
+				if (glm::length(glm::vec2(cPos - playerChunk)) > renderDistance + PRELOAD_DISTANCE) {
 					chunksMutex.unlock();
 					continue;
 				}
@@ -191,6 +190,12 @@ void World::render() {
 					loadChunk(cPos);
 					continue;
 				}
+
+				if (glm::length(glm::vec2(cPos - playerChunk) * 16.0f) + .5f > renderDistance * 16.0f) {
+					chunksMutex.unlock();
+					continue;
+				}
+
 				Chunk* chunk = it->second;
 				chunksMutex.unlock();
 				if (chunk == nullptr) continue;

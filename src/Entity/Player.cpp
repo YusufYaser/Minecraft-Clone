@@ -118,7 +118,7 @@ void Player::checkInputs(float delta) {
 			}
 		} else {
 			if (keyHandler->keyHeld(GLFW_KEY_SPACE)) {
-				if (verticalVelocity == 0.0f && !freecam) verticalVelocity = 6.0f;
+				if (verticalVelocity == 0.0f && !freecam) verticalVelocity = 7.0f;
 			}
 		}
 	} else {

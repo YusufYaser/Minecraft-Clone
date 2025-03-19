@@ -26,7 +26,7 @@ void World::chunkLoaderFunc() {
 		chunkLoadQueueMutex.unlock();
 
 		if (time(0) - chunk->lastRendered > 10 &&
-			(player == nullptr || glm::length(glm::vec2(chunk->pos - getPosChunk(player->getPos()))) > Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE)
+			(player == nullptr || glm::length(glm::vec2(chunk->pos - getPosChunk(player->getPos()))) > Game::getInstance()->getRenderDistance() + PRELOAD_DISTANCE)
 			) {
 			delete chunk;
 			chunkLoadQueueMutex.lock();
@@ -184,7 +184,7 @@ void World::chunkUnloaderFunc() {
 			Player* player = Game::getInstance()->getPlayer();
 
 			if (!unloading.load() && player != nullptr &&
-				glm::length(glm::vec2(chunk->pos - getPosChunk(player->getPos()))) <= Game::getInstance()->getRenderDistance() + EXTRA_RENDER_DISTANCE) continue;
+				glm::length(glm::vec2(chunk->pos - getPosChunk(player->getPos()))) <= Game::getInstance()->getRenderDistance() + PRELOAD_DISTANCE) continue;
 
 			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 20)
 				|| unloading.load()) {
