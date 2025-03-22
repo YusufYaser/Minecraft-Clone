@@ -49,8 +49,11 @@ int World::getHeight(glm::ivec2 pos) {
 	if (generator == Generator::Flat) {
 		return 7;
 	}
+	if (generator == Generator::Debug) {
+		return 1;
+	}
 	if (generator == Generator::Void) {
-		return 0;
+		return 1;
 	}
 
 	const double random = perlin.octave2D_01((pos.x * 0.025), (pos.y * 0.025), 4);

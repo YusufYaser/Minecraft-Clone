@@ -95,8 +95,6 @@ public:
 	void loadWorld(WorldSettings& settings, glm::vec3 playerPos = { 0, 0, 0 }, glm::vec3 playerOrientation = { 1, 0, 0 }, bool playerFlying = false);
 	void unloadWorld();
 	bool loadingWorld() const { return m_loadingWorld; };
-	void setLoadedWorldName(std::string name) { m_worldName = name; };
-	std::string getLoadedWorldName() const { return m_worldName; };
 
 	bool successfullyLoaded() const { return m_successfullyLoaded; };
 
@@ -115,8 +113,6 @@ private:
 #endif
 
 	bool m_shouldQuit = false;
-
-	std::string m_worldName = "invalid";
 
 	TextureAtlas* m_texAtlas;
 

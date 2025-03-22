@@ -3,8 +3,6 @@
 #include "../Game/Game.h"
 
 void World::chunkLoaderFunc() {
-	std::string name = Game::getInstance()->getLoadedWorldName();
-
 	while (!unloading.load()) {
 		chunkLoadQueueMutex.lock();
 		Chunk* chunk = nullptr;
@@ -35,39 +33,62 @@ void World::chunkLoaderFunc() {
 			continue;
 		}
 
-		std::string path = "worlds/" + name + "/c" + std::to_string(chunkCh);
-		if (std::filesystem::exists(path)) {
-			std::ifstream chunkFile(path, std::ios::binary);
-			ChunkSaveData* saveData = new ChunkSaveData();
-			chunkFile.read(reinterpret_cast<char*>(saveData), sizeof(ChunkSaveData));
-			chunkFile.close();
+		if (!m_internalWorld) {
+			std::string path = "worlds/" + m_name + "/c" + std::to_string(chunkCh);
+			if (std::filesystem::exists(path)) {
+				std::ifstream chunkFile(path, std::ios::binary);
+				ChunkSaveData* saveData = new ChunkSaveData();
+				chunkFile.read(reinterpret_cast<char*>(saveData), sizeof(ChunkSaveData));
+				chunkFile.close();
 
-			debug("Loading chunk", chunk->pos, "from file:", path, chunk);
+				debug("Loading chunk", chunk->pos, "from file:", path, chunk);
 
-			for (int y = 0; y < MAX_HEIGHT; y++) {
-				for (int x = 0; x < 16; x++) {
-					for (int z = 0; z < 16; z++) {
-						if (saveData->blocks[y][x][z] == BLOCK_TYPE::AIR) continue;
+				for (int y = 0; y < MAX_HEIGHT; y++) {
+					for (int x = 0; x < 16; x++) {
+						for (int z = 0; z < 16; z++) {
+							if (saveData->blocks[y][x][z] == BLOCK_TYPE::AIR) continue;
 
-						glm::ivec3 bPos = {
-							x + (pos.x * 16),
-							y,
-							z + (pos.y * 16),
-						};
+							glm::ivec3 bPos = {
+								x + (pos.x * 16),
+								y,
+								z + (pos.y * 16),
+							};
 
-						setBlock(bPos, saveData->blocks[y][x][z], false);
+							setBlock(bPos, saveData->blocks[y][x][z], false);
+						}
+					}
+				}
+
+				delete saveData;
+
+				chunk->loaded = true;
+				chunk->modified = false;
+
+#ifdef GAME_DEBUG
+				chunk->dLoadMethod = CHUNK_LOAD_METHOD::FILE;
+#endif
+				continue;
+			}
+		}
+
+		if (generator == Generator::Debug) {
+			for (int x = pos.x * 16; x < 16 + pos.x * 16; x++) {
+				for (int z = pos.y * 16; z < 16 + pos.y * 16; z++) {
+					setBlock(glm::ivec3(x, 0, z), std::abs(x) % 2 != std::abs(z) % 2 ? BLOCK_TYPE::STONE : BLOCK_TYPE::DIRT, false);
+
+					if (z < 0) continue;
+
+					if (x > -10 && x <= 0) {
+						if (x % 2 != 0 || z % 2 != 0) continue;
+						if ((z * 5 - x) / 2 >= BLOCK_TYPE_COUNT) continue;
+
+						setBlock(glm::ivec3(x, 2, z), BLOCK_TYPE((z * 5 - x) / 2), false);
 					}
 				}
 			}
 
-			delete saveData;
-
 			chunk->loaded = true;
 			chunk->modified = false;
-
-#ifdef GAME_DEBUG
-			chunk->dLoadMethod = CHUNK_LOAD_METHOD::FILE;
-#endif
 			continue;
 		}
 
@@ -77,6 +98,9 @@ void World::chunkLoaderFunc() {
 			}
 			chunk->loaded = true;
 			chunk->modified = false;
+#ifdef GAME_DEBUG
+			chunk->dLoadMethod = CHUNK_LOAD_METHOD::GENERATED;
+#endif
 			continue;
 		}
 
@@ -167,8 +191,6 @@ void World::chunkLoaderFunc() {
 }
 
 void World::chunkUnloaderFunc() {
-	std::string name = Game::getInstance()->getLoadedWorldName();
-
 	while (true) {
 		if (unloading.load() && chunks.size() == 0) break;
 		if (!unloading.load()) std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -206,7 +228,7 @@ void World::chunkUnloaderFunc() {
 						}
 						chunk->blocksMutex.unlock();
 
-						std::string path = "worlds/" + name + "/c" + std::to_string(ch);
+						std::string path = "worlds/" + m_name + "/c" + std::to_string(ch);
 						std::ofstream chunkFile(path, std::ios::binary);
 						chunkFile.write(reinterpret_cast<const char*>(saveData), sizeof(ChunkSaveData));
 						chunk->modified = false;

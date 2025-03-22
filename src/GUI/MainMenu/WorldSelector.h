@@ -19,6 +19,9 @@ private:
 	Button* newWorld;
 	Button* worldsDirectory;
 	Button* back;
+#ifdef GAME_DEBUG
+	Button* debugWorld;
+#endif
 
 	Text* overflow;
 

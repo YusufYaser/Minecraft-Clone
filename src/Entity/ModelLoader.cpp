@@ -4,7 +4,7 @@
 #include <json/json.hpp>
 #include "../Logging.h"
 
-inline EntityModel* models[ENTITY_TYPES_COUNT];
+inline EntityModel* models[ENTITY_TYPE_COUNT];
 
 struct Vertex {
 	glm::vec3 pos;
@@ -59,7 +59,7 @@ EntityModel* createModel(std::vector<Vertex>& vertices, std::vector<GLuint>& ind
 }
 
 void loadEntityModels() {
-	for (int i = 0; i < ENTITY_TYPES_COUNT; i++) {
+	for (int i = 0; i < ENTITY_TYPE_COUNT; i++) {
 		EntityModel* model = models[i];
 		if (model == nullptr) continue;
 		glDeleteBuffers(1, &model->VBO);
@@ -69,7 +69,7 @@ void loadEntityModels() {
 		models[i] = nullptr;
 	}
 
-	for (int i = 0; i < ENTITY_TYPES_COUNT; i++) {
+	for (int i = 0; i < ENTITY_TYPE_COUNT; i++) {
 		ENTITY_TYPE type = ENTITY_TYPE(i);
 		debug("Loading", getModelName(type), "model");
 		try {

@@ -147,7 +147,7 @@ void DebugText::render() {
 		text << "\n";
 
 
-		text << "World Name: " << game->getLoadedWorldName() << "\n";
+		text << "World Name: " << game->getWorld()->getName() << "\n";
 		int day = (float)floor((world->getTime() - 6000.0f) / 24000.0f);
 		if (day < 0) day = 0;
 		if (l == 2) {

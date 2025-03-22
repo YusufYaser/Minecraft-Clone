@@ -20,7 +20,8 @@
 enum class Generator : uint8_t {
 	Default = 0,
 	Flat,
-	Void
+	Void,
+	Debug
 };
 
 struct WorldSaveData {
@@ -39,10 +40,12 @@ struct ChunkSaveData {
 };
 
 struct WorldSettings {
+	std::string name = "World";
 	siv::PerlinNoise::seed_type seed = 0u;
 	Generator generator = Generator::Default;
 	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE, STRUCTURE_TYPE::HOUSE };
 	int initialTick = 0;
+	bool internalWorld = false;
 };
 
 #ifdef GAME_DEBUG
@@ -117,7 +120,10 @@ public:
 	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
 	void fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type);
 
+	std::string getName() const { return m_name; };
 	siv::PerlinNoise::seed_type getSeed() const { return seed; };
+	Generator getGenerator() const { return generator; };
+	bool isInternal() const { return m_internalWorld; };
 
 	void loadChunk(glm::ivec2 pos, bool permanentlyLoaded = false);
 
@@ -147,6 +153,9 @@ private:
 	std::atomic<bool> unloading;
 
 	std::atomic<int> m_tick;
+
+	std::string m_name = "World";
+	bool m_internalWorld = false;
 
 	siv::PerlinNoise::seed_type seed;
 	Generator generator;

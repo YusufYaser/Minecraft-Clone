@@ -11,7 +11,9 @@ World::World(WorldSettings& settings) {
 	World::perlin = siv::PerlinNoise{ seed };
 	World::perlin2 = siv::PerlinNoise{ seed + 10 };
 	World::generator = settings.generator;
+	m_name = settings.name;
 	m_tick = settings.initialTick;
+	m_internalWorld = settings.internalWorld;
 
 	int structureCount = 0;
 	for (STRUCTURE_TYPE structureType : settings.structures) {
@@ -34,6 +36,8 @@ World::World(WorldSettings& settings) {
 		});
 
 	tickThread = std::thread([this]() {
+		if (generator == Generator::Debug) return;
+
 #ifdef _WIN32
 		SetThreadDescription(GetCurrentThread(), L"World Tick");
 #endif

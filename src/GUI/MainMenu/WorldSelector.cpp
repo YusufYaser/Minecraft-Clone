@@ -28,6 +28,13 @@ WorldSelector::WorldSelector() {
 	back->setText("Back");
 	back->setPosition({ .5f, 0, 1, -75 });
 
+#ifdef GAME_DEBUG
+	debugWorld = new Button();
+	debugWorld->setText("Debug World");
+	debugWorld->setPosition({ 1, -65, 1, -25 });
+	debugWorld->setSize({ 0, 100, 0, 25 });
+#endif
+
 	overflow = new Text();
 	overflow->setText("There are more worlds below");
 	overflow->setCentered(true);
@@ -131,6 +138,9 @@ void WorldSelector::render() {
 	newWorld->render();
 	worldsDirectory->render();
 	back->render();
+#ifdef GAME_DEBUG
+	debugWorld->render();
+#endif
 
 	if (worldsDirectory->isClicked()) {
 		std::filesystem::path dirPath = std::filesystem::current_path() / "worlds";
@@ -185,6 +195,7 @@ void WorldSelector::render() {
 				dataFile.close();
 
 				WorldSettings settings;
+				settings.name = e->name;
 				settings.seed = data->seed;
 				settings.generator = data->generator;
 				settings.initialTick = data->tick;
@@ -215,7 +226,6 @@ void WorldSelector::render() {
 					orientation.x = 1;
 				}
 
-				game->setLoadedWorldName(e->name);
 				game->loadWorld(settings, pos, orientation, data->playerFlying);
 
 				double start = glfwGetTime();
@@ -257,9 +267,24 @@ void WorldSelector::render() {
 
 		strftime(name, sizeof(name), "%d %b %Y %H-%M-%S", &datetime);
 
-		game->setLoadedWorldName(&name[0]);
+		settings.name = std::string(name);
 		game->loadWorld(settings);
 	}
+
+#ifdef GAME_DEBUG
+	if (debugWorld->isClicked() || (!autoWentToWorld && getAutoGotoWorld() == "DEBUG_WORLD")) {
+		autoWentToWorld = true;
+
+		WorldSettings settings;
+		settings.name = "[internal:debug]";
+		settings.generator = Generator::Debug;
+		settings.internalWorld = true;
+		settings.seed = 1;
+		settings.structures = {};
+
+		game->loadWorld(settings, glm::vec3(), glm::vec3(1, 0, 0), true);
+	}
+#endif
 
 	if (!autoWentToWorld && getAutoGotoWorld() != "" && !game->loadingWorld()) {
 		error("World not found:", getAutoGotoWorld());

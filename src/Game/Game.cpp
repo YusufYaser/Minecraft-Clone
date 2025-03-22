@@ -690,12 +690,12 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos, glm::vec3 pla
 
 void Game::unloadWorld() {
 	try {
-		if (m_player != nullptr) {
+		if (m_player != nullptr && !m_world->isInternal()) {
 			print("Saving world data");
 			std::filesystem::create_directory("worlds");
-			std::filesystem::create_directory("worlds/" + m_worldName);
+			std::filesystem::create_directory("worlds/" + m_world->getName());
 
-			std::ofstream outFile("worlds/" + m_worldName + "/world.dat", std::ios::binary);
+			std::ofstream outFile("worlds/" + m_world->getName() + "/world.dat", std::ios::binary);
 			WorldSaveData* s = m_world->createWorldSaveData();
 			outFile.write(reinterpret_cast<const char*>(s), sizeof(WorldSaveData));
 			outFile.close();
