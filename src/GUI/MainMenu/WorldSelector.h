@@ -14,6 +14,7 @@ public:
 	bool isClosing() const { return m_isClosing; };
 
 private:
+	Image* background;
 	Text* title;
 	Button* newWorld;
 	Button* worldsDirectory;

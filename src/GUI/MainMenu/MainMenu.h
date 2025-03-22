@@ -14,6 +14,7 @@ public:
 	void render();
 
 private:
+	Image* background;
 	Text* title;
 	Button* selectWorld;
 	Button* settings;

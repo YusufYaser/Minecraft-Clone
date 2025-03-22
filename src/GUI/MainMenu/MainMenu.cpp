@@ -4,6 +4,10 @@
 std::string getAutoGotoWorld();
 
 MainMenu::MainMenu() {
+	background = new Image(getTexture("background"));
+	background->setSize({ 1, 0, 1, 0 });
+	background->setPosition({ .5f, 0, .5f, 0 });
+
 	title = new Text();
 	title->setText("Minecraft Clone");
 	title->setPosition({ .5f, 0, .5f, -75 });
@@ -36,6 +40,9 @@ MainMenu::MainMenu() {
 }
 
 MainMenu::~MainMenu() {
+	delete background;
+	background = nullptr;
+
 	delete title;
 	title = nullptr;
 
@@ -87,6 +94,7 @@ void MainMenu::render() {
 		return;
 	}
 
+	background->render();
 	selectWorld->render();
 	settings->render();
 	quit->render();

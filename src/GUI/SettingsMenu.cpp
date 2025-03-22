@@ -98,7 +98,7 @@ void SettingsMenu::render() {
 
 	game->setRenderDistance(tRenderDistance);
 
-	if (static_cast<unsigned long long>(tRenderDistance) * tRenderDistance * 5 * 1024 * 1024 > getMaxMemory() && getMaxMemory() != 0) {
+	if (static_cast<unsigned long long>(tRenderDistance) * tRenderDistance * 2 * 1024 * 1024 > getMaxMemory() && getMaxMemory() != 0) {
 		renderDistance->setColor({ 1.0f, 0.0f, 0.0f, 1.0f });
 		memoryUsage->setColor({ 1.0f, 0.0f, 0.0f, 1.0f });
 	} else {
@@ -127,7 +127,7 @@ void SettingsMenu::render() {
 	worldRes->render();
 
 	std::stringstream memUsage;
-	memUsage << "Approximate Memory Usage: " << round(tRenderDistance * tRenderDistance * 5) << " MB";
+	memUsage << "Approximate Memory Usage: " << round(tRenderDistance * tRenderDistance * 2) << " MB";
 	memoryUsage->setText(memUsage.str().c_str());
 	memoryUsage->render();
 

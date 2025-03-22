@@ -5,6 +5,10 @@
 std::string getAutoGotoWorld();
 
 WorldSelector::WorldSelector() {
+	background = new Image(getTexture("background"));
+	background->setSize({ 1, 0, 1, 0 });
+	background->setPosition({ .5f, 0, .5f, 0 });
+
 	title = new Text();
 	title->setText("Select World");
 	title->setPosition({ .5f, 0, 0, 75 });
@@ -83,6 +87,9 @@ WorldSelector::WorldSelector() {
 }
 
 WorldSelector::~WorldSelector() {
+	delete background;
+	background = nullptr;
+
 	delete title;
 	title = nullptr;
 
@@ -117,6 +124,8 @@ void WorldSelector::render() {
 
 	newWorld->setEnabled(!game->loadingWorld());
 	back->setEnabled(!game->loadingWorld());
+
+	background->render();
 
 	title->render();
 	newWorld->render();

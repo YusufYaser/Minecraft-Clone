@@ -135,7 +135,12 @@ void ScreenshotMenu::render() {
 
 			if (res == 1) {
 				print("Saved screenshot at", name.str());
+				fileName->setColor({ 1, 1, 1, 1 });
 				fileName->setText("Saved photo at " + name.str());
+			} else {
+				error("Failed to save screenshot:", res);
+				fileName->setColor({ 1, 0, 0, 1 });
+				fileName->setText("Failed to save photo");
 			}
 
 			delete[] pixels;
