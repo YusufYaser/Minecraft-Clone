@@ -61,13 +61,21 @@ struct Chunk {
 	Mux blocksMutex;
 	Mux renderingGroupsMutex;
 	time_t lastRendered = 0;
-	Block* blocks[16 * 16 * MAX_HEIGHT];
+	std::vector<Block*> blocks;
+	int maxHeight = -1;
 	std::vector<Block*> blocksToRender;
 	glm::ivec2 pos;
 
 #ifdef GAME_DEBUG
 	CHUNK_LOAD_METHOD dLoadMethod = CHUNK_LOAD_METHOD::UNKNOWN;
 #endif
+
+	void setMaxHeight(int height) {
+		if (height <= maxHeight) return;
+
+		maxHeight = height;
+		blocks.resize((height + 1) * 16 * 16, 0);
+	}
 
 	~Chunk() {
 		blocksMutex.lock();
@@ -79,6 +87,20 @@ struct Chunk {
 		blocksToRender.clear();
 		renderingGroupsMutex.unlock();
 	}
+};
+
+struct InstanceOffset {
+	glm::vec3 pos;
+	int blockType;
+};
+
+struct Instance {
+	BLOCK_STRUCTURE_TYPE bStructType;
+	BlockStructureData* bStructData;
+	uint8_t hiddenFaces;
+	GLuint VBO;
+	std::vector<glm::vec4> offsets;
+	bool transparent;
 };
 
 class World {
@@ -152,16 +174,6 @@ private:
 	int m_blocksRendered = 0;
 
 	bool m_worldRenderModified = true;
-
-	struct Instance {
-		BLOCK_STRUCTURE_TYPE bStructType;
-		BlockStructureData* bStructData;
-		uint8_t hiddenFaces;
-		GLuint VBO;
-		uint16_t offsetsCount;
-		glm::vec4 offsets[MAX_INSTANCE_OFFSETS];
-		bool transparent;
-	};
 
 	std::thread renderingThreads[RENDERER_THREAD_COUNT];
 	std::thread chunkLoaderThreads[CHUNK_LOADER_THREAD_COUNT];

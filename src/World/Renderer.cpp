@@ -46,7 +46,7 @@ void World::renderer(int c) {
 
 			Instance* i = nullptr;
 			for (auto& inst : instancesCache[hiddenFaces]) {
-				if (inst->offsetsCount >= MAX_INSTANCE_OFFSETS) continue;
+				if (inst->offsets.size() >= MAX_INSTANCE_OFFSETS) continue;
 				if (inst->transparent != transparent) continue;
 				if (inst->bStructType != structType) continue;
 				i = inst;
@@ -54,7 +54,6 @@ void World::renderer(int c) {
 			}
 			if (i == nullptr) {
 				i = new Instance();
-				i->offsetsCount = 0;
 				i->hiddenFaces = hiddenFaces;
 				i->transparent = transparent;
 				i->bStructType = structType;
@@ -70,7 +69,7 @@ void World::renderer(int c) {
 				instancesCache[hiddenFaces].push_back(i);
 			}
 
-			i->offsets[i->offsetsCount++] = glm::vec4(bPos, type);
+			i->offsets.push_back(glm::vec4(bPos, type));
 		}
 
 		chunk->renderingGroupsMutex.unlock();
@@ -231,7 +230,7 @@ void World::render() {
 		}
 
 		for (auto& i : instances) {
-			i->offsetsCount = 0;
+			i->offsets.resize(0, glm::vec4());
 		}
 
 		rendering.store(true);
@@ -272,7 +271,7 @@ void World::render() {
 
 		glGenBuffers(1, &i->VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
-		glBufferData(GL_ARRAY_BUFFER, MAX_INSTANCE_OFFSETS * sizeof(glm::vec4), nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
 
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
 		glEnableVertexAttribArray(3);
@@ -288,7 +287,7 @@ void World::render() {
 
 	m_blocksRendered = 0;
 	for (auto& i : instances) {
-		if (i->offsetsCount == 0 || i->bStructData == nullptr) continue;
+		if (i->offsets.size() == 0 || i->bStructData == nullptr) continue;
 		if (i->transparent && !blend) {
 			glEnable(GL_BLEND);
 			glDisable(GL_CULL_FACE);
@@ -302,12 +301,12 @@ void World::render() {
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBindVertexArray(i->bStructData->VAO);
 
-		if (rerender || m_worldRenderModified) glBufferSubData(GL_ARRAY_BUFFER, 0, i->offsetsCount * sizeof(glm::vec4), i->offsets);
+		if (rerender || m_worldRenderModified) glBufferData(GL_ARRAY_BUFFER, i->offsets.size() * sizeof(glm::vec4), i->offsets.data(), GL_DYNAMIC_DRAW);
 
-		glDrawElementsInstanced(GL_TRIANGLES, i->bStructData->faceCount * 6, GL_UNSIGNED_BYTE, 0, i->offsetsCount);
+		glDrawElementsInstanced(GL_TRIANGLES, i->bStructData->faceCount * 6, GL_UNSIGNED_BYTE, 0, i->offsets.size());
 
 		m_instancesRendered++;
-		m_blocksRendered += i->offsetsCount;
+		m_blocksRendered += i->offsets.size();
 	}
 	glDisable(GL_DEPTH_TEST);
 

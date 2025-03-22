@@ -17,6 +17,7 @@ Block* World::getBlock(glm::ivec3 pos) {
 
 	Chunk* chunk = cit->second;
 	if (chunk == nullptr) return nullptr;
+	if (chunk->maxHeight < pos.y) return nullptr;
 
 	chunk->blocksMutex.lock();
 	Block* block = chunk->blocks[hashPosForChunk(pos)];
@@ -54,6 +55,7 @@ void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
 					if (!cLoaded[chunk]) {
 						cLoaded[chunk] = true;
 						chunk->blocksMutex.lock();
+						chunk->setMaxHeight(end.y);
 					}
 
 					chunk->modified = true;
@@ -116,6 +118,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 	Chunk* chunk = cit->second;
 
 	chunk->blocksMutex.lock();
+	chunk->setMaxHeight(pos.y);
 	Block* block = chunk->blocks[hashPosForChunk(pos)];
 	chunk->blocksMutex.unlock();
 	if (block != nullptr) {
