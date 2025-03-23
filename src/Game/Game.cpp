@@ -603,8 +603,10 @@ void Game::update() {
 	double targetFps = m_maxFps;
 
 	if (!m_gameWindow->isFocused()) {
+#ifndef GAME_DEBUG
 		m_gamePaused = true;
 		if (targetFps > 5 || targetFps == 0) targetFps = 5;
+#endif
 	} else if (m_gamePaused) {
 		if (targetFps > 60 || targetFps == 0) targetFps = 60;
 	}

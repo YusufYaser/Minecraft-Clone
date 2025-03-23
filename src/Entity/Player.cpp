@@ -45,15 +45,16 @@ Player::~Player() {
 }
 
 void Player::update() {
-	float delta = Game::getInstance()->getSimDelta();
+	Game* game = Game::getInstance();
+	float delta = game->getSimDelta();
 	Entity::physicsUpdate(delta);
 
 	checkInputs(delta);
 
 	bool wasDebug = false;
-	if (Game::getInstance()->getDebugLevel() == 2) {
+	if (game->getDebugLevel() == 2) {
 		wasDebug = true;
-		Game::getInstance()->setDebugLevel(0);
+		game->setDebugLevel(0);
 	}
 	m_crosshair->render();
 	m_inventory->render();
@@ -63,7 +64,7 @@ void Player::update() {
 		m_inventoryImages[i]->render();
 	}
 	if (wasDebug) {
-		Game::getInstance()->setDebugLevel(2);
+		game->setDebugLevel(2);
 	}
 }
 
@@ -253,7 +254,9 @@ void Player::checkInputs(float delta) {
 		wasHidden = true;
 	}
 
-	glm::ivec2 size = Game::getInstance()->getGameWindow()->getSize();
+	if (!game->getGameWindow()->isFocused()) return;
+
+	glm::ivec2 size = game->getGameWindow()->getSize();
 	float rotX = 120.0f * (float)(posY - size.y / 2) / size.y;
 	float rotY = 120.0f * (float)(posX - size.x / 2) / size.x;
 
@@ -288,7 +291,8 @@ void Player::checkInputs(float delta) {
 }
 
 void Player::getTargetBlock(Block** block, BLOCK_FACE* face) {
-	World* world = Game::getInstance()->getWorld();
+	Game* game = Game::getInstance();
+	World* world = game->getWorld();
 
 	glm::vec3 oldBlockPos = glm::vec3();
 	glm::vec3 cameraPos = getCameraPos();
@@ -366,8 +370,6 @@ glm::mat4 Player::getProjection() const {
 }
 
 glm::mat4 Player::getView() const {
-	Game* game = Game::getInstance();
-
 	if (!freecam) {
 		if (m_isPerspective) {
 			return glm::lookAt(glm::vec3(), orientation, up);
