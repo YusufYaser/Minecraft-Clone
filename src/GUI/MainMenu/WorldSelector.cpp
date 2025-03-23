@@ -286,6 +286,16 @@ void WorldSelector::render() {
 	}
 #endif
 
+	if (!autoWentToWorld && getAutoGotoWorld() == "TEMP_WORLD") {
+		autoWentToWorld = true;
+
+		WorldSettings settings;
+		settings.name = "[internal:temp]";
+		settings.internalWorld = true;
+
+		game->loadWorld(settings);
+	}
+
 	if (!autoWentToWorld && getAutoGotoWorld() != "" && !game->loadingWorld()) {
 		error("World not found:", getAutoGotoWorld());
 		autoWentToWorld = true;

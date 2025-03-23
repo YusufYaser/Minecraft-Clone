@@ -20,11 +20,7 @@
 #include "../SoundEngine/SoundEngine.h"
 
 struct GameSettings {
-#ifndef GAME_DEBUG
-	int renderDistance = 12;
-#else
-	int renderDistance = 6;
-#endif
+	int renderDistance = 16;
 	int maxFps = 60;
 	float worldRes = 1;
 };
