@@ -26,6 +26,7 @@ bool Button::isHovered() {
 	if (!isRendered()) return false;
 
 	GameWindow* gameWindow = Game::getInstance()->getGameWindow();
+	if (!gameWindow->isFocused()) return false;
 	double posX, posY;
 	glfwGetCursorPos(gameWindow->getGlfwWindow(), &posX, &posY);
 	glm::ivec2 size = gameWindow->getSize();

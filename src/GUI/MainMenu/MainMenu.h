@@ -20,6 +20,7 @@ private:
 	Button* settings;
 	Button* quit;
 	Text* credits;
+	Button* githubButton;
 #ifdef GAME_DEBUG
 	Text* debug;
 #endif

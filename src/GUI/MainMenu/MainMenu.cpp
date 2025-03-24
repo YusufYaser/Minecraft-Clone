@@ -27,9 +27,14 @@ MainMenu::MainMenu() {
 	quit->setPosition({ .5f, 0, .5f, 100 });
 
 	credits = new Text();
-	credits->setText("Minecraft Clone - github.com/YusufYaser/Minecraft-Clone");
+	credits->setText("Minecraft Clone - " GITHUB_REPOSITORY);
 	credits->setPosition({ 0, 0, 1.0f, -15 });
 	credits->setColor({ .75f, .75f, .75f, 1.0f });
+
+	githubButton = new Button();
+	githubButton->setPosition({ 0, 32, 1, -44 });
+	githubButton->setSize({ 0, 48, 0, 48 });
+	githubButton->setBackground(getTexture("github"));
 
 #ifdef GAME_DEBUG
 	debug = new Text();
@@ -57,6 +62,9 @@ MainMenu::~MainMenu() {
 
 	delete credits;
 	credits = nullptr;
+
+	delete githubButton;
+	githubButton = nullptr;
 
 #ifdef GAME_DEBUG
 	delete debug;
@@ -100,6 +108,24 @@ void MainMenu::render() {
 	quit->render();
 	title->render();
 	credits->render();
+
+	githubButton->render();
+
+	if (githubButton->isClicked()) {
+		std::string url = GITHUB_REPOSITORY;
+		std::string cmd = "echo Platform not supported";
+#ifdef _WIN32
+		cmd = "explorer " + url;
+#elif __APPLE__
+		cmd = "open " + url;
+#elif __linux__
+		cmd = "xdg-open " + url;
+#else
+		error("Platform not supported");
+#endif
+		system(cmd.c_str());
+	}
+
 #ifdef GAME_DEBUG
 	if (static_cast<int>(glfwGetTime()) & 1) debug->render();
 #endif

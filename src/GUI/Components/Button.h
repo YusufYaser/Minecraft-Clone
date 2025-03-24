@@ -13,6 +13,7 @@ public:
 	bool isClicked();
 
 	void setText(const char* content);
+	void setBackground(Texture* nTex) { m_image->setTexture(nTex); };
 	void setEnabled(bool enabled) { m_enabled = enabled; };
 
 	void setPosition(glm::vec4 pos) override;

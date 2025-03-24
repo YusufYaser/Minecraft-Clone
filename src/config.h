@@ -9,3 +9,5 @@
 
 // Sound Engine
 #define SAME_SOUND_COUNT 9
+
+#define GITHUB_REPOSITORY "https://github.com/YusufYaser/Minecraft-Clone"
