@@ -188,6 +188,12 @@ void Player::checkInputs(float delta) {
 	if (change == glm::vec3(0, 0, 0)) {
 		speed = PLAYER_SPEED;
 	}
+	Block* playerBlock = world->getBlock(glm::round(pos));
+	if (playerBlock != nullptr && playerBlock->getType() == BLOCK_TYPE::WATER) {
+		speed = PLAYER_LIQUID_SPEED;
+	} else if (speed == PLAYER_LIQUID_SPEED) {
+		speed = PLAYER_SPEED;
+	}
 
 	if (keyHandler->keyHeld(GLFW_KEY_1)) slot = 0;
 	if (keyHandler->keyHeld(GLFW_KEY_2)) slot = 1;
@@ -364,6 +370,11 @@ glm::mat4 Player::getProjection() const {
 	} else if (currentTime - toggledRunning < .1f) {
 		FOV += 7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED;
 		FOV -= static_cast<float>(currentTime - toggledRunning) * (7.5f * PLAYER_RUN_SPEED / PLAYER_SPEED) * 10.0f;
+	}
+
+	Block* collBlock = game->getWorld()->getBlock(glm::round(getCameraPos()));
+	if (collBlock != nullptr && collBlock->getType() == BLOCK_TYPE::WATER) {
+		FOV -= 25.0f;
 	}
 
 	return glm::perspective(glm::radians(FOV), size.x / size.y, 0.01f, zFar);

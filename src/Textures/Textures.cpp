@@ -133,8 +133,8 @@ TextureAtlas* initializeTextures() {
 		}
 
 		if (name.ends_with(".lut")) {
-			if (width != height) {
-				error("Width must be the same as height in", name);
+			if (width != 512 || height != 512) {
+				error("Texture size must be 512x512 in", name);
 
 				stbi_image_free(data);
 				continue;

@@ -13,6 +13,7 @@
 
 constexpr auto PLAYER_SPEED = 5.0f;
 constexpr auto PLAYER_RUN_SPEED = 7.5f;
+constexpr auto PLAYER_LIQUID_SPEED = 3.0f;
 
 struct ItemStack {
 	BLOCK_TYPE block;

@@ -18,6 +18,7 @@ GameWindow::GameWindow(glm::ivec2 isize, const char* title) {
 	glfwWindowHint(GLFW_DEPTH_BITS, 32);
 #ifdef GAME_DEBUG
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+	glfwWindowHint(GLFW_FLOATING, GL_TRUE);
 #endif
 
 	m_size = isize;

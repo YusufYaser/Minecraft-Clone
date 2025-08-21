@@ -520,8 +520,8 @@ void Game::update() {
 			glBindTexture(GL_TEXTURE_2D, worldDepthTex->id);
 			// uniform sampler3D colorLUT
 			glActiveTexture(GL_TEXTURE2);
-			Block* upBlock = m_world->getBlock(glm::ivec3(glm::round(m_player->getPos())) + glm::ivec3(0, 1, 0));
-			if (upBlock != nullptr && upBlock->getType() == BLOCK_TYPE::WATER) {
+			Block* collBlock = m_world->getBlock(glm::round(m_player->getCameraPos()));
+			if (collBlock != nullptr && collBlock->getType() == BLOCK_TYPE::WATER) {
 				glBindTexture(GL_TEXTURE_3D, getTexture("water.lut")->id);
 			} else {
 				glBindTexture(GL_TEXTURE_3D, getTexture("default.lut")->id);
