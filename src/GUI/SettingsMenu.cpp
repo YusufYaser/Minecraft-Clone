@@ -4,6 +4,10 @@
 size_t getMaxMemory();
 
 SettingsMenu::SettingsMenu() {
+	background = new Image(getTexture("background"));
+	background->setSize({ 1, 0, 1, 0 });
+	background->setPosition({ .5f, 0, .5f, 0 });
+
 	title = new Text();
 	title->setText("Settings");
 	title->setPosition({ .5f, 0, 0, 75 });
@@ -60,6 +64,7 @@ SettingsMenu::SettingsMenu() {
 void SettingsMenu::render() {
 	Game* game = Game::getInstance();
 
+	if (game->getWorld() == nullptr) background->render();
 	title->render();
 	back->render();
 
@@ -127,7 +132,7 @@ void SettingsMenu::render() {
 	worldRes->render();
 
 	std::stringstream memUsage;
-	memUsage << "Approximate Memory Usage: " << round(tRenderDistance * tRenderDistance * 2) << " MB";
+	memUsage << "Approximate Memory Usage: " << round(tRenderDistance * tRenderDistance * 2) << " MB (inaccurate)";
 	memoryUsage->setText(memUsage.str().c_str());
 	memoryUsage->render();
 
