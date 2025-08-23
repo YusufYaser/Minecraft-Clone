@@ -169,8 +169,10 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 		if (block->hasTransparency() != otherBlock->hasTransparency()) {
 			if (block->hasTransparency()) {
 				hiddenFaces |= 1 << i;
-			} else if ((otherBlock->hiddenFaces & (1 << opposite)) == 0) {
-				otherBlock->hiddenFaces ^= 1 << opposite;
+			} else if (otherBlock->getType() != BLOCK_TYPE::WATER || opposite != int(BLOCK_FACE::TOP)) {
+				if ((otherBlock->hiddenFaces & (1 << opposite)) == 0) {
+					otherBlock->hiddenFaces ^= 1 << opposite;
+				}
 			}
 		} else {
 			otherBlock->hiddenFaces |= 1 << opposite;
