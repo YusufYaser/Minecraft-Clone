@@ -189,7 +189,7 @@ void Player::checkInputs(float delta) {
 		speed = PLAYER_SPEED;
 	}
 	Block* playerBlock = world->getBlock(glm::round(pos));
-	if (playerBlock != nullptr && playerBlock->getType() == BLOCK_TYPE::WATER) {
+	if (playerBlock != nullptr && playerBlock->getType() == BLOCK_TYPE::WATER && !flying) {
 		speed = PLAYER_LIQUID_SPEED;
 	} else if (speed == PLAYER_LIQUID_SPEED) {
 		speed = PLAYER_SPEED;
@@ -373,7 +373,7 @@ glm::mat4 Player::getProjection() const {
 	}
 
 	Block* collBlock = game->getWorld()->getBlock(glm::round(getCameraPos()));
-	if (collBlock != nullptr && collBlock->getType() == BLOCK_TYPE::WATER) {
+	if (collBlock != nullptr && collBlock->getType() == BLOCK_TYPE::WATER && !flying) {
 		FOV -= 25.0f;
 	}
 
