@@ -96,23 +96,27 @@ void DebugText::render() {
 			text << " Chunk: " << round(chunkPos.x * 100) / 100;
 			text << ", " << round(chunkPos.y * 100) / 100 << "\n";
 			text << " ID: " << hashPos(chunkPos) << "\n";
-			text << " Permanently Loaded: " << (chunk->permanentlyLoaded ? "true" : "false") << "\n";
-			text << " Modified: " << (chunk->modified ? "true" : "false") << "\n";
+			if (chunk != nullptr) {
+				text << " Permanently Loaded: " << (chunk->permanentlyLoaded ? "true" : "false") << "\n";
+				text << " Modified: " << (chunk->modified ? "true" : "false") << "\n";
 #ifdef GAME_DEBUG
-			text << " Load Method: ";
-			switch (chunk->dLoadMethod) {
-			case CHUNK_LOAD_METHOD::GENERATED:
-				text << "GENERATED";
-				break;
-			case CHUNK_LOAD_METHOD::FILE:
-				text << "FILE";
-				break;
-			default:
-				text << "UNKNOWN";
-				break;
-			}
-			text << "\n";
+				text << " Load Method: ";
+				switch (chunk->dLoadMethod) {
+				case CHUNK_LOAD_METHOD::GENERATED:
+					text << "GENERATED";
+					break;
+				case CHUNK_LOAD_METHOD::FILE:
+					text << "FILE";
+					break;
+				default:
+					text << "UNKNOWN";
+					break;
+				}
+				text << "\n";
 #endif
+			} else {
+				text << " Chunk not loaded\n";
+			}
 			text << "====================\n\n";
 		} else {
 			text << "Chunk: " << round(chunkPos.x * 100) / 100;
