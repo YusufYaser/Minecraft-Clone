@@ -223,6 +223,7 @@ void WorldSelector::render() {
 				orientation.z = data->playerOrientation[2];
 
 				if (orientation.x == 0 && orientation.y == 0 && orientation.z == 0) {
+					warn("Invalid player orientation, resetting to default");
 					orientation.x = 1;
 				}
 
@@ -276,7 +277,7 @@ void WorldSelector::render() {
 		autoWentToWorld = true;
 
 		WorldSettings settings;
-		settings.name = "[internal:debug]";
+		settings.name = "Debug World";
 		settings.generator = Generator::Debug;
 		settings.internalWorld = true;
 		settings.seed = 1;
@@ -290,7 +291,7 @@ void WorldSelector::render() {
 		autoWentToWorld = true;
 
 		WorldSettings settings;
-		settings.name = "[internal:temp]";
+		settings.name = "Temporary World";
 		settings.internalWorld = true;
 
 		game->loadWorld(settings);

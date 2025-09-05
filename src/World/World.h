@@ -120,7 +120,7 @@ public:
 	Block* setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace = true);
 	void fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type);
 
-	std::string getName() const { return m_name; };
+	std::string getName() const { return !m_internalWorld ? m_name : "[internal:" + m_name + "]"; };
 	siv::PerlinNoise::seed_type getSeed() const { return seed; };
 	Generator getGenerator() const { return generator; };
 	bool isInternal() const { return m_internalWorld; };
