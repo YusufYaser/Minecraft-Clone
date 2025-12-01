@@ -15,6 +15,8 @@ World::World(WorldSettings& settings) {
 	m_tick = settings.initialTick;
 	m_internalWorld = settings.internalWorld;
 
+	lastAutoSaved = glfwGetTime();
+
 	int structureCount = 0;
 	for (STRUCTURE_TYPE structureType : settings.structures) {
 		Structure* structure = Structure::getStructure(structureType);
@@ -122,6 +124,31 @@ World::~World() {
 		i = nullptr;
 	}
 	instances.clear();
+}
+
+bool World::saveWorld() {
+	if (m_internalWorld) return false;
+
+	try {
+		if (Game::getInstance()->getPlayer() != nullptr && !m_internalWorld) {
+			debug("Saving world data");
+			std::filesystem::create_directory("worlds");
+			std::filesystem::create_directory("worlds/" + getName());
+
+			std::ofstream outFile("worlds/" + getName() + "/world.dat", std::ios::binary);
+			WorldSaveData* s = createWorldSaveData();
+			outFile.write(reinterpret_cast<const char*>(s), sizeof(WorldSaveData));
+			outFile.close();
+
+			delete s;
+			debug("Saved world data");
+			return true;
+		}
+	} catch (std::filesystem::filesystem_error e) {
+		error("FAILED TO SAVE WORLD:", e.what());
+	}
+
+	return false;
 }
 
 void World::dontRender() {

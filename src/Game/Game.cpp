@@ -596,6 +596,10 @@ void Game::update() {
 		m_commandsHelp->render();
 	}
 
+	if (m_world != nullptr) {
+		m_world->autoSave();
+	}
+
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();
 
@@ -691,23 +695,7 @@ void Game::loadWorld(WorldSettings& settings, glm::vec3 playerPos, glm::vec3 pla
 }
 
 void Game::unloadWorld() {
-	try {
-		if (m_player != nullptr && !m_world->isInternal()) {
-			print("Saving world data");
-			std::filesystem::create_directory("worlds");
-			std::filesystem::create_directory("worlds/" + m_world->getName());
-
-			std::ofstream outFile("worlds/" + m_world->getName() + "/world.dat", std::ios::binary);
-			WorldSaveData* s = m_world->createWorldSaveData();
-			outFile.write(reinterpret_cast<const char*>(s), sizeof(WorldSaveData));
-			outFile.close();
-
-			delete s;
-			print("Saved world data");
-		}
-	} catch (std::filesystem::filesystem_error e) {
-		error("FAILED TO SAVE WORLD:", e.what());
-	}
+	m_world->saveWorld();
 
 	delete m_world;
 	m_world = nullptr;

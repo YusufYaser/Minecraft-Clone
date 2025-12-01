@@ -126,6 +126,10 @@ public:
 	bool isInternal() const { return m_internalWorld; };
 
 	void loadChunk(glm::ivec2 pos, bool permanentlyLoaded = false);
+	bool saveAllChunks();
+	bool saveWorld();
+	// saveWorld() and saveAllChunks() if not previously ran during the last auto save interval
+	bool autoSave();
 
 	size_t chunksLoaded();
 	size_t chunkLoadQueueCount();
@@ -166,6 +170,10 @@ private:
 	Mux chunksMutex;
 
 	void setRenderingGroup(Block* block);
+
+	bool saveChunk(Chunk* chunk);
+
+	double lastAutoSaved = 0;
 
 	void chunkLoaderFunc();
 	std::thread chunkUnloader;

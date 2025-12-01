@@ -93,6 +93,7 @@ void DebugText::render() {
 		if (l == 2) {
 			Chunk* chunk = world->getChunk(chunkPos);
 			text << "\n=== Current Chunk ===\n";
+			text << " " << chunk << "\n";
 			text << " Chunk: " << round(chunkPos.x * 100) / 100;
 			text << ", " << round(chunkPos.y * 100) / 100 << "\n";
 			text << " ID: " << hashPos(chunkPos) << "\n";

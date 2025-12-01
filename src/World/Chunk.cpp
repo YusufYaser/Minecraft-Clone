@@ -213,34 +213,7 @@ void World::chunkUnloaderFunc() {
 				|| unloading.load()) {
 
 				if (chunk->modified && chunk->loaded && !m_internalWorld) {
-					try {
-						ChunkSaveData* saveData = new ChunkSaveData();
-						chunk->blocksMutex.lock();
-						for (auto& block : chunk->blocks) {
-							if (block == nullptr) continue;
-							glm::ivec3 rPos = block->getPos();
-							glm::ivec2 cPos = getPosChunk(rPos);
-							glm::ivec3 pos = {
-								rPos.x - (cPos.x * 16),
-								rPos.y,
-								rPos.z - (cPos.y * 16),
-							};
-							saveData->blocks[pos.y][pos.x][pos.z] = block->getType();
-						}
-						chunk->blocksMutex.unlock();
-
-						std::string path = "worlds/" + m_name + "/c" + std::to_string(ch);
-						std::ofstream chunkFile(path, std::ios::binary);
-						chunkFile.write(reinterpret_cast<const char*>(saveData), sizeof(ChunkSaveData));
-						chunk->modified = false;
-						chunkFile.close();
-
-						delete saveData;
-
-						debug("Saved chunk", chunk->pos, "at", path);
-					} catch (std::filesystem::filesystem_error e) {
-						error("FAILED TO SAVE CHUNK:", e.what());
-					}
+					saveChunk(chunk);
 				}
 
 				delete chunks[ch];
@@ -255,6 +228,90 @@ void World::chunkUnloaderFunc() {
 		}
 		chunksMutex.unlock();
 	}
+}
+
+bool World::saveAllChunks() {
+	if (m_internalWorld) return false;
+
+	debug("Saving world");
+
+	bool status = true;
+	int savedCount = 0;
+
+	chunksMutex.lock();
+
+	for (auto& [ch, chunk] : chunks) {
+		if (chunk == nullptr) continue;
+
+		if (chunk->modified && chunk->loaded) {
+			status = status && saveChunk(chunk);
+			if (status) savedCount++;
+		}
+	}
+
+	chunksMutex.unlock();
+
+	if (status) {
+		if (savedCount != 0) {
+			print("Saved", savedCount, "chunks")
+		} else {
+			debug("Saved", savedCount, "chunks")
+		}
+	} else {
+		error("Failed to save some chunks. Chunks saved:", savedCount);
+	}
+
+	return status;
+}
+
+bool World::autoSave() {
+	double currentTime = glfwGetTime();
+	if (currentTime - lastAutoSaved < AUTOSAVE_INTERVAL) return false;
+
+	lastAutoSaved = currentTime;
+
+	bool saveChunksStatus = saveAllChunks();
+	bool saveWorldStatus = saveWorld();
+
+	return saveChunksStatus && saveWorldStatus;
+}
+
+bool World::saveChunk(Chunk* chunk) {
+	if (m_internalWorld) return false;
+
+	debug("Saving chunk", chunk->pos);
+
+	try {
+		ChunkSaveData* saveData = new ChunkSaveData();
+		chunk->blocksMutex.lock();
+		for (auto& block : chunk->blocks) {
+			if (block == nullptr) continue;
+			glm::ivec3 rPos = block->getPos();
+			glm::ivec2 cPos = getPosChunk(rPos);
+			glm::ivec3 pos = {
+				rPos.x - (cPos.x * 16),
+				rPos.y,
+				rPos.z - (cPos.y * 16),
+			};
+			saveData->blocks[pos.y][pos.x][pos.z] = block->getType();
+		}
+		chunk->blocksMutex.unlock();
+
+		std::string path = "worlds/" + m_name + "/c" + std::to_string(hashPos(chunk->pos));
+		std::ofstream chunkFile(path, std::ios::binary);
+		chunkFile.write(reinterpret_cast<const char*>(saveData), sizeof(ChunkSaveData));
+		chunk->modified = false;
+		chunkFile.close();
+
+		delete saveData;
+
+		debug("Saved chunk", chunk->pos, "at", path);
+		return true;
+	} catch (std::filesystem::filesystem_error e) {
+		error("FAILED TO SAVE CHUNK:", e.what());
+	}
+
+	return false;
 }
 
 void World::loadChunk(glm::ivec2 pos, bool permanentlyLoaded) {
