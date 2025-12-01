@@ -177,9 +177,10 @@ Q: Toggle 3D World Rendering
 R: Teleport to 0, )" + std::to_string(MAX_HEIGHT) + R"(, 0
 T: Teleport to height )" + std::to_string(MAX_HEIGHT) + R"(
 Y: Reset world time
-U: Reload textures, shaders, and models
+U: Reload game assets
+I: Save world
 )");
-	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 7 });
+	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 8 });
 	m_commandsHelp->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 
 	m_keyHandler = new KeyHandler();
@@ -429,6 +430,11 @@ void Game::update() {
 
 				print("Reloaded assets");
 			}
+		}
+
+		if (m_keyHandler->keyClicked(GLFW_KEY_I)) {
+			m_world->saveAllChunks();
+			m_world->saveWorld();
 		}
 	}
 
