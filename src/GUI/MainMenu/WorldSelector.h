@@ -15,10 +15,11 @@ public:
 	bool isClosing() const { return m_isClosing; };
 
 private:
-	NewWorld* newWorldMenu;
+	NewWorld* newWorldMenu = nullptr;
 
 	Image* background;
 	Text* title;
+	Text* worldCount;
 	Button* newWorld;
 	Button* worldsDirectory;
 	Button* back;

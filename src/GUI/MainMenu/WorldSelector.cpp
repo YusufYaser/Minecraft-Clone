@@ -15,6 +15,11 @@ WorldSelector::WorldSelector() {
 	title->setCentered(true);
 	title->setScale(2.0f);
 
+	worldCount = new Text();
+	worldCount->setPosition({ .5f, 0, 0, 75 + 16 });
+	worldCount->setCentered(true);
+	worldCount->setColor({ 0.75f, 0.75f, 0.75f, 1.0f });
+
 	newWorld = new Button();
 	newWorld->setText("Create New World");
 	newWorld->setPosition({ .5f, 0, .5f, 0 });
@@ -88,6 +93,7 @@ WorldSelector::WorldSelector() {
 			newWorld->setPosition({ .5f, -128 - 8, 1, -124 });
 			worldsDirectory->setPosition({ .5f, 128 + 8, 1, -124 });
 		}
+		worldCount->setText(std::to_string(i) + " world" + (i == 1 ? "" : "s"));
 	} catch (std::filesystem::filesystem_error e) {
 		error("Failed to load worlds:", e.what());
 	}
@@ -149,6 +155,7 @@ void WorldSelector::render() {
 	background->render();
 
 	title->render();
+	worldCount->render();
 	newWorld->render();
 	worldsDirectory->render();
 	back->render();
