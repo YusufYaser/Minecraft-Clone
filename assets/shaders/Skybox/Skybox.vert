@@ -19,8 +19,8 @@ void main() {
 		gl_Position = projection * view * vec4(position + blockPos, 1.0f);
 	} else { // sun
 		vec3 pos2 = position;
-		pos2.x *= .075f;
-		pos2.z *= .075f;
+		pos2.x *= .225f;
+		pos2.z *= .225f;
 		gl_Position = projection * view * model * vec4(pos2 + blockPos, 1.0f);
 	}
 
