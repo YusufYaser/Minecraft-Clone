@@ -3,6 +3,7 @@
 #include "../Components/Text.h"
 #include "../Components/Button.h"
 #include "../../World/World.h"
+#include "NewWorld.h"
 #include <vector>
 
 class WorldSelector {
@@ -14,6 +15,8 @@ public:
 	bool isClosing() const { return m_isClosing; };
 
 private:
+	NewWorld* newWorldMenu;
+
 	Image* background;
 	Text* title;
 	Button* newWorld;

@@ -108,6 +108,9 @@
     <ClCompile Include="src\Entity\ModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GUI\MainMenu\NewWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Logging.h">
@@ -198,6 +201,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Entity\Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\MainMenu\NewWorld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

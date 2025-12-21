@@ -116,6 +116,20 @@ void WorldSelector::render() {
 	static bool autoWentToWorld = false;
 
 	Game* game = Game::getInstance();
+	static int lastFrame = 0;
+
+	if (newWorldMenu != nullptr && (lastFrame + 1 != game->getFrameNum() || newWorldMenu->isClosing())) {
+		delete newWorldMenu;
+		newWorldMenu = nullptr;
+	}
+
+	lastFrame = game->getFrameNum();
+
+	if (newWorldMenu) {
+		newWorldMenu->render();
+		return;
+	}
+
 	if (game->loadingWorld()) {
 		if (game->getWorld() != nullptr) {
 			int progress = static_cast<int>((32 - game->getWorld()->chunkLoadQueueCount()) / 32.0f * 100);
@@ -251,26 +265,7 @@ void WorldSelector::render() {
 
 	if (overflowed) overflow->render();
 
-	if (newWorld->isClicked() || (!autoWentToWorld && getAutoGotoWorld() == "NEW_WORLD")) {
-		autoWentToWorld = true;
-
-		WorldSettings settings;
-		settings.generator = Generator::Default;
-
-		time_t timestamp = time(nullptr);
-		tm datetime;
-#ifdef _WIN32
-		localtime_s(&datetime, &timestamp);
-#else
-		localtime_r(&timestamp, &datetime);
-#endif
-		char name[21];
-
-		strftime(name, sizeof(name), "%d %b %Y %H-%M-%S", &datetime);
-
-		settings.name = std::string(name);
-		game->loadWorld(settings);
-	}
+	if (newWorld->isClicked() || (!autoWentToWorld && getAutoGotoWorld() == "NEW_WORLD")) newWorldMenu = new NewWorld();
 
 #ifdef GAME_DEBUG
 	if (debugWorld->isClicked() || (!autoWentToWorld && getAutoGotoWorld() == "DEBUG_WORLD")) {
@@ -302,7 +297,7 @@ void WorldSelector::render() {
 		autoWentToWorld = true;
 	}
 
-	if ((back->isClicked() || game->getKeyHandler()->keyHeld(GLFW_KEY_ESCAPE)) && !game->loadingWorld()) {
+	if ((back->isClicked() || game->getKeyHandler()->keyClicked(GLFW_KEY_ESCAPE)) && !game->loadingWorld()) {
 		m_isClosing = true;
 		return;
 	}
