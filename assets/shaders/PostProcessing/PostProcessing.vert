@@ -1,4 +1,3 @@
-R"END(
 #version 450 core
 
 void main() {
@@ -8,4 +7,3 @@ void main() {
 		0, 1.0f
 	);
 }
-)END"

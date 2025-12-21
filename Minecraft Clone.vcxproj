@@ -301,7 +301,6 @@
     <ClInclude Include="src\config.h" />
     <ClInclude Include="src\Entity\Entity.h" />
     <ClInclude Include="src\Game\Game.h" />
-    <ClInclude Include="src\Game\ShaderSources.h" />
     <ClInclude Include="src\GUI\Components\Button.h" />
     <ClInclude Include="src\GUI\Components\GUIComponent.h" />
     <ClInclude Include="src\GUI\DebugText.h" />
@@ -323,18 +322,6 @@
     <ClInclude Include="src\World\Structures.h" />
     <ClInclude Include="src\World\Utils.h" />
     <ClInclude Include="src\World\World.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Shaders\DefaultShader\Shader.frag" />
-    <None Include="src\Shaders\DefaultShader\Shader.vert" />
-    <None Include="src\Shaders\Entity\Entity.frag" />
-    <None Include="src\Shaders\Entity\Entity.vert" />
-    <None Include="src\Shaders\GUI\GUI.frag" />
-    <None Include="src\Shaders\GUI\GUI.vert" />
-    <None Include="src\Shaders\PostProcessing\PostProcessing.frag" />
-    <None Include="src\Shaders\PostProcessing\PostProcessing.vert" />
-    <None Include="src\Shaders\Skybox\Skybox.frag" />
-    <None Include="src\Shaders\Skybox\Skybox.vert" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

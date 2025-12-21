@@ -1,4 +1,3 @@
-R"END(
 #version 450 core
 
 in vec2 texCoord;
@@ -14,4 +13,3 @@ void main() {
 
     FragColor *= guiColor;
 }
-)END"

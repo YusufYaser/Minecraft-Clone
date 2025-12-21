@@ -1,4 +1,3 @@
-R"END(
 #version 450 core
 
 #define PI (acos(0) * 2)
@@ -39,4 +38,3 @@ void main() {
         break;
     }
 }
-)END"

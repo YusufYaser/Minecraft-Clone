@@ -1,4 +1,3 @@
-R"END(
 #version 450 core
 layout(early_fragment_tests) in;
 
@@ -86,4 +85,3 @@ void main() {
 
     FragColor *= vec4(vec3(ambientLight * lightPercentage), 1.0f);
 }
-)END"

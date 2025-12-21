@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-Shader::Shader(const char* vertexSource, const char* fragmentSource, const char* name) {
+Shader::Shader(const char* name) {
 	print("Loading", name, "shader");
 
 	std::string vertex;
@@ -12,24 +12,22 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource, const char*
 	{
 		std::ifstream file("assets/shaders/" + std::string(name) + "/" + std::string(name) + ".vert", std::ios::binary);
 		if (file.is_open()) {
-			print("Using custom vertex shader in assets");
 			std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 			vertex = content;
 			file.close();
 		} else {
-			vertex = vertexSource;
+			error("Failed to load shader vertex file");
 		}
 	}
 
 	{
 		std::ifstream file("assets/shaders/" + std::string(name) + "/" + std::string(name) + ".frag", std::ios::binary);
 		if (file.is_open()) {
-			print("Using custom fragment shader in assets");
 			std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 			fragment = content;
 			file.close();
 		} else {
-			fragment = fragmentSource;
+			error("Failed to load shader fragment file");
 		}
 	}
 

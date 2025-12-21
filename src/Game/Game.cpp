@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "ShaderSources.h"
 #ifdef _WIN32
 #undef APIENTRY
 #include <Windows.h>
@@ -92,11 +91,11 @@ Game::Game() {
 
 	// initialize shaders
 	print("Intializing shaders");
-	shader = new Shader(vertexShaderFile, fragmentShaderFile, "DefaultShader");
-	entityShader = new Shader(entityVertexShaderFile, entityFragmentShaderFile, "Entity");
-	guiShader = new Shader(guiVertexShaderFile, guiFragmentShaderFile, "GUI");
-	skyboxShader = new Shader(skyboxVertexShaderFile, skyboxFragmentShaderFile, "Skybox");
-	postProcessingShader = new Shader(postProcessingVertexShaderFile, postProcessingFragmentShaderFile, "PostProcessing");
+	shader = new Shader("World");
+	entityShader = new Shader("Entity");
+	guiShader = new Shader("GUI");
+	skyboxShader = new Shader("Skybox");
+	postProcessingShader = new Shader("PostProcessing");
 	if (!shader->successfullyLoaded() || !entityShader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded() || !postProcessingShader->successfullyLoaded()) {
 		error("Failed to initialize shaders");
 		return;
@@ -397,11 +396,11 @@ void Game::update() {
 			loadEntityModels();
 
 			print("Reloading shaders");
-			Shader* shader = new Shader(vertexShaderFile, fragmentShaderFile, "DefaultShader");
-			Shader* entityShader = new Shader(entityVertexShaderFile, entityFragmentShaderFile, "Entity");
-			Shader* guiShader = new Shader(guiVertexShaderFile, guiFragmentShaderFile, "GUI");
-			Shader* skyboxShader = new Shader(skyboxVertexShaderFile, skyboxFragmentShaderFile, "Skybox");
-			Shader* postProcessingShader = new Shader(postProcessingVertexShaderFile, postProcessingFragmentShaderFile, "PostProcessing");
+			Shader* shader = new Shader("World");
+			Shader* entityShader = new Shader("Entity");
+			Shader* guiShader = new Shader("GUI");
+			Shader* skyboxShader = new Shader("Skybox");
+			Shader* postProcessingShader = new Shader("PostProcessing");
 			if (!shader->successfullyLoaded() || !entityShader->successfullyLoaded() || !guiShader->successfullyLoaded() || !skyboxShader->successfullyLoaded() || !postProcessingShader->successfullyLoaded()) {
 				error("Failed to reload shaders");
 			} else {

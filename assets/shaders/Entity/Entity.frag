@@ -1,4 +1,3 @@
-R"END(
 #version 450 core
 
 out vec4 FragColor;
@@ -14,4 +13,3 @@ void main() {
 
 	FragColor = vec4(FragColor.xyz * ambientLight, 1.0f);
 }
-)END"

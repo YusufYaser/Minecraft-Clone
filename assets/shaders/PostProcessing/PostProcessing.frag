@@ -1,4 +1,3 @@
-R"END(
 #version 450 core
 precision highp float;
 
@@ -24,4 +23,3 @@ void main() {
         FragColor *= (sin(texCoord.y * PI) * .175f) + .825f;
     }
 }
-)END"
