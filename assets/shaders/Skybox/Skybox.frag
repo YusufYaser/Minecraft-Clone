@@ -31,6 +31,8 @@ void main() {
         FragColor *= .75f;
         FragColor *= 1.0f - (2.0f * dist);
         FragColor *= vec4(vec3(ambientLight), 1.0f);
+
+        FragColor *= sin(max(min((156 - playerPos.y) / 4.0f, 1.0f), 0.0f) * PI/2.0f);
         break;
 
     case 2: // sun
