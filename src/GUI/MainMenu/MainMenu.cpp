@@ -39,8 +39,9 @@ MainMenu::MainMenu() {
 #ifdef GAME_DEBUG
 	debug = new Text();
 	debug->setText("Debug Build");
-	debug->setPosition({ 1.0f, -95, 1.0f, -15 });
+	debug->setPosition({ .5f, 0, .5f, -75 + 18 });
 	debug->setColor({ 1.0f, .2f, .2f, 1.0f });
+	debug->setCentered(true);
 #endif
 }
 
@@ -127,7 +128,7 @@ void MainMenu::render() {
 	}
 
 #ifdef GAME_DEBUG
-	if (static_cast<int>(glfwGetTime()) & 1) debug->render();
+	debug->render();
 #endif
 
 	if (selectWorld->isClicked()) {

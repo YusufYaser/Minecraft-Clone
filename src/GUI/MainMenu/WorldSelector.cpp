@@ -16,7 +16,7 @@ WorldSelector::WorldSelector() {
 	title->setScale(2.0f);
 
 	worldCount = new Text();
-	worldCount->setPosition({ .5f, 0, 0, 75 + 16 });
+	worldCount->setPosition({ .5f, 0, 0, 75 + 18 });
 	worldCount->setCentered(true);
 	worldCount->setColor({ 0.75f, 0.75f, 0.75f, 1.0f });
 
