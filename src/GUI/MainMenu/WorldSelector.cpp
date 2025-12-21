@@ -74,8 +74,8 @@ WorldSelector::WorldSelector() {
 					world->playButton = new Button();
 					world->playButton->setText(world->name.c_str());
 					world->playButton->setEnabled(!corrupted);
-					world->playButton->setPosition({ .5f, 0, 0, 125 + i * 40 });
-					world->playButton->setSize({ 0, 384, 0, 32 });
+					world->playButton->setPosition({ .5f, (256 + 8) * ((i % 3) - 1), 0, 125 + (i / 3) * 40 });
+					world->playButton->setSize({ 0, 256, 0, 32 });
 
 					worlds.push_back(world);
 
@@ -184,9 +184,6 @@ void WorldSelector::render() {
 	bool overflowed = false;
 	for (auto& e : worlds) {
 		if (e->playButton->getPosition().w > size.y - 185) {
-			if (!overflowed) {
-				overflow->setPosition(e->playButton->getPosition());
-			}
 			overflowed = true;
 			continue;
 		}
