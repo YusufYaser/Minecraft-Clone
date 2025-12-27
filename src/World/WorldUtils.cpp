@@ -58,7 +58,26 @@ int World::getHeight(glm::ivec2 pos) {
 
 	const double random = perlin.octave2D_01((pos.x * 0.025), (pos.y * 0.025), 4);
 	int height = static_cast<int>(round(random * 16 + 30));
+
+	Biome biome = getBiome(pos);
+	if (biome.type == BiomeType::Mountain) {
+		height += height * biome.value;
+	}
+
 	return height;
+}
+
+Biome World::getBiome(glm::ivec2 pos) {
+	float biome = perlinBiomes.octave2D_01((pos.x * 0.0025), (pos.y * 0.0025), 4);
+
+	if (biome >= 0.85f) {
+		return Biome{ BiomeType::Mountain, (biome - 0.85f) / 0.15f };
+	}
+	/*if (biome <= 0.5f) {
+		return Biome{ BiomeType::Desert, biome / 0.5f };
+	}*/
+
+	return Biome{ BiomeType::Plains, (biome / 0.85f) };
 }
 
 double World::random(glm::ivec2 pos, int otherSeed) {

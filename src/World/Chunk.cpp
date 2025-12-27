@@ -124,22 +124,35 @@ void World::chunkLoaderFunc() {
 		for (int x = pos.x * 16; x < 16 + pos.x * 16; x++) {
 			for (int z = pos.y * 16; z < 16 + pos.y * 16; z++) {
 				int height = heightMap[x - pos.x * 16][z - pos.y * 16];
+
+				Biome biome = getBiome({ x, z });
+
 				for (int y = minHeight; y < height; y++) {
 					if (unloading.load()) break;
 					BLOCK_TYPE type = BLOCK_TYPE::STONE;
 					if (y == 0) {
 						type = BLOCK_TYPE::BEDROCK;
-					} else if (height > seaLevel) {
-						if (y == height - 1) type = BLOCK_TYPE::GRASS;
-						else if (y >= height - 3) type = BLOCK_TYPE::DIRT;
 					} else {
-						if (y == height - 1 || y == height - 2) type = BLOCK_TYPE::SAND;
-						else type = BLOCK_TYPE::STONE;
+						switch (biome.type) {
+						case BiomeType::Desert:
+							type = BLOCK_TYPE::SAND;
+							break;
+						default:
+							if (height > seaLevel) {
+								if (y == height - 1) type = BLOCK_TYPE::GRASS;
+								else if (y >= height - 3) {
+									type = BLOCK_TYPE::DIRT;
+								}
+							} else {
+								if (y == height - 1 || y == height - 2) type = BLOCK_TYPE::SAND;
+								else type = BLOCK_TYPE::STONE;
+							}
+						}
 					}
 
 					setBlock(glm::ivec3(x, y, z), type, false);
 				}
-				if (height <= seaLevel) {
+				if (height <= seaLevel && biome.type != BiomeType::Desert) {
 					for (int y = height; y < seaLevel; y++) {
 						setBlock(glm::ivec3(x, y, z), BLOCK_TYPE::WATER, false);
 					}

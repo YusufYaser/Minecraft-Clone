@@ -9,7 +9,7 @@
 World::World(WorldSettings& settings) {
 	World::seed = settings.seed;
 	World::perlin = siv::PerlinNoise{ seed };
-	World::perlin2 = siv::PerlinNoise{ seed + 10 };
+	World::perlinBiomes = siv::PerlinNoise{ seed + 10 };
 	World::generator = settings.generator;
 	m_name = settings.name;
 	m_tick = settings.initialTick;

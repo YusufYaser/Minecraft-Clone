@@ -17,6 +17,17 @@
 #include "../Mux.h"
 #include "../Entity/Entity.h"
 
+enum class BiomeType : uint8_t {
+	Plains = 0,
+	Mountain,
+	Desert
+};
+
+struct Biome {
+	BiomeType type;
+	float value;
+};
+
 enum class Generator : uint8_t {
 	Default = 0,
 	Flat,
@@ -142,6 +153,7 @@ public:
 
 	// Get the height at a position from the world generator
 	int getHeight(glm::ivec2 pos);
+	Biome getBiome(glm::ivec2 pos);
 	double random(glm::ivec2 pos, int seed = 0);
 	int getSeaLevel() const { return generator == Generator::Default ? 36 : 0; };
 
@@ -184,7 +196,7 @@ private:
 	Mux chunkLoadQueueMutex;
 
 	siv::PerlinNoise perlin;
-	siv::PerlinNoise perlin2;
+	siv::PerlinNoise perlinBiomes;
 
 	int m_chunksRendered = 0;
 	int m_instancesRendered = 0;

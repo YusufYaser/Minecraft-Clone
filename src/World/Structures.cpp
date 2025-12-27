@@ -16,6 +16,7 @@ void Structure::initialize() {
 	treeConfig.probability = .0625f;
 	treeConfig.size = { 5, 6, 5 };
 	treeConfig.pivot = { 2, 0, 2 };
+	treeConfig.allowedBiomes = { BiomeType::Plains, BiomeType::Mountain };
 	Structure* tree = new Structure(STRUCTURE_TYPE::TREE, treeConfig, [](glm::ivec2 sPos, glm::ivec3 vPos) {
 		int height = 5;
 
@@ -42,6 +43,7 @@ void Structure::initialize() {
 	houseConfig.probability = .01f;
 	houseConfig.size = { 7, 7, 7 };
 	houseConfig.pivot = { 2, 1, 2 };
+	houseConfig.allowedBiomes = { BiomeType::Plains };
 	Structure* house = new Structure(STRUCTURE_TYPE::HOUSE, houseConfig, [](glm::ivec2 sPos, glm::ivec3 vPos) {
 		// floor
 		if (vPos.y == 0 && vPos.x > 1 && vPos.x < 6 && vPos.z > 1 && vPos.z < 6) return BLOCK_TYPE::OAK_PLANKS;
@@ -84,6 +86,7 @@ Structure::Structure(STRUCTURE_TYPE type, StructureConfig& config, std::function
 	m_getBlock = algorithm;
 	m_type = type;
 	m_priority = config.priority;
+	m_allowedBiomes = config.allowedBiomes;
 	m_pivot = config.pivot;
 }
 
@@ -117,7 +120,20 @@ bool Structure::isInXZ(glm::ivec2 pos) {
 		(pos.y >= 0) ? pos.y / m_size.z : (pos.y - m_size.z + 1) / m_size.z
 	};
 
-	return world->random(sPos, 4u * (int)m_type) <= m_probability;
+	Biome biome = world->getBiome({
+		(sPos.x * m_size.x) + m_pivot.x,
+		(sPos.y * m_size.z) + m_pivot.z
+		});
+
+	bool biomeAllowed = false;
+	for (BiomeType type : m_allowedBiomes) {
+		if (biome.type == type) {
+			biomeAllowed = true;
+			break;
+		}
+	}
+
+	return biomeAllowed && world->random(sPos, 4u * (int)m_type) <= m_probability;
 }
 
 int Structure::getBase(glm::ivec2 pos) {

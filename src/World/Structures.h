@@ -5,6 +5,8 @@
 
 #define STRUCTURES_COUNT 2
 
+enum class BiomeType : uint8_t;
+
 enum class STRUCTURE_TYPE : uint8_t {
 	TREE = 0,
 	HOUSE
@@ -13,6 +15,7 @@ enum class STRUCTURE_TYPE : uint8_t {
 struct StructureConfig {
 	int priority = 0;
 	float probability = 0.0f;
+	std::vector<BiomeType> allowedBiomes;
 	glm::ivec3 size = { 0, 0, 0 };
 	glm::ivec3 pivot = { 0, 0, 0 };
 };
@@ -26,6 +29,7 @@ public:
 	STRUCTURE_TYPE getType() { return m_type; };
 	float getProbability() { return m_probability; };
 	int getPriority() { return m_priority; };
+	std::vector<BiomeType> getAllowedBiomes() { return m_allowedBiomes; };
 	BLOCK_TYPE getBlock(glm::ivec3 pos);
 
 	bool isInXZ(glm::ivec2 pos); // please ignore that name
@@ -44,6 +48,8 @@ private:
 	glm::ivec3 m_pivot;
 	std::function<BLOCK_TYPE(glm::ivec2, glm::ivec3)> m_getBlock;
 	STRUCTURE_TYPE m_type;
+
+	std::vector<BiomeType> m_allowedBiomes;
 
 	static Structure* structures[STRUCTURES_COUNT];
 };
