@@ -57,27 +57,52 @@ int World::getHeight(glm::ivec2 pos) {
 	}
 
 	const double random = perlin.octave2D_01((pos.x * 0.025), (pos.y * 0.025), 4);
-	int height = static_cast<int>(round(random * 16 + 30));
+	int height = static_cast<int>(round(random * 16 + getSeaLevel() - 6));
 
 	Biome biome = getBiome(pos);
-	if (biome.type == BiomeType::Mountain) {
+	switch (biome.type) {
+	case BiomeType::Mountain:
 		height += height * biome.value;
+		break;
+	case BiomeType::Desert:
+		height = static_cast<int>(round((random * 5 + getSeaLevel()) * fmin(biome.value / 0.05f, 1.0f) + (float)height * (1.0f - fmin(biome.value / 0.05f, 1.0f))));
+		break;
 	}
 
 	return height;
 }
 
 Biome World::getBiome(glm::ivec2 pos) {
-	float biome = perlinBiomes.octave2D_01((pos.x * 0.0025), (pos.y * 0.0025), 4);
+	float biome = getBiomeFloat(pos);
+
+	/*
+	1.00
+	|
+	| Mountain
+	|
+	0.85
+	|
+	| Plains
+	|
+	0.35
+	|
+	| Desert
+	|
+	0.00
+	*/
 
 	if (biome >= 0.85f) {
 		return Biome{ BiomeType::Mountain, (biome - 0.85f) / 0.15f };
 	}
-	/*if (biome <= 0.5f) {
-		return Biome{ BiomeType::Desert, biome / 0.5f };
-	}*/
+	if (biome <= 0.35f) {
+		return Biome{ BiomeType::Desert, 1.0f - biome / 0.35f };
+	}
 
-	return Biome{ BiomeType::Plains, (biome / 0.85f) };
+	return Biome{ BiomeType::Plains, 1 };
+}
+
+float World::getBiomeFloat(glm::ivec2 pos) {
+	return perlinBiomes.octave2D_01((pos.x * 0.0025), (pos.y * 0.0025), 4);
 }
 
 double World::random(glm::ivec2 pos, int otherSeed) {

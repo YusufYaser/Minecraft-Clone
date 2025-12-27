@@ -135,8 +135,10 @@ void World::chunkLoaderFunc() {
 					} else {
 						switch (biome.type) {
 						case BiomeType::Desert:
-							type = BLOCK_TYPE::SAND;
-							break;
+							if (fmin(random({x, z}), 1.0f) <= fmin(biome.value / 0.02f, 1.0f)) {
+								type = BLOCK_TYPE::SAND;
+								break;
+							}
 						default:
 							if (height > seaLevel) {
 								if (y == height - 1) type = BLOCK_TYPE::GRASS;
@@ -152,7 +154,7 @@ void World::chunkLoaderFunc() {
 
 					setBlock(glm::ivec3(x, y, z), type, false);
 				}
-				if (height <= seaLevel && biome.type != BiomeType::Desert) {
+				if (height <= seaLevel) {
 					for (int y = height; y < seaLevel; y++) {
 						setBlock(glm::ivec3(x, y, z), BLOCK_TYPE::WATER, false);
 					}

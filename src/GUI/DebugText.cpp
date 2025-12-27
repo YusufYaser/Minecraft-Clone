@@ -84,9 +84,12 @@ void DebugText::render() {
 	text << "Sound Device: " << soundEngine->getSoundDeviceName() << "\n\n";
 
 	if (player != nullptr) {
-		text << "Position: " << round(player->getPos().x * 100) / 100;
-		text << ", " << round(player->getPos().y * 100) / 100;
-		text << ", " << round(player->getPos().z * 100) / 100 << "\n";
+		glm::vec3 playerPos = player->getPos();
+		text << "Position: " << round(playerPos.x * 100) / 100;
+		text << ", " << round(playerPos.y * 100) / 100;
+		text << ", " << round(playerPos.z * 100) / 100 << "\n";
+		text << "Biome: " << (int)world->getBiome({ playerPos.x, playerPos.z }).type << " (" << world->getBiome({ playerPos.x, playerPos.z }).value << ")\n";
+		if (l == 2) text << "Biome Float: " << world->getBiomeFloat({ playerPos.x, playerPos.z }) << "\n";
 
 		glm::ivec2 chunkPos = getPosChunk(player->getPos());
 		text << "Chunk: " << round(chunkPos.x * 100) / 100;
