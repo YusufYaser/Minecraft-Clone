@@ -194,22 +194,6 @@ TextureAtlas* initializeTextures() {
 		tex->height = height;
 		tex->width = width;
 
-		for (auto& l : tex->lod) {
-			l = glm::vec4();
-		}
-
-		if (height == 96) {
-			for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					unsigned char* pixel = data + y * width + x * 4;
-					int i = (int)floor(y / 16.0f);
-					i += 2;
-					i %= 6;
-					tex->lod[i] += glm::vec4(float(*pixel), float(*(pixel + 1)), float(*(pixel + 2)), float(*(pixel + 3))) / float(width * height / 6.0f) / 255.0f;
-				}
-			}
-		}
-
 		stbi_image_free(data);
 
 		textures[name] = tex;

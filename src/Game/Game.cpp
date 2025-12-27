@@ -113,12 +113,6 @@ Game::Game() {
 	for (int i = 2; i < BLOCK_TYPE_COUNT; i++) {
 		std::string name = "atlasRanges[" + std::to_string(i) + "]";
 		glUniform4fv(glGetUniformLocation(shader->getId(), name.c_str()), 1, glm::value_ptr(m_texAtlas->ranges[i]));
-
-		Texture* tex = getTexture(getTextureName((BLOCK_TYPE)i));
-		for (int f = 0; f < 6; f++) {
-			name = "lods[" + std::to_string(i) + "][" + std::to_string(f) + "]";
-			glUniform4fv(glGetUniformLocation(shader->getId(), name.c_str()), 1, glm::value_ptr(tex->lod[f]));
-		}
 	}
 
 	guiShader->activate();
@@ -419,12 +413,6 @@ void Game::update() {
 				for (int i = 2; i < BLOCK_TYPE_COUNT; i++) {
 					std::string name = "atlasRanges[" + std::to_string(i) + "]";
 					glUniform4fv(glGetUniformLocation(shader->getId(), name.c_str()), 1, glm::value_ptr(m_texAtlas->ranges[i]));
-
-					Texture* tex = getTexture(getTextureName((BLOCK_TYPE)i));
-					for (int f = 0; f < 6; f++) {
-						name = "lods[" + std::to_string(i) + "][" + std::to_string(f) + "]";
-						glUniform4fv(glGetUniformLocation(shader->getId(), name.c_str()), 1, glm::value_ptr(tex->lod[f]));
-					}
 				}
 
 				print("Reloaded assets");
