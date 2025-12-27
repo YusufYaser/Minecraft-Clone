@@ -69,7 +69,7 @@ void World::renderer(int c) {
 				instancesCache[hiddenFaces].push_back(i);
 			}
 
-			i->offsets.push_back(glm::vec4(bPos, type));
+			i->offsets.push_back(BlockOffsetData{ bPos, (uint8_t)type });
 		}
 
 		chunk->renderingGroupsMutex.unlock();
@@ -230,7 +230,7 @@ void World::render() {
 		}
 
 		for (auto& i : instances) {
-			i->offsets.resize(0, glm::vec4());
+			i->offsets.resize(0);
 		}
 
 		rendering.store(true);
@@ -273,9 +273,12 @@ void World::render() {
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
 
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(BlockOffsetData), 0);
+		glVertexAttribIPointer(4, 1, GL_UNSIGNED_BYTE, sizeof(BlockOffsetData), (void*)offsetof(BlockOffsetData, blockType));
 		glEnableVertexAttribArray(3);
+		glEnableVertexAttribArray(4);
 		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
 
 		//debug("Initialized new instance:", i, "Hidden faces:", int(i->hiddenFaces));
 	}
@@ -301,7 +304,7 @@ void World::render() {
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBindVertexArray(i->bStructData->VAO);
 
-		if (rerender || m_worldRenderModified) glBufferData(GL_ARRAY_BUFFER, i->offsets.size() * sizeof(glm::vec4), i->offsets.data(), GL_DYNAMIC_DRAW);
+		if (rerender || m_worldRenderModified) glBufferData(GL_ARRAY_BUFFER, i->offsets.size() * sizeof(BlockStructureData), i->offsets.data(), GL_DYNAMIC_DRAW);
 
 		glDrawElementsInstanced(GL_TRIANGLES, i->bStructData->faceCount * 6, GL_UNSIGNED_BYTE, 0, i->offsets.size());
 

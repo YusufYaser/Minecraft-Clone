@@ -92,9 +92,9 @@ struct Chunk {
 	}
 };
 
-struct InstanceOffset {
+struct BlockOffsetData {
 	glm::vec3 pos;
-	int blockType;
+	uint8_t blockType;
 };
 
 struct Instance {
@@ -102,7 +102,7 @@ struct Instance {
 	BlockStructureData* bStructData;
 	uint8_t hiddenFaces;
 	GLuint VBO;
-	std::vector<glm::vec4> offsets;
+	std::vector<BlockOffsetData> offsets;
 	bool transparent;
 };
 

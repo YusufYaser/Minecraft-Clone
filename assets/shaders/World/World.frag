@@ -2,13 +2,14 @@
 layout(early_fragment_tests) in;
 
 #define BLOCK_TYPE_COUNT 12
+#define ANIMATION_SPEED 1.0f
 
 in vec2 texCoord;
 flat in float face;
 flat in int instanceId;
 flat in vec3 blockPosOffset;
 flat in vec3 fPlayerPos;
-flat in int fBlockType;
+flat in uint fBlockType;
 flat in float fFogSize;
 flat in int fRenderDistance;
 
@@ -55,7 +56,7 @@ void main() {
         } else {
             int animationFrameCount = int(round(size.x / (size.y / 6.0f)));
 
-            vec2 tc2 = vec2((tc.x + float(int(time) % animationFrameCount)) / float(animationFrameCount), (tc.y + float(face)) / 6.0f);
+            vec2 tc2 = vec2((tc.x + float(int(time * ANIMATION_SPEED) % animationFrameCount)) / float(animationFrameCount), (tc.y + float(face)) / 6.0f);
             tc2 = range.xy + (tc2 * size);
 
             FragColor = texture(tex0, tc2);

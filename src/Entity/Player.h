@@ -58,7 +58,7 @@ private:
 
 	Image* m_crosshair = nullptr;
 	Image* m_inventory = nullptr;
-	Image* m_inventoryImages[9];
+	Image* m_inventoryImage;
 	int slot = 0;
 
 	ItemStack* m_items[9];

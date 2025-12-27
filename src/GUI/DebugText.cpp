@@ -64,23 +64,22 @@ void DebugText::render() {
 	const GPUInfo* gpu = game->getGpuInfo();
 	text << "GPU: " << gpu->renderer << " (" << gpu->vendor << ")" << "\n";
 	text << "Version: " << gpu->version << "\n\n";
-	if (l == 2) {
-		int mem = 0;
+
+	int mem = 0;
 #ifdef _WIN32
-		PROCESS_MEMORY_COUNTERS pmc;
-		if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-			mem = static_cast<int>(pmc.WorkingSetSize / 1024 / 1024);
-		}
+	PROCESS_MEMORY_COUNTERS pmc;
+	if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
+		mem = static_cast<int>(pmc.WorkingSetSize / 1024 / 1024);
+	}
 #endif
 
 #if defined(__linux__) || defined(__APPLE__)
-		struct rusage usage;
-		if (getrusage(RUSAGE_SELF, &usage) == 0) {
-			mem = static_cast<int>(usage.ru_maxrss / 1024);
-		}
-#endif
-		text << "Game Memory: " << mem << " MB / " << round(getMaxMemory() / 1024 / 1024) << " MB\n\n";
+	struct rusage usage;
+	if (getrusage(RUSAGE_SELF, &usage) == 0) {
+		mem = static_cast<int>(usage.ru_maxrss / 1024);
 	}
+#endif
+	text << "Game Memory: " << mem << " MB / " << round(getMaxMemory() / 1024 / 1024) << " MB\n\n";
 
 	text << "Sound Device: " << soundEngine->getSoundDeviceName() << "\n\n";
 
@@ -90,53 +89,25 @@ void DebugText::render() {
 		text << ", " << round(player->getPos().z * 100) / 100 << "\n";
 
 		glm::ivec2 chunkPos = getPosChunk(player->getPos());
-		if (l == 2) {
-			Chunk* chunk = world->getChunk(chunkPos);
-			text << "\n=== Current Chunk ===\n";
-			text << " " << chunk << "\n";
-			text << " Chunk: " << round(chunkPos.x * 100) / 100;
-			text << ", " << round(chunkPos.y * 100) / 100 << "\n";
-			text << " ID: " << hashPos(chunkPos) << "\n";
-			if (chunk != nullptr) {
-				text << " Permanently Loaded: " << (chunk->permanentlyLoaded ? "true" : "false") << "\n";
-				text << " Modified: " << (chunk->modified ? "true" : "false") << "\n";
-#ifdef GAME_DEBUG
-				text << " Load Method: ";
-				switch (chunk->dLoadMethod) {
-				case CHUNK_LOAD_METHOD::GENERATED:
-					text << "GENERATED";
-					break;
-				case CHUNK_LOAD_METHOD::FILE:
-					text << "FILE";
-					break;
-				default:
-					text << "UNKNOWN";
-					break;
-				}
-				text << "\n";
-#endif
-			} else {
-				text << " Chunk not loaded\n";
-			}
-			text << "====================\n\n";
-		} else {
-			text << "Chunk: " << round(chunkPos.x * 100) / 100;
-			text << ", " << round(chunkPos.y * 100) / 100 << "\n\n";
-		}
+		text << "Chunk: " << round(chunkPos.x * 100) / 100;
+		text << ", " << round(chunkPos.y * 100) / 100 << "\n\n";
 	}
 
 	static int loadPerSecond = 0;
 	static double lastLoadPerSecondTime = 0;
 	static size_t lastLoadQueueCount = 0;
-	if (glfwGetTime() - lastLoadPerSecondTime > 1.0) {
+	if (currentTime - lastLoadPerSecondTime > 0.25) {
 		if (world != nullptr) {
-			loadPerSecond = static_cast<int>(round((lastLoadQueueCount - world->chunkLoadQueueCount()) / (glfwGetTime() - lastLoadPerSecondTime)));
-			lastLoadQueueCount = world->chunkLoadQueueCount();
+			size_t loadQueueCount = world->chunkLoadQueueCount();
+			int oldLoadPerSecond = loadPerSecond;
+			loadPerSecond = static_cast<int>(round((lastLoadQueueCount - loadQueueCount) / (currentTime - lastLoadPerSecondTime)));
+			if (loadPerSecond < 0) loadPerSecond = oldLoadPerSecond;
+			lastLoadQueueCount = loadQueueCount;
 		} else {
 			loadPerSecond = 0;
 			lastLoadQueueCount = 0;
 		}
-		lastLoadPerSecondTime = glfwGetTime();
+		lastLoadPerSecondTime = currentTime;
 	}
 
 	if (world != nullptr) {
@@ -165,22 +136,54 @@ void DebugText::render() {
 	}
 
 	if (player != nullptr && world != nullptr) {
+		glm::ivec2 chunkPos = getPosChunk(player->getPos());
+
+		if (l == 2) {
+			Chunk* chunk = world->getChunk(chunkPos);
+			text << "Current Chunk:\n";
+			text << " * " << chunk << "\n";
+			text << " * Chunk: " << round(chunkPos.x * 100) / 100;
+			text << ", " << round(chunkPos.y * 100) / 100 << "\n";
+			text << " * ID: " << hashPos(chunkPos) << "\n";
+			if (chunk != nullptr) {
+				text << " * Permanently Loaded: " << (chunk->permanentlyLoaded ? "true" : "false") << "\n";
+				text << " * Modified: " << (chunk->modified ? "true" : "false") << "\n";
+#ifdef GAME_DEBUG
+				text << " * Load Method: ";
+				switch (chunk->dLoadMethod) {
+				case CHUNK_LOAD_METHOD::GENERATED:
+					text << "GENERATED";
+					break;
+				case CHUNK_LOAD_METHOD::FILE:
+					text << "FILE";
+					break;
+				default:
+					text << "UNKNOWN";
+					break;
+				}
+				text << "\n";
+#endif
+			} else {
+				text << " * Chunk not loaded\n";
+			}
+			text << "\n";
+		}
+
 		Block* targetBlock = nullptr;
 		player->getTargetBlock(&targetBlock);
 
 		if (targetBlock != nullptr) {
-			text << "=== Target Block ===\n";
-			if (l == 2) text << " " << targetBlock << "\n";
-			text << " Block ID: " << (int)targetBlock->getType() << "\n";
-			text << " Block Type: " << targetBlock->getName() << "\n";
+			text << "Target Block:\n";
+			if (l == 2) text << " * " << targetBlock << "\n";
 			glm::vec3 bPos = targetBlock->getPos();
-			text << " Block Position: " << round(bPos.x * 100) / 100;
+			text << " * Position: " << round(bPos.x * 100) / 100;
 			text << ", " << round(bPos.y * 100) / 100;
 			text << ", " << round(bPos.z * 100) / 100 << "\n";
-			text << " Ambient Light: " << world->getAmbientLight() << "\n";
+			text << " * Type: " << (int)targetBlock->getType() << " (" << targetBlock->getName() << ")\n";
+			text << " * Ambient Light: " << world->getAmbientLight() << "\n";
 
 #ifdef GAME_DEBUG
-			text << " Placement Method: ";
+			text << " * Placement Method: ";
 			switch (targetBlock->dPlacementMethod) {
 			case BLOCK_PLACEMENT_METHOD::SET_BLOCK:
 				text << "SET_BLOCK";
@@ -194,7 +197,7 @@ void DebugText::render() {
 			}
 			text << "\n";
 #endif
-			text << "==================\n";
+			text << "\n";
 		}
 	}
 

@@ -12,17 +12,14 @@ Player::Player() {
 	m_inventory->setSize({ 0, 472, 0, 56 });
 	m_inventory->setZIndex(998);
 
+	m_inventoryImage = new Image(getTexture("invalid"));
+	m_inventoryImage->setZIndex(999);
+	m_inventoryImage->setSize({ 0, 48, 0, 48 });
+
 	for (int i = 0; i < 9; i++) {
 		ItemStack* item = new ItemStack();
 		item->block = BLOCK_TYPE(i + 2);
 		m_items[i] = item;
-
-		Image* img = new Image(getTexture(getTextureName(item->block)));
-		img->setZIndex(999);
-		img->setPosition({ .5f, -236 + (52 * i) + 28, 1, -32 });
-		img->setSize({ 0, 48, 0, 48 });
-		img->setCrop({ 1.0f / getAnimationFrameCount(item->block), 1.0f / 6.0f });
-		m_inventoryImages[i] = img;
 	}
 
 	type = ENTITY_TYPE::PLAYER;
@@ -35,12 +32,12 @@ Player::~Player() {
 	delete m_inventory;
 	m_inventory = nullptr;
 
+	delete m_inventoryImage;
+	m_inventoryImage = nullptr;
+
 	for (int i = 0; i < 9; i++) {
 		delete m_items[i];
 		m_items[i] = nullptr;
-
-		delete m_inventoryImages[i];
-		m_inventoryImages[i] = nullptr;
 	}
 }
 
@@ -60,8 +57,13 @@ void Player::update() {
 	m_inventory->render();
 
 	for (int i = 0; i < 9; i++) {
-		m_inventoryImages[i]->setColor(i == slot ? glm::vec4(1.0f, 1.0f, 1.0f, 1.0f) : glm::vec4(.5f, .5f, .5f, 1.0f));
-		m_inventoryImages[i]->render();
+		ItemStack* item = m_items[i];
+		if (item == nullptr) continue;
+		m_inventoryImage->setColor(i == slot ? glm::vec4(1.0f, 1.0f, 1.0f, 1.0f) : glm::vec4(.5f, .5f, .5f, 1.0f));
+		m_inventoryImage->setPosition({ .5f, -236 + (52 * i) + 28, 1, -32 });
+		m_inventoryImage->setCrop({ 1.0f / getAnimationFrameCount(item->block), 1.0f / 6.0f });
+		m_inventoryImage->setTexture(getTexture(getTextureName(m_items[i]->block)));
+		m_inventoryImage->render();
 	}
 	if (wasDebug) {
 		game->setDebugLevel(2);
