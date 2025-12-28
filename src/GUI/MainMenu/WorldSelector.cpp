@@ -46,6 +46,12 @@ WorldSelector::WorldSelector() {
 	overflow->setPosition({ .5f, 0, 1, -160 });
 	overflow->setColor({ .75f, .75f, .75f, 1.0f });
 
+	upgradeText = new Text();
+	overflow->setText("Worlds with this color will be upgraded\nand cannot be played on older versions");
+	overflow->setCentered(true);
+	overflow->setPosition({ .5f, 0, 1, -15 });
+	overflow->setColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+
 	try {
 		std::filesystem::create_directory("worlds");
 
@@ -76,6 +82,12 @@ WorldSelector::WorldSelector() {
 					world->playButton->setEnabled(!corrupted);
 					world->playButton->setPosition({ .5f, (256 + 8) * ((i % 3) - 1), 0, 125 + (i / 3) * 40 });
 					world->playButton->setSize({ 0, 256, 0, 32 });
+
+					if (std::filesystem::file_size(p + "/world.dat") == sizeof(OldWorldSaveData)) {
+						m_showUpgradeText = true;
+						world->willUpgrade = true;
+						world->playButton->setTextColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+					}
 
 					worlds.push_back(world);
 
@@ -209,17 +221,69 @@ void WorldSelector::render() {
 					error("Failed to open world.dat");
 					continue;
 				}
-				dataFile.read(reinterpret_cast<char*>(data), sizeof(WorldSaveData));
-				dataFile.close();
+
+				if (e->willUpgrade) {
+					OldWorldSaveData* old = new OldWorldSaveData();
+					warn("Updating world.dat");
+					dataFile.read(reinterpret_cast<char*>(old), sizeof(OldWorldSaveData));
+					dataFile.close();
+
+					/*
+					* uint8_t version = 1;
+					int tick;
+					unsigned int seed;
+					Generator generator;
+					float playerPos[3];
+					float playerOrientation[3];
+					bool playerFlying;
+					uint8_t structuresCount;
+					STRUCTURE_TYPE structures[64];
+					*/
+
+					data->tick = old->tick;
+					data->seed = old->seed;
+					data->generator = old->generator;
+					data->playerPos[0] = old->playerPos[0];
+					data->playerPos[1] = old->playerPos[1];
+					data->playerPos[2] = old->playerPos[2];
+					data->playerOrientation[0] = old->playerOrientation[0];
+					data->playerOrientation[1] = old->playerOrientation[1];
+					data->playerOrientation[2] = old->playerOrientation[2];
+					data->playerFlying = old->playerFlying;
+
+					uint8_t structuresCount = old->structuresCount;
+					if (structuresCount == 2) {
+						structuresCount = -1;
+
+						for (int i = 0; i < STRUCTURES_COUNT; i++) {
+							data->structures[i] = (STRUCTURE_TYPE)i;
+						}
+					} else {
+						for (int i = 0; i < structuresCount; i++) {
+							data->structures[i] = old->structures[i];
+						}
+					}
+
+					data->structuresCount = structuresCount;
+
+					delete old;
+
+					print("World updated");
+				} else {
+					dataFile.read(reinterpret_cast<char*>(data), sizeof(WorldSaveData));
+					dataFile.close();
+				}
 
 				WorldSettings settings;
 				settings.name = e->name;
 				settings.seed = data->seed;
 				settings.generator = data->generator;
 				settings.initialTick = data->tick;
+				settings.structuresCount = data->structuresCount != -1 ? data->structuresCount : STRUCTURES_COUNT;
+				settings.allStructures = data->structuresCount == -1;
 				settings.structures.clear();
-				if (data->structuresCount <= STRUCTURES_COUNT) {
-					for (int i = 0; i < data->structuresCount; i++) {
+				if (settings.structuresCount <= STRUCTURES_COUNT) {
+					for (int i = 0; i < settings.structuresCount; i++) {
 						if (i < STRUCTURES_COUNT) {
 							settings.structures.push_back(data->structures[i]);
 						} else {
@@ -228,6 +292,7 @@ void WorldSelector::render() {
 					}
 				} else {
 					warn("Invalid structures count");
+					settings.structuresCount = 0;
 				}
 
 				glm::vec3 pos = {};

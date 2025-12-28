@@ -29,11 +29,15 @@ private:
 
 	Text* overflow;
 
+	Text* upgradeText;
+	bool m_showUpgradeText = false;
+
 	bool m_isClosing = false;
 
 	struct WorldEntry {
 		std::string name;
 		Button* playButton;
+		bool willUpgrade;
 	};
 
 	std::vector<WorldEntry*> worlds;

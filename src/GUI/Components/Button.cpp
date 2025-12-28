@@ -5,6 +5,8 @@ Button::Button() {
 	m_text = new Text();
 	m_text->setCentered(true);
 
+	m_textColor = glm::vec4(1.0f);
+
 	m_image = new Image(getTexture("button"));
 	m_image->setSize({ 0, 256, 0, 32 });
 
@@ -84,7 +86,7 @@ void Button::render() {
 		m_image->setColor(glm::vec4(1.0f));
 	}
 	if (m_enabled) {
-		m_text->setColor(glm::vec4(1.0f));
+		m_text->setColor(m_textColor);
 	} else {
 		m_text->setColor({ .75f, .75f, .75f, 1.0f });
 	}

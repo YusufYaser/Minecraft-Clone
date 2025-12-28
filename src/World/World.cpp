@@ -14,12 +14,12 @@ World::World(WorldSettings& settings) {
 	m_name = settings.name;
 	m_tick = settings.initialTick;
 	m_internalWorld = settings.internalWorld;
+	m_allStructures = settings.allStructures;
 
 	lastAutoSaved = glfwGetTime();
 
-	int structureCount = 0;
-	for (STRUCTURE_TYPE structureType : settings.structures) {
-		Structure* structure = Structure::getStructure(structureType);
+	for (int i = 0; i < settings.structuresCount; i++) {
+		Structure* structure = Structure::getStructure(settings.structures[i]);
 		structures.push_back(structure);
 	}
 
@@ -190,6 +190,7 @@ WorldSaveData* World::createWorldSaveData() {
 		data->structures[i++] = structure->getType();
 	}
 	data->structuresCount = i;
+	if (m_allStructures) data->structuresCount = -1;
 
 	Player* player = Game::getInstance()->getPlayer();
 

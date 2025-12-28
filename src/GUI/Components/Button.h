@@ -13,6 +13,7 @@ public:
 	bool isClicked();
 
 	void setText(const char* content);
+	void setTextColor(glm::vec4 color) { m_textColor = color; };
 	void setBackground(Texture* nTex) { m_image->setTexture(nTex); };
 	void setEnabled(bool enabled) { m_enabled = enabled; };
 
@@ -24,6 +25,7 @@ public:
 private:
 	Text* m_text;
 	Image* m_image;
+	glm::vec4 m_textColor;
 
 	bool m_enabled;
 };

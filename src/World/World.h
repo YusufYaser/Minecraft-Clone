@@ -35,15 +35,28 @@ enum class Generator : uint8_t {
 	Debug
 };
 
-struct WorldSaveData {
+struct OldWorldSaveData {
 	int tick;
 	unsigned int seed;
 	Generator generator;
 	uint8_t structuresCount;
-	STRUCTURE_TYPE structures[STRUCTURES_COUNT];
+	STRUCTURE_TYPE structures[2];
 	float playerPos[3];
 	float playerOrientation[3];
 	bool playerFlying;
+};
+
+struct WorldSaveData {
+	uint8_t version = 1;
+	int tick;
+	unsigned int seed;
+	Generator generator;
+	float playerPos[3];
+	float playerOrientation[3];
+	bool playerFlying;
+	// -1 for all structures and add new structures in each update
+	int8_t structuresCount;
+	STRUCTURE_TYPE structures[64];
 };
 
 struct ChunkSaveData {
@@ -54,7 +67,9 @@ struct WorldSettings {
 	std::string name = "World";
 	siv::PerlinNoise::seed_type seed = 0u;
 	Generator generator = Generator::Default;
-	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE, STRUCTURE_TYPE::HOUSE };
+	bool allStructures = false;
+	int8_t structuresCount = 0;
+	std::vector<STRUCTURE_TYPE> structures = { STRUCTURE_TYPE::TREE, STRUCTURE_TYPE::HOUSE, STRUCTURE_TYPE::PYRAMID };
 	int initialTick = 0;
 	bool internalWorld = false;
 };
@@ -177,6 +192,7 @@ private:
 	siv::PerlinNoise::seed_type seed;
 	Generator generator;
 
+	bool m_allStructures = false;
 	std::vector<Structure*> structures;
 
 	std::unordered_map<std::size_t, Chunk*> chunks;
