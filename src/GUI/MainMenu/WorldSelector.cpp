@@ -47,10 +47,10 @@ WorldSelector::WorldSelector() {
 	overflow->setColor({ .75f, .75f, .75f, 1.0f });
 
 	upgradeText = new Text();
-	overflow->setText("Worlds with this color will be upgraded\nand cannot be played on older versions");
-	overflow->setCentered(true);
-	overflow->setPosition({ .5f, 0, 1, -15 });
-	overflow->setColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+	upgradeText->setText("Worlds with this color will be upgraded\nand cannot be played on older versions");
+	upgradeText->setCentered(true);
+	upgradeText->setPosition({ .5f, 0, 1, -15 });
+	upgradeText->setColor({ 1.0f, 1.0f, 0.0f, 1.0f });
 
 	try {
 		std::filesystem::create_directory("worlds");
@@ -165,6 +165,8 @@ void WorldSelector::render() {
 	back->setEnabled(!game->loadingWorld());
 
 	background->render();
+
+	if (m_showUpgradeText) upgradeText->render();
 
 	title->render();
 	worldCount->render();
