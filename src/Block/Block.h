@@ -17,10 +17,11 @@ enum class BLOCK_TYPE : uint8_t {
 	BEDROCK,
 	SAND,
 	OAK_PLANKS,
-	FLOWER
+	FLOWER,
+	SANDSTONE
 };
 
-#define BLOCK_TYPE_COUNT 12
+#define BLOCK_TYPE_COUNT 13
 
 enum class BLOCK_FACE : uint8_t {
 	FRONT = 0,

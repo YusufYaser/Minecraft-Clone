@@ -77,6 +77,26 @@ void Structure::initialize() {
 		});
 	structures[(int)STRUCTURE_TYPE::HOUSE] = house;
 
+	print("Initializing pyramid");
+	StructureConfig pyramidConfig;
+	pyramidConfig.priority = 1;
+	pyramidConfig.probability = .01f;
+	pyramidConfig.size = { 30, 15, 30 };
+	pyramidConfig.pivot = { 0, 3, 0 };
+	pyramidConfig.allowedBiomes = { BiomeType::Desert };
+	Structure* pyramid = new Structure(STRUCTURE_TYPE::PYRAMID, pyramidConfig, [](glm::ivec2 sPos, glm::ivec3 vPos) {
+		if (vPos.x > 29 - vPos.y || 29 - vPos.x > 29 - vPos.y) {
+			return BLOCK_TYPE::NONE;
+		}
+
+		if (vPos.z > 29 - vPos.y || 29 - vPos.z > 29 - vPos.y) {
+			return BLOCK_TYPE::NONE;
+		}
+
+		return BLOCK_TYPE::SANDSTONE;
+		});
+	structures[(int)STRUCTURE_TYPE::PYRAMID] = pyramid;
+
 	initialized = true;
 }
 

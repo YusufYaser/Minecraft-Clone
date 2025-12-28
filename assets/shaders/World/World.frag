@@ -1,7 +1,7 @@
 #version 450 core
 layout(early_fragment_tests) in;
 
-#define BLOCK_TYPE_COUNT 12
+#define BLOCK_TYPE_COUNT 13
 #define ANIMATION_SPEED 1.0f
 
 in vec2 texCoord;
@@ -35,7 +35,8 @@ void main() {
 
     vec2 tc = texCoord;
 
-    if (fBlockType == 3 && face == 5 || (fBlockType != 3 && fBlockType != 7 && fBlockType != 10 && fBlockType != 11)) {
+    if (fBlockType == 3 && face == 5 || fBlockType == 12 && face == 5 ||
+        (fBlockType != 3 && fBlockType != 12 && fBlockType != 7 && fBlockType != 10 && fBlockType != 11)) {
         vec3 p = fract((blockPosOffset + fPlayerPos) * 0.1031);
         p += dot(p, p.yxz + 19.19);
         if (fract((p.x + p.y) * p.z) > 0.5f) {

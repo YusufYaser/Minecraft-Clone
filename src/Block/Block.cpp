@@ -165,6 +165,9 @@ const char* getTextureName(BLOCK_TYPE type) {
 	case BLOCK_TYPE::FLOWER:
 		return "flower";
 
+	case BLOCK_TYPE::SANDSTONE:
+		return "sandstone";
+
 	default:
 		return "invalid";
 	}

@@ -3,13 +3,14 @@
 #include "../Block/Block.h"
 #include "stdint.h"
 
-#define STRUCTURES_COUNT 2
+#define STRUCTURES_COUNT 3
 
 enum class BiomeType : uint8_t;
 
 enum class STRUCTURE_TYPE : uint8_t {
 	TREE = 0,
-	HOUSE
+	HOUSE,
+	PYRAMID
 };
 
 struct StructureConfig {
