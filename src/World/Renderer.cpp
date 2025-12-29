@@ -7,6 +7,8 @@ void World::renderer(int c) {
 	std::vector<Instance*> instancesCache[64];
 	Player* player = nullptr;
 
+	glm::ivec3 maxDist = glm::ivec3(24, 12, 24);
+
 	while (!unloading.load()) {
 		if (!rendering.load()) continue;
 
@@ -34,14 +36,30 @@ void World::renderer(int c) {
 			BLOCK_TYPE type = block->getType();
 
 			if (type == BLOCK_TYPE::NONE || type == BLOCK_TYPE::AIR) continue;
-			bool transparent = isBlockTypeTransparent(type);
-			BLOCK_STRUCTURE_TYPE structType = getStructureType(type);
 
 			const glm::ivec3& bPos = block->getPos();
 			const glm::vec3 diff = glm::vec3(bPos) - pos;
+			uint8_t hiddenFaces = block->hiddenFaces;
+			bool transparent = isBlockTypeTransparent(type);
+
+			if (!transparent) {
+				for (int i = 0; i < 6; i++) {
+					if ((hiddenFaces & (1 << i))) continue;
+					glm::ivec3 faceDir = getBlockFaceDirection(BLOCK_FACE(i));
+					glm::ivec3 d = glm::ivec3(diff) * faceDir;
+
+					if (d.x > maxDist.x || d.y > maxDist.y || d.z > maxDist.z) {
+						hiddenFaces += 1 << i;
+					}
+				}
+
+				if (hiddenFaces == 63) continue;
+			}
+
+			BLOCK_STRUCTURE_TYPE structType = getStructureType(type);
+
 			const float half = .5f;
 
-			uint8_t hiddenFaces = block->hiddenFaces;
 			if (structType == BLOCK_STRUCTURE_TYPE::PLANT) hiddenFaces = 0;
 
 			Instance* i = nullptr;
@@ -166,10 +184,11 @@ void World::render() {
 	static size_t oldChunksLoaded = 0;
 	size_t chunksLoaded = this->chunksLoaded() - this->chunkLoadQueueCount();
 	bool rerender = false;
+	static int lastYLevel = 0;
 
 	static int oldChunksRendered = 0;
 
-	if (oldPlayerChunk != playerChunk || oldChunksLoaded < chunksLoaded || m_worldRenderModified) {
+	if (oldPlayerChunk != playerChunk || lastYLevel != round(pos.y / 8) || oldChunksLoaded < chunksLoaded || m_worldRenderModified) {
 		chunksToRender.clear();
 
 		for (int x = -renderDistance + playerChunk.x - PRELOAD_DISTANCE; x < renderDistance + playerChunk.x + PRELOAD_DISTANCE; x++) {
@@ -204,10 +223,11 @@ void World::render() {
 			}
 		}
 
-		rerender = oldChunksRendered != chunksToRender.size() || oldPlayerChunk != playerChunk || m_worldRenderModified;
+		rerender = oldChunksRendered != chunksToRender.size() || oldPlayerChunk != playerChunk || lastYLevel != round(pos.y / 8) || m_worldRenderModified;
 
 		oldPlayerChunk = playerChunk;
 		oldChunksLoaded = chunksLoaded;
+		lastYLevel = round(pos.y / 8);
 
 		if (!rerender) {
 			chunksToRender.clear();
