@@ -108,7 +108,15 @@ void NewWorld::render() {
 		settings.generator = selectedGenerator;
 
 		if (!structuresEnabled) {
+			settings.structuresCount = 0;
+			settings.allStructures = false;
 			settings.structures = {};
+		} else {
+			settings.structuresCount = STRUCTURES_COUNT;
+			settings.allStructures = true;
+			for (int i = 0; i < settings.structuresCount; i++) {
+				settings.structures[i] = (STRUCTURE_TYPE)i;
+			}
 		}
 
 		time_t timestamp = time(nullptr);
