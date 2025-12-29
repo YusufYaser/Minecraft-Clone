@@ -5,25 +5,28 @@
 This is my own Minecraft Clone, a personal project where I attempt to create my own first game engine. This is a for-fun project that I work on in my free time.
 
 ## Features
+- 🖌️ Custom Textures
 - 🌍 Infinite World Generation
 - 🏢 Structure Generation
 - 💡 Basic Lighting System
 - 🕑 World Tick System
 - 💾 World Saving
 - 📸 Screenshotting
+- 🏜️ Biomes
 
 ## Controls
-| Keybind        | Action              | Notes                     |
-| -------------- | ------------------- | ------------------------- |
-| `F`            | Fly                 |                           |
-| `Left Control` | Sprint              |                           |
-| `/ + Q`        | Toggle 3D Rendering |                           |
-| `/ + U`        | Reload Assets       |                           |
-| `/ + I`        | Save World          |                           |
-| `F1`           | Toggle GUI          |                           |
-| `F3`           | Debug Menu          | Click twice for more info |
-| `F11`          | Full Screen         |                           |
-| `F4`           | Debug Camera        | Only in debug builds      |
+| Keybind        | Action                          | Notes                     |
+| -------------- | ------------------------------- | ------------------------- |
+| `F`            | Fly                             |                           |
+| `Left Control` | Sprint                          |                           |
+| `/ + Q`        | Toggle 3D Rendering             |                           |
+| `/ + U`        | Reload Assets                   |                           |
+| `/ + I`        | Save World                      |                           |
+| `F1`           | Toggle GUI                      |                           |
+| `F3`           | Debug Menu                      | Click twice for more info |
+| `F11`          | Full Screen                     |                           |
+| `F4`           | Debug Camera                    | Only in debug builds      |
+| `C`            | Teleport to Debug Camera        | Only in debug builds      |
 
 ## Startup Flags
 | Flag                            | Description                                                |
