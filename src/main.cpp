@@ -34,6 +34,10 @@ inline size_t maxMemory;
 inline bool noSound;
 inline std::string autoGotoWorld;
 
+#ifdef _WIN32
+inline HWND windowHandle = nullptr;
+#endif
+
 size_t getMaxMemory() {
 	return maxMemory;
 }
@@ -93,7 +97,7 @@ void oomHandler() {
 	}
 	oom.store(true);
 #ifdef _WIN32
-	MessageBoxW(nullptr, L"The game ran out of memory. Try reducing your maximum render distance.", L"Out of Memory", MB_OK | MB_ICONERROR);
+	MessageBoxW(windowHandle, L"The game ran out of memory. Try reducing your maximum render distance.", L"Out of Memory", MB_OK | MB_ICONERROR);
 #endif
 	if (mainThread != id) {
 		std::this_thread::sleep_for(std::chrono::seconds(999));
@@ -251,12 +255,16 @@ int main(int argc, char* argv[]) {
 	if (!game->successfullyLoaded()) {
 		error("Failed to start game");
 #ifdef _WIN32
-		MessageBox(nullptr, L"The game failed to start. Please check the game console for any errors.", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(windowHandle, L"The game failed to start. Please check the game console for any errors.", L"Error", MB_OK | MB_ICONERROR);
 #endif
 		delete game;
 		game = nullptr;
 		return 1;
 	}
+
+#ifdef _WIN32
+	windowHandle = game->getGameWindow()->getWin32Handle();
+#endif
 
 #ifndef GAME_DEBUG
 	try {
@@ -278,12 +286,12 @@ int main(int argc, char* argv[]) {
 	} catch (const std::exception& e) {
 		error("The game has crashed!", e.what());
 #ifdef _WIN32
-		MessageBox(nullptr, L"The game has crashed, information about this crash is available in the game logs. Please try restarting the game", L"Game Crashed", MB_OK | MB_ICONERROR);
+		MessageBox(windowHandle, L"The game has crashed, information about this crash is available in the game logs. Please try restarting the game", L"Game Crashed", MB_OK | MB_ICONERROR);
 #endif
 	} catch (...) {
 		error("The game has crashed!");
 #ifdef _WIN32
-		MessageBox(nullptr, L"The game has crashed. Please try restarting the game", L"Game Crashed", MB_OK | MB_ICONERROR);
+		MessageBox(windowHandle, L"The game has crashed. Please try restarting the game", L"Game Crashed", MB_OK | MB_ICONERROR);
 #endif
 	}
 #endif
