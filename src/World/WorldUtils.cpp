@@ -80,29 +80,29 @@ Biome World::getBiome(glm::ivec2 pos) {
 	|
 	| Mountain
 	|
-	0.85
+	0.75
 	|
 	| Plains
 	|
-	0.35
+	0.25
 	|
 	| Desert
 	|
 	0.00
 	*/
 
-	if (biome >= 0.85f) {
-		return Biome{ BiomeType::Mountain, (biome - 0.85f) / 0.15f };
+	if (biome >= 0.75f) {
+		return Biome{ BiomeType::Mountain, (biome - 0.75f) / 0.25f };
 	}
-	if (biome <= 0.35f) {
-		return Biome{ BiomeType::Desert, 1.0f - biome / 0.35f };
+	if (biome <= 0.25f) {
+		return Biome{ BiomeType::Desert, 1.0f - biome / 0.25f };
 	}
 
 	return Biome{ BiomeType::Plains, 1 };
 }
 
 float World::getBiomeFloat(glm::ivec2 pos) {
-	return perlinBiomes.octave2D_01((pos.x * 0.0025), (pos.y * 0.0025), 4);
+	return perlinBiomes.octave2D_01((pos.x * 0.0005), (pos.y * 0.0005), 4);
 }
 
 double World::random(glm::ivec2 pos, int otherSeed) {

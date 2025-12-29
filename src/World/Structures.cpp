@@ -85,11 +85,14 @@ void Structure::initialize() {
 	pyramidConfig.pivot = { 0, 3, 0 };
 	pyramidConfig.allowedBiomes = { BiomeType::Desert };
 	Structure* pyramid = new Structure(STRUCTURE_TYPE::PYRAMID, pyramidConfig, [](glm::ivec2 sPos, glm::ivec3 vPos) {
-		if (vPos.x > 29 - vPos.y || 29 - vPos.x > 29 - vPos.y) {
+		World* world = Game::getInstance()->getWorld();
+		int height = round(20 + 9.0 * world->random(sPos));
+
+		if (vPos.x > height - vPos.y || height - vPos.x > height - vPos.y) {
 			return BLOCK_TYPE::NONE;
 		}
 
-		if (vPos.z > 29 - vPos.y || 29 - vPos.z > 29 - vPos.y) {
+		if (vPos.z > height - vPos.y || height - vPos.z > height - vPos.y) {
 			return BLOCK_TYPE::NONE;
 		}
 

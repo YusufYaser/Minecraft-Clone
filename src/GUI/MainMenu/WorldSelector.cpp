@@ -230,18 +230,6 @@ void WorldSelector::render() {
 					dataFile.read(reinterpret_cast<char*>(old), sizeof(OldWorldSaveData));
 					dataFile.close();
 
-					/*
-					* uint8_t version = 1;
-					int tick;
-					unsigned int seed;
-					Generator generator;
-					float playerPos[3];
-					float playerOrientation[3];
-					bool playerFlying;
-					uint8_t structuresCount;
-					STRUCTURE_TYPE structures[64];
-					*/
-
 					data->tick = old->tick;
 					data->seed = old->seed;
 					data->generator = old->generator;
@@ -287,7 +275,11 @@ void WorldSelector::render() {
 				if (settings.structuresCount <= STRUCTURES_COUNT) {
 					for (int i = 0; i < settings.structuresCount; i++) {
 						if (i < STRUCTURES_COUNT) {
-							settings.structures.push_back(data->structures[i]);
+							if (!settings.allStructures) {
+								settings.structures.push_back(data->structures[i]);
+							} else {
+								settings.structures.push_back((STRUCTURE_TYPE)i);
+							}
 						} else {
 							warn("Invalid structure", std::to_string(i));
 						}
