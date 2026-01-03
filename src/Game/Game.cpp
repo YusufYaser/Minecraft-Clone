@@ -163,6 +163,11 @@ Game::Game() {
 	m_flyingText->setPosition({ 1.0f, -40, 1.0f, -15 });
 	m_flyingText->setColor({ .75f, .75f, .75f, 1.0f });
 
+	m_changingItemText = new Text();
+	m_changingItemText->setText("Item ID: __");
+	m_changingItemText->setCentered(true);
+	m_changingItemText->setPosition({ .5f, 0, 1, -88 });
+
 	m_commandsHelp = new Text();
 	m_commandsHelp->setText(R"(Commands
 
@@ -273,6 +278,9 @@ Game::~Game() {
 
 	delete m_flyingText;
 	m_flyingText = nullptr;
+
+	delete m_changingItemText;
+	m_changingItemText = nullptr;
 
 	delete m_soundEngine;
 	m_soundEngine = nullptr;
@@ -583,6 +591,11 @@ void Game::update() {
 	}
 
 	if (m_player != nullptr && m_player->isFlying() && !m_gamePaused) m_flyingText->render();
+	if (m_player != nullptr && m_player->isChangingItem() && !m_gamePaused) {
+		const char* name = getTextureName((BLOCK_TYPE)m_player->getChangingItemInputInt());
+		m_changingItemText->setText("Item ID: " + m_player->getChangingItemInputString() + "\n" + std::string(name != "invalid" ? name : ""));
+		m_changingItemText->render();
+	}
 	if (m_debugLevel != 0) DebugText::render();
 
 	if (m_keyHandler->keyHeld(GLFW_KEY_SLASH)) {

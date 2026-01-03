@@ -27,6 +27,7 @@ This is my own Minecraft Clone, a personal project where I attempt to create my 
 | `F11`          | Full Screen                     |                           |
 | `F4`           | Debug Camera                    | Only in debug builds      |
 | `C`            | Teleport to Debug Camera        | Only in debug builds      |
+| `0`            | Change Selected Slot Item       | `Enter` to confirm        |
 
 ## Startup Flags
 | Flag                            | Description                                                |

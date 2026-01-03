@@ -118,6 +118,7 @@ private:
 	Player* m_player = nullptr;
 	Image* m_collOverlay = nullptr;
 	Text* m_flyingText = nullptr;
+	Text* m_changingItemText = nullptr;
 	SoundEngine* m_soundEngine = nullptr;
 
 	World* m_world = nullptr;

@@ -38,6 +38,11 @@ public:
 	bool isFlying() const { return flying; }
 	void setFlying(bool nFlying) { flying = nFlying; }
 
+	bool isChangingItem() const { return m_changingItem; };
+	bool setChangingItem(bool nChangingItem) { m_changingItem = nChangingItem; };
+	std::string getChangingItemInputString();
+	int getChangingItemInputInt();
+
 	bool isPerspective() const { return m_isPerspective; };
 	void setPerspective(bool mPerspective) { m_isPerspective = mPerspective; };
 
@@ -62,4 +67,7 @@ private:
 	int slot = 0;
 
 	ItemStack* m_items[9];
+
+	bool m_changingItem = false;
+	char changingItemInputs[2] = { '\0', '\0' };
 };

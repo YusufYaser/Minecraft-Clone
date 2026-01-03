@@ -197,15 +197,53 @@ void Player::checkInputs(float delta) {
 		speed = PLAYER_SPEED;
 	}
 
-	if (keyHandler->keyHeld(GLFW_KEY_1)) slot = 0;
-	if (keyHandler->keyHeld(GLFW_KEY_2)) slot = 1;
-	if (keyHandler->keyHeld(GLFW_KEY_3)) slot = 2;
-	if (keyHandler->keyHeld(GLFW_KEY_4)) slot = 3;
-	if (keyHandler->keyHeld(GLFW_KEY_5)) slot = 4;
-	if (keyHandler->keyHeld(GLFW_KEY_6)) slot = 5;
-	if (keyHandler->keyHeld(GLFW_KEY_7)) slot = 6;
-	if (keyHandler->keyHeld(GLFW_KEY_8)) slot = 7;
-	if (keyHandler->keyHeld(GLFW_KEY_9)) slot = 8;
+	if (m_changingItem) {
+		for (int i = 0; i < 10; i++) {
+			if (keyHandler->keyClicked(GLFW_KEY_0 + i)) {
+				if (changingItemInputs[0] == '\0') changingItemInputs[0] = '0' + i;
+				else if (changingItemInputs[1] == '\0') changingItemInputs[1] = '0' + i;
+			}
+		}
+
+		if (keyHandler->keyClicked(GLFW_KEY_BACKSPACE)) {
+			if (changingItemInputs[1] != '\0') changingItemInputs[1] = '\0';
+			else if (changingItemInputs[0] != '\0') changingItemInputs[0] = '\0';
+			else m_changingItem = false;
+		}
+
+		if (keyHandler->keyClicked(GLFW_KEY_ENTER)) {
+			m_changingItem = false;
+
+			if (changingItemInputs[0] != '\0') {
+				if (changingItemInputs[1] == '\0') {
+					changingItemInputs[1] = changingItemInputs[0];
+					changingItemInputs[0] = '0';
+				}
+
+				int id = getChangingItemInputInt();
+
+				if (id <= BLOCK_TYPE_COUNT - 1) {
+					ItemStack* item = new ItemStack();
+					item->block = BLOCK_TYPE(id);
+					delete m_items[slot];
+					m_items[slot] = item;
+					print("Selected Block ID", id, ":", getTextureName(BLOCK_TYPE(id)));
+				} else {
+					error("Invalid Block ID:", id);
+				}
+			}
+		}
+	} else {
+		if (!m_changingItem && keyHandler->keyClicked(GLFW_KEY_0)) {
+			m_changingItem = true;
+			changingItemInputs[0] = '\0';
+			changingItemInputs[1] = '\0';
+		}
+
+		for (int i = 0; i < 9; i++) {
+			if (keyHandler->keyClicked(GLFW_KEY_1 + i)) slot = i;
+		}
+	}
 
 	Block* targetBlock = nullptr;
 	BLOCK_FACE face;
@@ -392,4 +430,19 @@ glm::mat4 Player::getView() const {
 	} else {
 		return glm::lookAt(freecamPos - (pos), freecamPos - (pos)+freecamOrientation, up);
 	}
+}
+
+std::string Player::getChangingItemInputString() {
+	return std::string(1, changingItemInputs[0] ? changingItemInputs[0] : '-') + (changingItemInputs[1] ? changingItemInputs[1] : '-');
+}
+
+int Player::getChangingItemInputInt() {
+	if (changingItemInputs[0] == '\0') return 0;
+	if (changingItemInputs[1] == '\0') return changingItemInputs[0] - '0';
+
+	int id = 0;
+
+	id += (changingItemInputs[0] - '0') * 10;
+	id += (changingItemInputs[1] - '0');
+	return id;
 }
