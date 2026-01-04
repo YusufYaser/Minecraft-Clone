@@ -177,8 +177,9 @@ T: Teleport to height )" + std::to_string(MAX_HEIGHT) + R"(
 Y: Reset world time
 U: Reload game assets
 I: Save world
+O: Speed up world
 )");
-	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 8 });
+	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 9 });
 	m_commandsHelp->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 
 	m_keyHandler = new KeyHandler();
@@ -430,6 +431,14 @@ void Game::update() {
 		if (m_keyHandler->keyClicked(GLFW_KEY_I)) {
 			m_world->saveAllChunks();
 			m_world->saveWorld();
+		}
+	}
+
+	if (m_world != nullptr) {
+		if (m_keyHandler->keyHeld(GLFW_KEY_SLASH) && m_keyHandler->keyHeld(GLFW_KEY_O)) {
+			m_world->setTickDelay(1.0 / 1000);
+		} else {
+			m_world->setTickDelay(1.0 / 20);
 		}
 	}
 

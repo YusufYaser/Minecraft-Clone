@@ -60,7 +60,7 @@ World::World(WorldSettings& settings) {
 
 			delta = currentTime - lastTick;
 
-			if (delta >= 1.0 / 20) {
+			if (delta >= m_tickDelay) {
 				tick(static_cast<float>(delta));
 				lastTick = currentTime;
 			}

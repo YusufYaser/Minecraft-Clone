@@ -175,6 +175,8 @@ public:
 
 	void setTick(int tick) { m_tick.store(tick); }
 	int getTick() const { return m_tick.load(); }
+	void setTickDelay(float nTickDelay) { m_tickDelay = nTickDelay; };
+	float getTickDelay() const { return m_tickDelay; };
 	int getTime();
 
 	float getAmbientLight();
@@ -185,6 +187,7 @@ private:
 	std::atomic<bool> unloading;
 
 	std::atomic<int> m_tick;
+	float m_tickDelay = 1.0f / 20;
 
 	std::string m_name = "World";
 	bool m_internalWorld = false;

@@ -22,6 +22,7 @@ This is my own Minecraft Clone, a personal project where I attempt to create my 
 | `/ + Q`        | Toggle 3D Rendering             |                           |
 | `/ + U`        | Reload Assets                   |                           |
 | `/ + I`        | Save World                      |                           |
+| `/ + O`        | Speed up World                  |                           |
 | `F1`           | Toggle GUI                      |                           |
 | `F3`           | Debug Menu                      | Click twice for more info |
 | `F11`          | Full Screen                     |                           |
