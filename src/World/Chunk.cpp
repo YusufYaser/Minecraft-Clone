@@ -6,7 +6,8 @@ void World::chunkLoaderFunc() {
 	while (!unloading.load()) {
 		chunkLoadQueueMutex.lock();
 		Chunk* chunk = nullptr;
-		if (!chunkLoadQueue.empty()) {
+		generatingChunks.store(!chunkLoadQueue.empty());
+		if (generatingChunks.load()) {
 			chunk = chunkLoadQueue.front();
 			chunkLoadQueue.pop_front();
 		}
@@ -135,7 +136,7 @@ void World::chunkLoaderFunc() {
 					} else {
 						switch (biome.type) {
 						case BiomeType::Desert:
-							if (fmin(random({x, z}), 1.0f) <= fmin(biome.value / 0.02f, 1.0f)) {
+							if (fmin(random({ x, z }), 1.0f) <= fmin(biome.value / 0.02f, 1.0f)) {
 								type = BLOCK_TYPE::SAND;
 								break;
 							}

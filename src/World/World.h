@@ -121,6 +121,7 @@ struct Chunk {
 struct BlockOffsetData {
 	glm::vec3 pos;
 	uint8_t blockType;
+	glm::vec3 extend;
 };
 
 struct Instance {
@@ -185,6 +186,7 @@ public:
 
 private:
 	std::atomic<bool> unloading;
+	std::atomic<bool> generatingChunks;
 
 	std::atomic<int> m_tick;
 	float m_tickDelay = 1.0f / 20;

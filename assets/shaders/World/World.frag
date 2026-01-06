@@ -12,6 +12,7 @@ flat in vec3 fPlayerPos;
 flat in uint fBlockType;
 flat in float fFogSize;
 flat in int fRenderDistance;
+flat in vec3 fExtend;
 
 out vec4 FragColor;
 
@@ -32,8 +33,10 @@ void main() {
     if (val >= 1) {
         discard;
     }
-
+    
     vec2 tc = texCoord;
+    tc.x *= 1 + fExtend.x;
+    if (tc.x > 1) tc.x -= 1;
 
     if (fBlockType == 3 && face == 5 || fBlockType == 12 && face == 5 ||
         (fBlockType != 3 && fBlockType != 12 && fBlockType != 7 && fBlockType != 10 && fBlockType != 11)) {

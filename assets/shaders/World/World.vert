@@ -5,6 +5,7 @@ layout(location = 1) in vec2 inTexCoord;
 layout(location = 2) in float inFace;
 layout(location = 3) in vec3 inBlockPos;
 layout(location = 4) in uint inBlockType;
+layout(location = 5) in vec3 inExtend;
 
 out vec2 texCoord;
 flat out float face;
@@ -14,6 +15,7 @@ flat out vec3 fPlayerPos;
 flat out uint fBlockType;
 flat out float fFogSize;
 flat out int fRenderDistance;
+flat out vec3 fExtend;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -36,7 +38,11 @@ void main() {
 	if (inBlockType == 7 && pos2.y > 0) {
 		pos2 -= vec3(0, .05f * 2, 0);
 	}
-	gl_Position = projection * view * vec4(pos2 + inBlockPosOffset, 1.0f);
+
+	vec3 extend = vec3(0);
+	if (inExtend.x > 0 && pos2.x > 0) extend.x += inExtend.x;
+	if (inExtend.z > 0 && pos2.z > 0) extend.z += inExtend.z;
+	gl_Position = projection * view * vec4(pos2 + inBlockPosOffset + extend, 1.0f);
 
 	texCoord = inTexCoord;
 	face = inFace;
@@ -46,4 +52,5 @@ void main() {
 	fBlockType = inBlockType;
 	fFogSize = fogSize;
 	fRenderDistance = renderDistance;
+	fExtend = inExtend;
 }

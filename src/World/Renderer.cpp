@@ -42,7 +42,7 @@ void World::renderer(int c) {
 			uint8_t hiddenFaces = block->hiddenFaces;
 			bool transparent = isBlockTypeTransparent(type);
 
-			if (!transparent) {
+			if (!transparent && (bPos.x % 2) == 0) {
 				for (int i = 0; i < 6; i++) {
 					if ((hiddenFaces & (1 << i))) continue;
 					glm::ivec3 faceDir = getBlockFaceDirection(BLOCK_FACE(i));
@@ -54,6 +54,19 @@ void World::renderer(int c) {
 				}
 
 				if (hiddenFaces == 63) continue;
+			}
+
+			glm::ivec3 extend = {};
+
+			if (!generatingChunks.load() && (hiddenFaces == 31 || hiddenFaces == 47)) {
+				if (abs(diff.x) > maxDist.x || abs(diff.y) > maxDist.y || abs(diff.z) > maxDist.z) {
+					Block* otherBlock = nullptr;
+					if (bPos.x % 2 && (otherBlock = getBlock(bPos - glm::ivec3(1, 0, 0)))) {
+						if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) continue;
+					} else if ((bPos.x % 2) == 0 && (otherBlock = getBlock(bPos + glm::ivec3(1, 0, 0)))) {
+						if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) extend = { 1, 0, 0 };
+					}
+				}
 			}
 
 			BLOCK_STRUCTURE_TYPE structType = getStructureType(type);
@@ -87,7 +100,7 @@ void World::renderer(int c) {
 				instancesCache[hiddenFaces].push_back(i);
 			}
 
-			i->offsets.push_back(BlockOffsetData{ bPos, (uint8_t)type });
+			i->offsets.push_back(BlockOffsetData{ bPos, (uint8_t)type, extend });
 		}
 
 		chunk->renderingGroupsMutex.unlock();
@@ -182,13 +195,15 @@ void World::render() {
 
 	static glm::ivec2 oldPlayerChunk = playerChunk;
 	static size_t oldChunksLoaded = 0;
+	static bool wasGenerating = false;
 	size_t chunksLoaded = this->chunksLoaded() - this->chunkLoadQueueCount();
 	bool rerender = false;
 	static int lastYLevel = 0;
 
 	static int oldChunksRendered = 0;
+	bool isGenerating = generatingChunks.load();
 
-	if (oldPlayerChunk != playerChunk || lastYLevel != round(pos.y / 8) || oldChunksLoaded < chunksLoaded || m_worldRenderModified) {
+	if (oldPlayerChunk != playerChunk || lastYLevel != round(pos.y / 8) || oldChunksLoaded < chunksLoaded || isGenerating != wasGenerating || m_worldRenderModified) {
 		chunksToRender.clear();
 
 		for (int x = -renderDistance + playerChunk.x - PRELOAD_DISTANCE; x < renderDistance + playerChunk.x + PRELOAD_DISTANCE; x++) {
@@ -223,11 +238,12 @@ void World::render() {
 			}
 		}
 
-		rerender = oldChunksRendered != chunksToRender.size() || oldPlayerChunk != playerChunk || lastYLevel != round(pos.y / 8) || m_worldRenderModified;
+		rerender = oldChunksRendered != chunksToRender.size() || oldPlayerChunk != playerChunk || isGenerating != wasGenerating || lastYLevel != round(pos.y / 8) || m_worldRenderModified;
 
 		oldPlayerChunk = playerChunk;
 		oldChunksLoaded = chunksLoaded;
 		lastYLevel = round(pos.y / 8);
+		wasGenerating = isGenerating;
 
 		if (!rerender) {
 			chunksToRender.clear();
@@ -295,10 +311,13 @@ void World::render() {
 
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(BlockOffsetData), 0);
 		glVertexAttribIPointer(4, 1, GL_UNSIGNED_BYTE, sizeof(BlockOffsetData), (void*)offsetof(BlockOffsetData, blockType));
+		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(BlockOffsetData), (void*)offsetof(BlockOffsetData, extend));
 		glEnableVertexAttribArray(3);
 		glEnableVertexAttribArray(4);
+		glEnableVertexAttribArray(5);
 		glVertexAttribDivisor(3, 1);
 		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
 
 		//debug("Initialized new instance:", i, "Hidden faces:", int(i->hiddenFaces));
 	}
@@ -324,7 +343,7 @@ void World::render() {
 		glBindBuffer(GL_ARRAY_BUFFER, i->VBO);
 		glBindVertexArray(i->bStructData->VAO);
 
-		if (rerender || m_worldRenderModified) glBufferData(GL_ARRAY_BUFFER, i->offsets.size() * sizeof(BlockStructureData), i->offsets.data(), GL_DYNAMIC_DRAW);
+		if (rerender || m_worldRenderModified) glBufferData(GL_ARRAY_BUFFER, i->offsets.size() * sizeof(BlockOffsetData), i->offsets.data(), GL_DYNAMIC_DRAW);
 
 		glDrawElementsInstanced(GL_TRIANGLES, i->bStructData->faceCount * 6, GL_UNSIGNED_BYTE, 0, i->offsets.size());
 
