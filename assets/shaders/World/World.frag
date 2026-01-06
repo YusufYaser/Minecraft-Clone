@@ -5,6 +5,7 @@ layout(early_fragment_tests) in;
 #define ANIMATION_SPEED 1.0f
 
 in vec2 texCoord;
+in vec3 vertex;
 flat in float face;
 flat in int instanceId;
 flat in vec3 blockPosOffset;
@@ -36,11 +37,19 @@ void main() {
     
     vec2 tc = texCoord;
     tc.x *= 1 + fExtend.x;
-    if (tc.x > 1) tc.x -= 1;
+    tc.x -= floor(tc.x);
+
+    vec3 blockPos = blockPosOffset + fPlayerPos;
+	if (fExtend.x > 0 && vertex.x > 0) {
+        blockPos.x += fExtend.x;
+    }
+	if (fExtend.z > 0 && vertex.z > 0) {
+        blockPos.z += fExtend.z;
+    }
 
     if (fBlockType == 3 && face == 5 || fBlockType == 12 && face == 5 ||
         (fBlockType != 3 && fBlockType != 12 && fBlockType != 7 && fBlockType != 10 && fBlockType != 11)) {
-        vec3 p = fract((blockPosOffset + fPlayerPos) * 0.1031);
+        vec3 p = fract((blockPos) * 0.1031);
         p += dot(p, p.yxz + 19.19);
         if (fract((p.x + p.y) * p.z) > 0.5f) {
             float temp = tc.x;
@@ -63,7 +72,7 @@ void main() {
         FragColor = texture(tex0, tc2);
     }
 
-    if (ivec3(blockPosOffset + fPlayerPos) == highlighted && !(tc.x < (1 - BORDER_SIZE) && tc.x > BORDER_SIZE &&
+    if (ivec3(blockPos) == highlighted && !(tc.x < (1 - BORDER_SIZE) && tc.x > BORDER_SIZE &&
         tc.y < (1 - BORDER_SIZE) && tc.y > BORDER_SIZE)) {
 
         FragColor = vec4(FragColor.rgb, 1.0f);

@@ -89,9 +89,9 @@ struct Chunk {
 	bool reserved : 5;
 	Mux blocksMutex;
 	Mux renderingGroupsMutex;
+	int maxHeight = -1;
 	time_t lastRendered = 0;
 	std::vector<Block*> blocks;
-	int maxHeight = -1;
 	std::vector<Block*> blocksToRender;
 	glm::ivec2 pos;
 
@@ -125,12 +125,12 @@ struct BlockOffsetData {
 };
 
 struct Instance {
-	BLOCK_STRUCTURE_TYPE bStructType;
 	BlockStructureData* bStructData;
+	BLOCK_STRUCTURE_TYPE bStructType;
+	bool transparent;
 	uint8_t hiddenFaces;
 	GLuint VBO;
 	std::vector<BlockOffsetData> offsets;
-	bool transparent;
 };
 
 class World {

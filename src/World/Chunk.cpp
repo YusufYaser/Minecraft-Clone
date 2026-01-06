@@ -225,7 +225,7 @@ void World::chunkUnloaderFunc() {
 			if (!unloading.load() && player != nullptr &&
 				glm::length(glm::vec2(chunk->pos - getPosChunk(player->getPos()))) <= Game::getInstance()->getRenderDistance() + PRELOAD_DISTANCE) continue;
 
-			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 20)
+			if ((chunk->loaded && !chunk->permanentlyLoaded && current - chunk->lastRendered > 10)
 				|| unloading.load()) {
 
 				if (chunk->modified && chunk->loaded && !m_internalWorld) {

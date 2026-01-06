@@ -8,6 +8,7 @@ layout(location = 4) in uint inBlockType;
 layout(location = 5) in vec3 inExtend;
 
 out vec2 texCoord;
+out vec3 vertex;
 flat out float face;
 flat out int instanceId;
 flat out vec3 blockPosOffset;
@@ -53,4 +54,5 @@ void main() {
 	fFogSize = fogSize;
 	fRenderDistance = renderDistance;
 	fExtend = inExtend;
+	vertex = position;
 }
