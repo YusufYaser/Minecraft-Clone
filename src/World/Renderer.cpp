@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <execution>
 
-void World::renderer(int c) {
+void World::instancesPreparer(int c) {
 	std::vector<Instance*> instancesCache[64];
 	Player* player = nullptr;
 
@@ -260,7 +260,7 @@ void World::render() {
 			renderingQueue.push_back(chunk);
 			rendered[c] = false;
 
-			c = (c + 1) % RENDERER_THREAD_COUNT;
+			c = (c + 1) % INSTANCES_PREP_THREAD_COUNT;
 
 			chunk->lastRendered = time(nullptr);
 		}
@@ -270,7 +270,7 @@ void World::render() {
 		}
 
 		rendering.store(true);
-		for (int c = 0; c < RENDERER_THREAD_COUNT; c++) {
+		for (int c = 0; c < INSTANCES_PREP_THREAD_COUNT; c++) {
 			while (!rendered[c].load());
 		}
 		rendering.store(false);

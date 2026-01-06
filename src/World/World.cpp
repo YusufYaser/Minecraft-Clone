@@ -67,13 +67,13 @@ World::World(WorldSettings& settings) {
 		}
 		});
 
-	for (int c = 0; c < RENDERER_THREAD_COUNT; c++) {
+	for (int c = 0; c < INSTANCES_PREP_THREAD_COUNT; c++) {
 		renderingThreads[c] = std::thread([this](int c) {
 #ifdef _WIN32
 			SetThreadDescription(GetCurrentThread(), L"Instances Preparer");
 #endif
 
-			renderer(c);
+			instancesPreparer(c);
 			}, c);
 	}
 
@@ -99,8 +99,8 @@ World::~World() {
 	print("Waiting for chunk unloader thread...");
 	chunkUnloader.join();
 
-	for (int c = 0; c < RENDERER_THREAD_COUNT; c++) {
-		print("Waiting for rendering thread...");
+	for (int c = 0; c < INSTANCES_PREP_THREAD_COUNT; c++) {
+		print("Waiting for instances preparer thread...");
 		renderingThreads[c].join();
 	}
 

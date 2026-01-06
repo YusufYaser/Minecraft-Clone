@@ -226,11 +226,11 @@ private:
 
 	bool m_worldRenderModified = true;
 
-	std::thread renderingThreads[RENDERER_THREAD_COUNT];
+	std::thread renderingThreads[INSTANCES_PREP_THREAD_COUNT];
 	std::thread chunkLoaderThreads[CHUNK_LOADER_THREAD_COUNT];
 	Mux renderingQueueMutex;
 	std::deque<Chunk*> renderingQueue;
-	std::atomic<bool> rendered[RENDERER_THREAD_COUNT];
+	std::atomic<bool> rendered[INSTANCES_PREP_THREAD_COUNT];
 
 	Block* targetBlock = nullptr;
 
@@ -241,7 +241,7 @@ private:
 	std::vector<Instance*> instancesToInit;
 
 	std::atomic<bool> rendering;
-	void renderer(int c);
+	void instancesPreparer(int c);
 
 	std::vector<Entity*> entities;
 };
