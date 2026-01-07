@@ -123,7 +123,7 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
+      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; mkdir $(OutDir)worlds\  &amp;&amp; mkdir $(OutDir)screenshots\ &amp;&amp; mkdir $(OutDir)benchmarks\  &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
@@ -165,7 +165,7 @@
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
+      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; mkdir $(OutDir)worlds\  &amp;&amp; mkdir $(OutDir)screenshots\ &amp;&amp; mkdir $(OutDir)benchmarks\  &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
@@ -204,7 +204,7 @@
       <EmbedManagedResourceFile>resource.rc</EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
+      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; mkdir $(OutDir)worlds\  &amp;&amp; mkdir $(OutDir)screenshots\ &amp;&amp; mkdir $(OutDir)benchmarks\  &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
@@ -246,7 +246,7 @@
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
+      <Command>xcopy assets $(OutDir)assets\ /E &amp;&amp; mkdir $(OutDir)worlds\  &amp;&amp; mkdir $(OutDir)screenshots\ &amp;&amp; mkdir $(OutDir)benchmarks\  &amp;&amp; move "$(OutDir)Minecraft Clone.pdb" "Minecraft Clone.pdb" &amp;&amp; powershell -command "Compress-Archive -Path '$(OutDir)*' -DestinationPath '.\build\Game.zip' -Force" &amp;&amp; move "Minecraft Clone.pdb" "$(OutDir)Minecraft Clone.pdb"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy the assets folder to build directory and create ZIP file</Message>
@@ -263,6 +263,7 @@
     <ClCompile Include="src\Block\Block.cpp" />
     <ClCompile Include="src\Entity\Entity.cpp" />
     <ClCompile Include="src\Entity\ModelLoader.cpp" />
+    <ClCompile Include="src\Game\Benchmark.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
     <ClCompile Include="libraries\implementations\gltext.cpp" />
     <ClCompile Include="src\GUI\Components\Button.cpp" />

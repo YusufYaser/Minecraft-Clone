@@ -1,13 +1,5 @@
 #include "DebugText.h"
 #include "../Game/Game.h"
-#ifdef _WIN32
-#undef APIENTRY
-#include <windows.h>
-#include <psapi.h>
-#endif
-#if defined(__linux__) || defined(__APPLE__)
-#include <sys/resource.h>
-#endif
 
 size_t getMaxMemory();
 
@@ -65,21 +57,7 @@ void DebugText::render() {
 	text << "GPU: " << gpu->renderer << " (" << gpu->vendor << ")" << "\n";
 	text << "Version: " << gpu->version << "\n\n";
 
-	int mem = 0;
-#ifdef _WIN32
-	PROCESS_MEMORY_COUNTERS pmc;
-	if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-		mem = static_cast<int>(pmc.WorkingSetSize / 1024 / 1024);
-	}
-#endif
-
-#if defined(__linux__) || defined(__APPLE__)
-	struct rusage usage;
-	if (getrusage(RUSAGE_SELF, &usage) == 0) {
-		mem = static_cast<int>(usage.ru_maxrss / 1024);
-	}
-#endif
-	text << "Game Memory: " << mem << " MB / " << round(getMaxMemory() / 1024 / 1024) << " MB\n\n";
+	text << "Game Memory: " << game->getMemoryUsage() << " MB / " << round(getMaxMemory() / 1024 / 1024) << " MB\n\n";
 
 	text << "Sound Device: " << soundEngine->getSoundDeviceName() << "\n\n";
 

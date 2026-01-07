@@ -36,5 +36,8 @@ $(INTERMEDIATES_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(BUILD_DIR)/game: $(SRCS:$(SRC_DIR)/%.cpp=$(INTERMEDIATES_DIR)/%.o)
 	$(CXX) $(CXXFLAGS) $^ -o $(BUILD_DIR)/game $(LDFLAGS)
 	cp -r assets $(BUILD_DIR)/assets
+	mkdir $(BUILD_DIR)/worlds
+	mkdir $(BUILD_DIR)/screenshots
+	mkdir $(BUILD_DIR)/benchmarks
 	rm -f build/Game.zip
 	cd $(BUILD_DIR) && zip -r ../Game.zip * && cd ../..

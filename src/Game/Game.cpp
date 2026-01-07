@@ -2,8 +2,12 @@
 #ifdef _WIN32
 #undef APIENTRY
 #include <Windows.h>
+#include <psapi.h>
 #undef max
 #undef min
+#endif
+#if defined(__linux__) || defined(__APPLE__)
+#include <sys/resource.h>
 #endif
 
 Game* Game::_instance = nullptr;
@@ -173,14 +177,20 @@ Game::Game() {
 
 Q: Toggle 3D World Rendering
 R: Teleport to 0, )" + std::to_string(MAX_HEIGHT) + R"(, 0
-T: Teleport to height )" + std::to_string(MAX_HEIGHT) + R"(
-Y: Reset world time
-U: Reload game assets
-I: Save world
-O: Speed up world
+T: Teleport to Height )" + std::to_string(MAX_HEIGHT) + R"(
+Y: Reset World Time
+U: Reload Game Assets
+I: Save World
+O: Speed Up World
+B: Start/Stop Benchmark
 )");
-	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 9 });
+	m_commandsHelp->setPosition({ 0, 0, 1.0f, -17 * 10 });
 	m_commandsHelp->setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+
+	m_benchmarkText = new Text();
+	m_benchmarkText->setText("Benchmark Running");
+	m_benchmarkText->setColor({ 1, 0, 0, 1 });
+	m_benchmarkText->setPosition({ 1.0f, -150, 0, 0 });
 
 	m_keyHandler = new KeyHandler();
 
@@ -432,6 +442,14 @@ void Game::update() {
 			m_world->saveAllChunks();
 			m_world->saveWorld();
 		}
+
+		if (m_keyHandler->keyClicked(GLFW_KEY_B)) {
+			if (m_benchmarkRunning) {
+				stopBenchmark();
+			} else {
+				startBenchmark();
+			}
+		}
 	}
 
 	if (m_world != nullptr) {
@@ -599,6 +617,7 @@ void Game::update() {
 		}
 	}
 
+	if (m_benchmarkRunning) m_benchmarkText->render();
 	if (m_player != nullptr && m_player->isFlying() && !m_gamePaused) m_flyingText->render();
 	if (m_player != nullptr && m_player->isChangingItem() && !m_gamePaused) {
 		const char* name = getTextureName((BLOCK_TYPE)m_player->getChangingItemInputInt());
@@ -617,6 +636,8 @@ void Game::update() {
 
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();
+
+	if (m_benchmarkRunning) updateBenchmark();
 
 	double endTime = glfwGetTime();
 	double targetFps = m_maxFps;
@@ -772,4 +793,23 @@ const char* Game::getBuild() {
 	gotBuildNumber = true;
 
 	return build.c_str();
+}
+
+int Game::getMemoryUsage() {
+	int mem = 0;
+#ifdef _WIN32
+	PROCESS_MEMORY_COUNTERS pmc;
+	if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
+		mem = static_cast<int>(pmc.WorkingSetSize / 1024 / 1024);
+	}
+#endif
+
+#if defined(__linux__) || defined(__APPLE__)
+	struct rusage usage;
+	if (getrusage(RUSAGE_SELF, &usage) == 0) {
+		mem = static_cast<int>(usage.ru_maxrss / 1024);
+	}
+#endif
+
+	return mem;
 }

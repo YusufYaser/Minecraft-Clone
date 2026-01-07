@@ -96,6 +96,12 @@ public:
 
 	const char* getBuild();
 
+	int getMemoryUsage();
+
+	bool startBenchmark();
+	bool updateBenchmark();
+	bool stopBenchmark();
+
 private:
 	static Game* _instance;
 	GameWindow* m_gameWindow = nullptr;
@@ -155,4 +161,9 @@ private:
 	// gui
 	PauseMenu* m_pauseMenu = nullptr;
 	MainMenu* m_mainMenu = nullptr;
+
+	bool m_benchmarkRunning = false;
+	std::ofstream m_benchmarkFile;
+	double m_lastBenchmarkUpdate = 0;
+	Text* m_benchmarkText;
 };
