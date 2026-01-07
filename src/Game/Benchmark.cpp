@@ -65,7 +65,7 @@ bool Game::updateBenchmark() {
 	World* world = Game::getWorld();
 	if (world) {
 		chunksRendered = world->chunksRendered();
-		chunksLoaded = world->chunksLoaded();
+		chunksLoaded = world->chunksLoaded() - world->chunkLoadQueueCount();
 		instancesRendered = world->chunksRendered();
 		blocksRendered = world->blocksRendered();
 	}

@@ -259,6 +259,7 @@ B: Start/Stop Benchmark
 
 Game::~Game() {
 	if (m_world != nullptr) unloadWorld();
+	if (m_benchmarkRunning) stopBenchmark();
 
 	print("Saving settings");
 	try {
