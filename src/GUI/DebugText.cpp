@@ -33,23 +33,19 @@ void DebugText::render() {
 	text << "\nBuild: " << game->getBuild() << "\n";
 	static double lastFpsUpdated = 0;
 	static int lastFps = 0;
-	static float lastDelta1 = 0;
-	static float lastDelta2 = 0;
-	static float lastDelta3 = 0;
+	static float lastDelta = 0;
 	if (currentTime - lastFpsUpdated > .25 || (l == 2 && currentTime - lastFpsUpdated > .1)) {
 		lastFps = static_cast<int>(round(1 / delta));
-		lastDelta1 = delta;
-		lastDelta2 = game->getSimDelta();
-		lastDelta3 = game->getRealDelta();
+		lastDelta = delta;
 		lastFpsUpdated = currentTime;
 	}
 	text << "FPS: " << lastFps;
-	text << " (" << lastDelta1 << ")";
 	if (l == 2) {
-		text << " (" << round(1 / lastDelta2) << ":" << round(lastDelta2 * 1000) / 1000 << ")";
-		text << " (" << round(1 / lastDelta3) << ":" << round(lastDelta3 * 1000) / 1000 << ")";
+		text << " (" << lastDelta << ")\n";
+	} else {
+		text << "\n";
 	}
-	text << "\n\n";
+	text << "\n";
 
 	text << "Resolution: " << size.x << "x" << size.y << "\n";
 	if (l == 2) if (worldRes != 1.0f) text << "3D Resolution: " << size.x * worldRes << "x" << size.y * worldRes << " (" << int(round(worldRes * 100)) << "%)\n";

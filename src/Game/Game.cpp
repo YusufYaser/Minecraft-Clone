@@ -635,24 +635,20 @@ void Game::update() {
 		m_world->autoSave();
 	}
 
+	glfwSwapInterval(m_gamePaused);
 	glfwSwapBuffers(getGlfwWindow());
 	glfwPollEvents();
 
 	if (m_benchmarkRunning) updateBenchmark();
 
-	double endTime = glfwGetTime();
 	double targetFps = m_maxFps;
 
-	if (!m_gameWindow->isFocused()) {
 #ifndef GAME_DEBUG
+	if (!m_gameWindow->isFocused()) {
 		m_gamePaused = true;
 		if (targetFps > 5 || targetFps == 0) targetFps = 5;
-#endif
-	} else if (m_gamePaused) {
-		if (targetFps > 60 || targetFps == 0) targetFps = 60;
 	}
-
-	m_realDelta = static_cast<float>(glfwGetTime() - startTime);
+#endif
 
 	// limit FPS
 	while (targetFps != 0 && glfwGetTime() - startTime < 1.0 / targetFps);
