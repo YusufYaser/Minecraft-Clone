@@ -19,10 +19,17 @@
 #include <fstream>
 #include "../SoundEngine/SoundEngine.h"
 
+enum class MergeSize : uint8_t {
+	None = 0,
+	OneByTwo,
+	TwoByTwo
+};
+
 struct GameSettings {
 	int renderDistance = 16;
 	int maxFps = 60;
 	float worldRes = 1;
+	MergeSize mergeSize = MergeSize::OneByTwo;
 };
 
 struct GPUInfo {
@@ -82,6 +89,8 @@ public:
 	void setMaxFps(int maxFps) { m_maxFps = maxFps; }
 	float getWorldResolution() const { return m_worldRes; };
 	void setWorldResolution(float newWorldRes) { m_worldRes = newWorldRes; };
+	MergeSize getMergeSize() const { return m_mergeSize; };
+	void setMergeSize(MergeSize newMergeSize) { m_mergeSize = newMergeSize; };
 
 	void forceRender() { m_forceRender = true; };
 
@@ -142,6 +151,7 @@ private:
 	int m_renderDistance = 6;
 	int m_maxFps = 60;
 	float m_worldRes = 1;
+	MergeSize m_mergeSize = MergeSize::None;
 
 	bool m_gamePaused = false;
 

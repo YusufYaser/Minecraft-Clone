@@ -28,6 +28,9 @@ private:
 	Button* iWorldRes;
 	Button* dWorldRes;
 
+	Text* mergeSize;
+	Button* cMergeSize;
+
 	Text* memoryUsage;
 
 	bool m_isClosing = false;

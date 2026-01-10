@@ -53,6 +53,15 @@ SettingsMenu::SettingsMenu() {
 	dWorldRes->setSize({ 0, 32, 0, 32 });
 	dWorldRes->setPosition({ .5f, 250 - 48, 0, 225 + 8 });
 
+	mergeSize = new Text();
+	mergeSize->setText("Merge Size: None");
+	mergeSize->setPosition({ .5f, -250, 0, 267 });
+
+	cMergeSize = new Button();
+	cMergeSize->setText("Change");
+	cMergeSize->setSize({ 0, 80, 0, 32 });
+	cMergeSize->setPosition({ .5f, 226, 0, 275 + 8 });
+
 	memoryUsage = new Text();
 	memoryUsage->setPosition({ 0, 0, 1, -15 });
 
@@ -84,7 +93,7 @@ void SettingsMenu::render() {
 
 	fps->setText("Max FPS: " + std::to_string(game->getMaxFps()));
 	if (game->getMaxFps() == 0) {
-		fps->setText("Max FPS: unlimited (not recommended)");
+		fps->setText("Max FPS: unlimited");
 	}
 	fps->render();
 
@@ -130,6 +139,24 @@ void SettingsMenu::render() {
 
 	worldRes->setText("3D Resolution: " + std::to_string(int(game->getWorldResolution() * 100)) + "%");
 	worldRes->render();
+
+	cMergeSize->render();
+	if (cMergeSize->isClicked()) {
+		game->setMergeSize(MergeSize(((uint8_t)game->getMergeSize() + 1) % 3));
+	}
+
+	switch (game->getMergeSize()) {
+	case MergeSize::None:
+		mergeSize->setText("Block Merge Size: None\nThis will help reduce lag spikes");
+		break;
+	case MergeSize::OneByTwo:
+		mergeSize->setText("Block Merge Size: 1x2\nDefault and Recommended");
+		break;
+	case MergeSize::TwoByTwo:
+		mergeSize->setText("Block Merge Size: 2x2\nNot recommended, not significantly better than 1x2");
+		break;
+	}
+	mergeSize->render();
 
 	std::stringstream memUsage;
 	memUsage << "Approximate Memory Usage: " << round(tRenderDistance * tRenderDistance * 2) << " MB (inaccurate)";

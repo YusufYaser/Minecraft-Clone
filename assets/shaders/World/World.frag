@@ -38,6 +38,8 @@ void main() {
     vec2 tc = texCoord;
     tc.x *= 1 + fExtend.x;
     tc.x -= floor(tc.x);
+    tc.y *= 1 + fExtend.z;
+    tc.y -= floor(tc.y);
 
     vec3 blockPos = blockPosOffset + fPlayerPos;
 	if (fExtend.x > 0 && vertex.x > 0) {

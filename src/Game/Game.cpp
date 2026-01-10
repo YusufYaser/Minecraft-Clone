@@ -57,6 +57,7 @@ Game::Game() {
 		m_maxFps = settings->maxFps;
 		m_renderDistance = settings->renderDistance;
 		m_worldRes = settings->worldRes;
+		m_mergeSize = settings->mergeSize;
 		delete settings;
 	}
 	print("Loaded settings");
@@ -267,6 +268,7 @@ Game::~Game() {
 		settings->maxFps = m_maxFps;
 		settings->renderDistance = m_renderDistance;
 		settings->worldRes = m_worldRes;
+		settings->mergeSize = m_mergeSize;
 
 		std::ofstream settingsFile("settings.dat");
 		settingsFile.write(reinterpret_cast<const char*>(settings), sizeof(GameSettings));

@@ -6,6 +6,7 @@
 void World::instancesPreparer(int c) {
 	std::vector<Instance*> instancesCache[64];
 	Player* player = nullptr;
+	Game* game = Game::getInstance();
 
 	glm::ivec3 maxDist = glm::ivec3(24, 12, 24);
 
@@ -62,15 +63,38 @@ void World::instancesPreparer(int c) {
 
 			glm::ivec3 extend = {};
 
-			if (!generatingChunks.load() && (hiddenFaces == 31 || hiddenFaces == 47)) {
-				//if (abs(diff.x) > maxDist.x || abs(diff.y) > maxDist.y || abs(diff.z) > maxDist.z) {
+			if (game->getMergeSize() != MergeSize::None && !generatingChunks.load() && (hiddenFaces == 31 || hiddenFaces == 47)) {
 				Block* otherBlock = nullptr;
-				if (bPos.x % 2 && (otherBlock = getBlock(bPos - glm::ivec3(1, 0, 0)))) {
+				if (bPos.x % 2 && (otherBlock = getBlock(bPos + glm::ivec3(-1, 0, 0)))) {
 					if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) continue;
 				} else if ((bPos.x % 2) == 0 && (otherBlock = getBlock(bPos + glm::ivec3(1, 0, 0)))) {
-					if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) extend = { 1, 0, 0 };
+					if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+						extend = { 1, 0, 0 };
+						if (game->getMergeSize() == MergeSize::TwoByTwo) {
+							if ((bPos.z % 2) == 0) {
+								if ((otherBlock = getBlock(bPos + glm::ivec3(0, 0, 1)))) {
+									if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+										if ((otherBlock = getBlock(bPos + glm::ivec3(1, 0, 1)))) {
+											if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+												extend = { 1, 0, 1 };
+											}
+										}
+									}
+								}
+							} else {
+								if ((otherBlock = getBlock(bPos + glm::ivec3(0, 0, -1)))) {
+									if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+										if ((otherBlock = getBlock(bPos + glm::ivec3(1, 0, -1)))) {
+											if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+												continue;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
-				//}
 			}
 
 			Instance* i = nullptr;
