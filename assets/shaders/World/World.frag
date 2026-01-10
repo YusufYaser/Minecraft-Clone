@@ -10,7 +10,7 @@ flat in float face;
 flat in int instanceId;
 flat in vec3 blockPosOffset;
 flat in vec3 fPlayerPos;
-flat in uint fBlockType;
+flat in ivec4 fBlockTypes;
 flat in float fFogSize;
 flat in int fRenderDistance;
 flat in vec3 fExtend;
@@ -41,16 +41,22 @@ void main() {
     tc.y *= 1 + fExtend.z;
     tc.y -= floor(tc.y);
 
+    ivec2 mergePos = ivec2(0);
+
     vec3 blockPos = blockPosOffset + fPlayerPos;
 	if (fExtend.x > 0 && vertex.x > 0) {
         blockPos.x += fExtend.x;
+        mergePos.x += 1;
     }
 	if (fExtend.z > 0 && vertex.z > 0) {
         blockPos.z += fExtend.z;
+        mergePos.y += 1;
     }
 
-    if (fBlockType == 3 && face == 5 || fBlockType == 12 && face == 5 ||
-        (fBlockType != 3 && fBlockType != 12 && fBlockType != 7 && fBlockType != 10 && fBlockType != 11)) {
+    uint blockType = fBlockTypes[mergePos.x + mergePos.y * 2];
+
+    if (blockType == 3 && face == 5 || blockType == 12 && face == 5 ||
+        (blockType != 3 && blockType != 12 && blockType != 7 && blockType != 10 && blockType != 11)) {
         vec3 p = fract((blockPos) * 0.1031);
         p += dot(p, p.yxz + 19.19);
         if (fract((p.x + p.y) * p.z) > 0.5f) {
@@ -60,7 +66,7 @@ void main() {
         }
     }
 
-    vec4 range = atlasRanges[fBlockType];
+    vec4 range = atlasRanges[blockType];
     vec2 size = vec2(range.z - range.x, range.w - range.y);
 
     if ((range.x == range.z) || (range.y == range.w)) {

@@ -50,7 +50,7 @@ int World::getHeight(glm::ivec2 pos) {
 		return 7;
 	}
 	if (generator == Generator::Debug) {
-		return 1;
+		return 2;
 	}
 	if (generator == Generator::Void) {
 		return 1;

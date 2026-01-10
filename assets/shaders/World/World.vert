@@ -4,7 +4,7 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec2 inTexCoord;
 layout(location = 2) in float inFace;
 layout(location = 3) in vec3 inBlockPos;
-layout(location = 4) in uint inBlockType;
+layout(location = 4) in ivec4 inBlockTypes;
 layout(location = 5) in vec3 inExtend;
 
 out vec2 texCoord;
@@ -13,7 +13,7 @@ flat out float face;
 flat out int instanceId;
 flat out vec3 blockPosOffset;
 flat out vec3 fPlayerPos;
-flat out uint fBlockType;
+flat out ivec4 fBlockTypes;
 flat out float fFogSize;
 flat out int fRenderDistance;
 flat out vec3 fExtend;
@@ -36,7 +36,7 @@ void main() {
     }
 
 	vec3 pos2 = position;
-	if (inBlockType == 7 && pos2.y > 0) {
+	if (inBlockTypes[0] == 7 && pos2.y > 0) {
 		pos2 -= vec3(0, .05f * 2, 0);
 	}
 
@@ -50,7 +50,7 @@ void main() {
 	instanceId = gl_InstanceID;
 	blockPosOffset = inBlockPosOffset;
 	fPlayerPos = playerPos;
-	fBlockType = inBlockType;
+	fBlockTypes = inBlockTypes;
 	fFogSize = fogSize;
 	fRenderDistance = renderDistance;
 	fExtend = inExtend;

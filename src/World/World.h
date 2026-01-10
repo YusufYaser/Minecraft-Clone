@@ -120,7 +120,7 @@ struct Chunk {
 
 struct BlockOffsetData {
 	glm::vec3 pos;
-	uint8_t blockType;
+	glm::ivec4 blockTypes;
 	glm::vec3 extend;
 };
 

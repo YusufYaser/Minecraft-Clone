@@ -75,7 +75,8 @@ void World::chunkLoaderFunc() {
 		if (generator == Generator::Debug) {
 			for (int x = pos.x * 16; x < 16 + pos.x * 16; x++) {
 				for (int z = pos.y * 16; z < 16 + pos.y * 16; z++) {
-					setBlock(glm::ivec3(x, 0, z), std::abs(x) % 2 != std::abs(z) % 2 ? BLOCK_TYPE::STONE : BLOCK_TYPE::DIRT, false);
+					setBlock(glm::ivec3(x, 0, z), BLOCK_TYPE::BEDROCK, false);
+					setBlock(glm::ivec3(x, 1, z), std::abs(x) % 2 != std::abs(z) % 2 ? BLOCK_TYPE::STONE : BLOCK_TYPE::DIRT, false);
 
 					if (z < 0) continue;
 
@@ -83,7 +84,7 @@ void World::chunkLoaderFunc() {
 						if (x % 2 != 0 || z % 2 != 0) continue;
 						if ((z * 5 - x) / 2 >= BLOCK_TYPE_COUNT) continue;
 
-						setBlock(glm::ivec3(x, 2, z), BLOCK_TYPE((z * 5 - x) / 2), false);
+						setBlock(glm::ivec3(x, 3, z), BLOCK_TYPE((z * 5 - x) / 2), false);
 					}
 				}
 			}

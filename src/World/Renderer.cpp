@@ -62,30 +62,38 @@ void World::instancesPreparer(int c) {
 			if (structType == BLOCK_STRUCTURE_TYPE::PLANT) hiddenFaces = 0;
 
 			glm::ivec3 extend = {};
+			glm::ivec4 blockTypes = { type, 0, 0, 0 };
 
 			if (game->getMergeSize() != MergeSize::None && !generatingChunks.load() && (hiddenFaces == 31 || hiddenFaces == 47)) {
 				Block* otherBlock = nullptr;
+
+				bool isWater = type == BLOCK_TYPE::WATER;
+
 				if (bPos.x % 2 && (otherBlock = getBlock(bPos + glm::ivec3(-1, 0, 0)))) {
-					if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) continue;
+					if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) continue;
 				} else if ((bPos.x % 2) == 0 && (otherBlock = getBlock(bPos + glm::ivec3(1, 0, 0)))) {
-					if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+					if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
 						extend = { 1, 0, 0 };
+						blockTypes[1] = (int)otherBlock->getType();
 						if (game->getMergeSize() == MergeSize::TwoByTwo) {
 							if ((bPos.z % 2) == 0) {
 								if ((otherBlock = getBlock(bPos + glm::ivec3(0, 0, 1)))) {
-									if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+									if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
+										BLOCK_TYPE prevBlockType = otherBlock->getType();
 										if ((otherBlock = getBlock(bPos + glm::ivec3(1, 0, 1)))) {
-											if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+											if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
 												extend = { 1, 0, 1 };
+												blockTypes[2] = (int)prevBlockType;
+												blockTypes[3] = (int)otherBlock->getType();;
 											}
 										}
 									}
 								}
 							} else {
 								if ((otherBlock = getBlock(bPos + glm::ivec3(0, 0, -1)))) {
-									if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+									if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
 										if ((otherBlock = getBlock(bPos + glm::ivec3(1, 0, -1)))) {
-											if (otherBlock->getType() == type && otherBlock->hiddenFaces == hiddenFaces) {
+											if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
 												continue;
 											}
 										}
@@ -122,7 +130,7 @@ void World::instancesPreparer(int c) {
 				instancesCache[hiddenFaces].push_back(i);
 			}
 
-			i->offsets.push_back(BlockOffsetData{ bPos, (uint8_t)type, extend });
+			i->offsets.push_back(BlockOffsetData{ bPos, blockTypes, extend });
 		}
 
 		chunk->renderingGroupsMutex.unlock();
@@ -332,7 +340,7 @@ void World::render() {
 		glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
 
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(BlockOffsetData), 0);
-		glVertexAttribIPointer(4, 1, GL_UNSIGNED_BYTE, sizeof(BlockOffsetData), (void*)offsetof(BlockOffsetData, blockType));
+		glVertexAttribIPointer(4, 4, GL_INT, sizeof(BlockOffsetData), (void*)offsetof(BlockOffsetData, blockTypes));
 		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(BlockOffsetData), (void*)offsetof(BlockOffsetData, extend));
 		glEnableVertexAttribArray(3);
 		glEnableVertexAttribArray(4);
