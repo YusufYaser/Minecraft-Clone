@@ -4,7 +4,6 @@
 Block* World::getBlock(glm::ivec3 pos) {
 	if (pos.y >= MAX_HEIGHT || pos.y < 0) return nullptr;
 
-	std::size_t blockCh = hashPos(pos);
 	std::size_t chunkCh = hashPos(getPosChunk(pos));
 
 	chunksMutex.lock();
