@@ -58,11 +58,15 @@ void Player::update() {
 
 	for (int i = 0; i < 9; i++) {
 		ItemStack* item = m_items[i];
-		if (item == nullptr) continue;
-		m_inventoryImage->setColor(i == slot ? glm::vec4(1.0f, 1.0f, 1.0f, 1.0f) : glm::vec4(.5f, .5f, .5f, 1.0f));
 		m_inventoryImage->setPosition({ .5f, -236 + (52 * i) + 28, 1, -32 });
 		m_inventoryImage->setCrop({ 1.0f / getAnimationFrameCount(item->block), 1.0f / 6.0f });
-		m_inventoryImage->setTexture(getTexture(getTextureName(m_items[i]->block)));
+		if (item != nullptr && item->block != BLOCK_TYPE::NONE && item->block != BLOCK_TYPE::AIR) {
+			m_inventoryImage->setColor(i == slot ? glm::vec4(1.0f, 1.0f, 1.0f, 1.0f) : glm::vec4(.5f, .5f, .5f, 1.0f));
+			m_inventoryImage->setTexture(getTexture(getTextureName(m_items[i]->block)));
+		} else {
+			m_inventoryImage->setColor(i == slot ? glm::vec4(.2f, .2f, .2f, 0.5f) : glm::vec4(.1f, .1f, .1f, .5f));
+			m_inventoryImage->setTexture(getTexture("white"));
+		}
 		m_inventoryImage->render();
 	}
 	if (wasDebug) {

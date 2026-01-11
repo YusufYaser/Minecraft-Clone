@@ -43,7 +43,7 @@ TextureAtlas* initializeTextures() {
 		}
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, &invalidTexData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, invalidTexData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	Texture* tex = textures["invalid"];
@@ -56,6 +56,19 @@ TextureAtlas* initializeTextures() {
 
 	Texture* black = new Texture();
 	textures["black"] = black;
+
+	glGenTextures(1, &ID);
+	glBindTexture(GL_TEXTURE_2D, ID);
+
+	uint8_t whitePixel[4] = { 255, 255, 255, 255 };
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, whitePixel);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	Texture* white = new Texture();
+	white->id = ID;
+	white->height = 1;
+	white->width = 1;
+	textures["white"] = white;
 
 	recursive_directory_iterator it;
 	try {

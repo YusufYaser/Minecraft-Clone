@@ -43,20 +43,6 @@ void World::instancesPreparer(int c) {
 
 			BLOCK_STRUCTURE_TYPE structType = getStructureType(type);
 
-			if (!transparent && (bPos.x % 2) == 0 && structType == BLOCK_STRUCTURE_TYPE::FULL_BLOCK) {
-				for (int i = 0; i < 6; i++) {
-					if ((hiddenFaces & (1 << i))) continue;
-					glm::ivec3 faceDir = getBlockFaceDirection(BLOCK_FACE(i));
-					glm::ivec3 d = glm::ivec3(diff) * faceDir;
-
-					if (d.x > maxDist.x || d.y > maxDist.y || d.z > maxDist.z) {
-						hiddenFaces += 1 << i;
-					}
-				}
-
-				if (hiddenFaces == 63) continue;
-			}
-
 			const float half = .5f;
 
 			if (structType == BLOCK_STRUCTURE_TYPE::PLANT) hiddenFaces = 0;
@@ -64,7 +50,7 @@ void World::instancesPreparer(int c) {
 			glm::ivec3 extend = {};
 			glm::ivec4 blockTypes = { type, 0, 0, 0 };
 
-			if (game->getMergeSize() != MergeSize::None && !generatingChunks.load() && (hiddenFaces == 31 || hiddenFaces == 47)) {
+			if (game->getMergeSize() != MergeSize::None && !generatingChunks.load() && (hiddenFaces == 31 || hiddenFaces == 47 || hiddenFaces == 15)) {
 				Block* otherBlock = nullptr;
 
 				bool isWater = type == BLOCK_TYPE::WATER;
@@ -103,6 +89,20 @@ void World::instancesPreparer(int c) {
 						}
 					}
 				}
+			}
+
+			if (!transparent && (bPos.x % 2) == 0 && structType == BLOCK_STRUCTURE_TYPE::FULL_BLOCK) {
+				for (int i = 0; i < 6; i++) {
+					if ((hiddenFaces & (1 << i))) continue;
+					glm::ivec3 faceDir = getBlockFaceDirection(BLOCK_FACE(i));
+					glm::ivec3 d = glm::ivec3(diff) * faceDir;
+
+					if (d.x > maxDist.x || d.y > maxDist.y || d.z > maxDist.z) {
+						hiddenFaces += 1 << i;
+					}
+				}
+
+				if (hiddenFaces == 63) continue;
 			}
 
 			Instance* i = nullptr;
