@@ -351,6 +351,11 @@ void WorldSelector::render() {
 		WorldSettings settings;
 		settings.name = "Temporary World";
 		settings.internalWorld = true;
+		settings.structuresCount = STRUCTURES_COUNT;
+		settings.allStructures = true;
+		for (int i = 0; i < settings.structuresCount; i++) {
+			settings.structures[i] = (STRUCTURE_TYPE)i;
+		}
 
 		game->loadWorld(settings);
 	}
