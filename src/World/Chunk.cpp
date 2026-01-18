@@ -303,14 +303,14 @@ bool World::saveChunk(Chunk* chunk) {
 		chunk->blocksMutex.lock();
 		for (auto& block : chunk->blocks) {
 			if (block == nullptr) continue;
-			glm::ivec3 rPos = block->getPos();
+			glm::ivec3 rPos = block->pos;
 			glm::ivec2 cPos = getPosChunk(rPos);
 			glm::ivec3 pos = {
 				rPos.x - (cPos.x * 16),
 				rPos.y,
 				rPos.z - (cPos.y * 16),
 			};
-			saveData->blocks[pos.y][pos.x][pos.z] = block->getType();
+			saveData->blocks[pos.y][pos.x][pos.z] = block->type;
 		}
 		chunk->blocksMutex.unlock();
 

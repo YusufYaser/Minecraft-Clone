@@ -488,7 +488,7 @@ void Game::update() {
 
 	if (m_world == nullptr) m_gamePaused = true;
 
-	glfwSetInputMode(getGlfwWindow(), GLFW_CURSOR, m_gamePaused ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+	glfwSetInputMode(getGlfwWindow(), GLFW_CURSOR, m_gamePaused ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
 	m_gameWindow->update();
 
@@ -552,7 +552,7 @@ void Game::update() {
 			// uniform sampler3D colorLUT
 			glActiveTexture(GL_TEXTURE2);
 			Block* collBlock = m_world->getBlock(glm::round(m_player->getCameraPos()));
-			if (collBlock != nullptr && collBlock->getType() == BLOCK_TYPE::WATER) {
+			if (collBlock != nullptr && collBlock->type == BLOCK_TYPE::WATER) {
 				glBindTexture(GL_TEXTURE_3D, getTexture("water.lut")->id);
 			} else {
 				glBindTexture(GL_TEXTURE_3D, getTexture("default.lut")->id);
@@ -593,9 +593,9 @@ void Game::update() {
 		glm::ivec3 iPos = glm::round(m_player->getPos());
 
 		Block* upBlock = m_world->getBlock(iPos + glm::ivec3(0, 1, 0));
-		if (upBlock != nullptr && upBlock->getType() != BLOCK_TYPE::WATER) {
+		if (upBlock != nullptr && upBlock->type != BLOCK_TYPE::WATER) {
 			m_collOverlay->setTexture(getTexture(upBlock->getName()));
-			m_collOverlay->setCrop({ 1.0f / getAnimationFrameCount(upBlock->getType()), 1.0f / 6.0f });
+			m_collOverlay->setCrop({ 1.0f / getAnimationFrameCount(upBlock->type), 1.0f / 6.0f });
 			if (!m_gamePaused) {
 				m_collOverlay->setColor({ .25f, .25f, .25f, 1.0f });
 			} else {

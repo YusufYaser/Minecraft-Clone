@@ -72,7 +72,7 @@ void Entity::physicsUpdate(float delta) {
 			if (!block->hasCollision()) continue;
 
 			verticalVelocity = 0;
-			pos.y = block->getPos().y + 1.0f;
+			pos.y = block->pos.y + 1.0f;
 
 			break;
 		}
@@ -98,7 +98,7 @@ void Entity::physicsUpdate(float delta) {
 		Block* collBlock = world->getBlock(iPos);
 		if (collBlock != nullptr && collBlock->hasCollision()) {
 			verticalVelocity = 0;
-			pos.y = collBlock->getPos().y + 1.0f;
+			pos.y = collBlock->pos.y + 1.0f;
 			iPos = glm::floor(pos);
 			iPos.y = static_cast<int>(floor(pos.y));
 		}

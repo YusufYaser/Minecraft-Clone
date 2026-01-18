@@ -7,14 +7,8 @@ Block* World::getBlock(glm::ivec3 pos) {
 	std::size_t chunkCh = hashPos(getPosChunk(pos));
 
 	chunksMutex.lock();
-	auto cit = chunks.find(chunkCh);
-	if (cit == chunks.end()) {
-		chunksMutex.unlock();
-		return nullptr; // chunk not loaded
-	}
+	Chunk* chunk = chunks[chunkCh];
 	chunksMutex.unlock();
-
-	Chunk* chunk = cit->second;
 	if (chunk == nullptr) return nullptr;
 	if (chunk->maxHeight < pos.y) return nullptr;
 
@@ -26,7 +20,7 @@ Block* World::getBlock(glm::ivec3 pos) {
 }
 
 void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
-	if (type == BLOCK_TYPE::NONE) return;
+	if (type == BLOCK_TYPE::NONE || (uint8_t)type < 0 || (uint8_t)type >= BLOCK_TYPE_COUNT) return;
 
 	start.y = std::min(MAX_HEIGHT, std::max(0, start.y));
 	end.y = std::min(MAX_HEIGHT, std::max(0, end.y));
@@ -99,7 +93,7 @@ void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
 }
 
 Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
-	if (type == BLOCK_TYPE::NONE) return nullptr;
+	if (type == BLOCK_TYPE::NONE || (uint8_t)type < 0 || (uint8_t)type >= BLOCK_TYPE_COUNT) return nullptr;
 
 	if (pos.y < 0 || pos.y >= MAX_HEIGHT) return nullptr;
 	if (unloading.load()) return nullptr;
@@ -146,7 +140,7 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 
 	if (type == BLOCK_TYPE::AIR) {
 		for (int i = 0; i < 6; i++) {
-			Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
+			Block* otherBlock = getBlock(pos + faceDirections[i]);
 			if (otherBlock == nullptr) continue;
 			int opposite = (i % 2 == 0) ? i + 1 : i - 1;
 			if ((otherBlock->hiddenFaces & (1 << opposite)) != 0) {
@@ -162,13 +156,13 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 	block = new Block(type, pos);
 
 	for (int i = 0; i < 6; i++) {
-		Block* otherBlock = getBlock(pos + getBlockFaceDirection((BLOCK_FACE)i));
+		Block* otherBlock = getBlock(pos + faceDirections[i]);
 		if (otherBlock == nullptr) continue;
 		int opposite = (i % 2 == 0) ? i + 1 : i - 1;
 		if (block->hasTransparency() != otherBlock->hasTransparency()) {
 			if (block->hasTransparency()) {
 				hiddenFaces |= 1 << i;
-			} else if (otherBlock->getType() != BLOCK_TYPE::WATER || opposite != int(BLOCK_FACE::TOP)) {
+			} else if (otherBlock->type != BLOCK_TYPE::WATER || opposite != int(BLOCK_FACE::TOP)) {
 				if ((otherBlock->hiddenFaces & (1 << opposite)) == 0) {
 					otherBlock->hiddenFaces ^= 1 << opposite;
 				}
@@ -197,8 +191,8 @@ Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
 }
 
 void World::setRenderingGroup(Block* block) {
-	std::size_t blockCh = hashPos(block->getPos());
-	std::size_t chunkCh = hashPos(getPosChunk(block->getPos()));
+	std::size_t blockCh = hashPos(block->pos);
+	std::size_t chunkCh = hashPos(getPosChunk(block->pos));
 
 	chunksMutex.lock();
 	auto cit = chunks.find(chunkCh);
@@ -209,7 +203,7 @@ void World::setRenderingGroup(Block* block) {
 
 	Chunk* chunk = cit->second;
 
-	BLOCK_TYPE type = block->getType();
+	BLOCK_TYPE type = block->type;
 	chunk->renderingGroupsMutex.lock();
 	if (block == nullptr || block->hiddenFaces == 63) {
 		std::vector<Block*>::iterator end = chunk->blocksToRender.end();
@@ -229,7 +223,7 @@ void World::setRenderingGroup(Block* block) {
 	}
 	chunk->renderingGroupsMutex.unlock();
 
-	glm::ivec3 pos = block->getPos();
+	glm::ivec3 pos = block->pos;
 	std::size_t ch = hashPos(pos);
 
 	chunk->renderingGroupsMutex.lock();

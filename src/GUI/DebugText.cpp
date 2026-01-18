@@ -152,11 +152,11 @@ void DebugText::render() {
 		if (targetBlock != nullptr) {
 			text << "Target Block:\n";
 			if (l == 2) text << " * " << targetBlock << "\n";
-			glm::vec3 bPos = targetBlock->getPos();
+			glm::vec3 bPos = targetBlock->pos;
 			text << " * Position: " << round(bPos.x * 100) / 100;
 			text << ", " << round(bPos.y * 100) / 100;
 			text << ", " << round(bPos.z * 100) / 100 << "\n";
-			text << " * Type: " << (int)targetBlock->getType() << " (" << targetBlock->getName() << ")\n";
+			text << " * Type: " << (int)targetBlock->type << " (" << targetBlock->getName() << ")\n";
 			text << " * Ambient Light: " << world->getAmbientLight() << "\n";
 
 #ifdef GAME_DEBUG

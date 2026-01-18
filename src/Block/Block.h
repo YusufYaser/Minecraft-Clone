@@ -50,11 +50,25 @@ BlockStructureData* createBlockStructureData(BLOCK_STRUCTURE_TYPE type, uint8_t 
 
 BLOCK_STRUCTURE_TYPE getStructureType(BLOCK_TYPE type);
 
-glm::ivec3 getBlockFaceDirection(BLOCK_FACE face);
+inline constexpr glm::ivec3 faceDirections[6] = {
+	{ 0, 0, 1 },
+	{ 0, 0, -1 },
+	{ 1, 0, 0 },
+	{ -1, 0, 0 },
+	{ 0, -1, 0 },
+	{ 0, 1, 0 }
+};
+
+inline constexpr bool blocksTransparencies[BLOCK_TYPE_COUNT] = {
+	0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0
+};
+
+inline constexpr bool blocksCollisions[BLOCK_TYPE_COUNT] = {
+	1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1
+};
+
 const char* getTextureName(BLOCK_TYPE type);
 int getAnimationFrameCount(BLOCK_TYPE type);
-bool blockTypeHasCollision(BLOCK_TYPE type);
-bool isBlockTypeTransparent(BLOCK_TYPE type);
 
 #ifdef GAME_DEBUG
 enum class BLOCK_PLACEMENT_METHOD {
@@ -66,23 +80,19 @@ enum class BLOCK_PLACEMENT_METHOD {
 
 class Block {
 public:
-	Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces = 0);
+	Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces = 0) : type(type), pos(pos), hiddenFaces(hiddenFaces) {};
 
 	void Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTexture = true);
 	const char* getName() const { return getTextureName(type); };
-	glm::ivec3 getPos() const { return pos; };
-	BLOCK_TYPE getType() const { return type; };
-	bool hasCollision() const { return blockTypeHasCollision(type); };
-	bool hasTransparency() const { return isBlockTypeTransparent(type); };
+	bool hasCollision() const { return blocksCollisions[(uint8_t)type]; };
+	bool hasTransparency() const { return blocksTransparencies[(uint8_t)type]; };
 
 #ifdef GAME_DEBUG
 	BLOCK_PLACEMENT_METHOD dPlacementMethod = BLOCK_PLACEMENT_METHOD::UNKNOWN;
 #endif
 
-private:
-	glm::ivec3 pos;
-	BLOCK_TYPE type;
-
 public:
+	const glm::ivec3 pos;
+	const BLOCK_TYPE type;
 	uint8_t hiddenFaces;
 };

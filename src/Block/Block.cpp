@@ -105,31 +105,6 @@ BLOCK_STRUCTURE_TYPE getStructureType(BLOCK_TYPE type) {
 	}
 }
 
-glm::ivec3 getBlockFaceDirection(BLOCK_FACE face) {
-	switch (face) {
-	case BLOCK_FACE::FRONT:
-		return glm::ivec3(0.0f, 0.0f, 1.0f);
-
-	case BLOCK_FACE::BACK:
-		return glm::ivec3(0.0f, 0.0f, -1.0f);
-
-	case BLOCK_FACE::TOP:
-		return glm::ivec3(0.0f, 1.0f, 0.0f);
-
-	case BLOCK_FACE::BOTTOM:
-		return glm::ivec3(0.0f, -1.0f, 0.0f);
-
-	case BLOCK_FACE::RIGHT:
-		return glm::ivec3(1.0f, 0.0f, 0.0f);
-
-	case BLOCK_FACE::LEFT:
-		return glm::ivec3(-1.0f, 0.0f, 0.0f);
-
-	default:
-		return glm::ivec3();
-	}
-}
-
 const char* getTextureName(BLOCK_TYPE type) {
 	switch (type) {
 	case BLOCK_TYPE::AIR:
@@ -176,35 +151,6 @@ const char* getTextureName(BLOCK_TYPE type) {
 int getAnimationFrameCount(BLOCK_TYPE type) {
 	Texture* tex = getTexture(getTextureName(type));
 	return static_cast<int>(round(tex->width / (static_cast<float>(tex->height) / 6.0f)));
-}
-
-bool blockTypeHasCollision(BLOCK_TYPE type) {
-	switch (type) {
-	case BLOCK_TYPE::WATER:
-	case BLOCK_TYPE::FLOWER:
-		return false;
-
-	default:
-		return true;
-	}
-}
-
-bool isBlockTypeTransparent(BLOCK_TYPE type) {
-	switch (type) {
-	case BLOCK_TYPE::WATER:
-	case BLOCK_TYPE::OAK_LEAVES:
-	case BLOCK_TYPE::FLOWER:
-		return true;
-
-	default:
-		return false;
-	}
-}
-
-Block::Block(BLOCK_TYPE type, glm::ivec3 pos, uint8_t hiddenFaces) {
-	Block::type = type;
-	Block::pos = pos;
-	Block::hiddenFaces = hiddenFaces;
 }
 
 void Block::Render(Shader* shader, uint8_t additionalHiddenFaces, bool bindTexture) {

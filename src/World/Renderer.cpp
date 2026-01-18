@@ -3,30 +3,8 @@
 #include <algorithm>
 #include <execution>
 
-Block* getBlockCached(Block* cache[][16][16], World* world, glm::ivec3 pos) {
-	glm::ivec2 cPos = getPosChunk(pos);
-	glm::ivec3 pos2 = {
-		pos.x - (cPos.x * 16),
-		pos.y,
-		pos.z - (cPos.y * 16),
-	};
-
-	Block** pBlock = &(cache[pos2.y][pos2.x][pos2.z]);
-
-	if (*pBlock == (Block*)1) return nullptr;
-	if (*pBlock) return *pBlock;
-
-	*pBlock = world->getBlock(pos);
-	if (*pBlock == nullptr) {
-		*pBlock = (Block*)1;
-		return nullptr;
-	}
-
-	return *pBlock;
-}
-
 void World::instancesPreparer(int c) {
-	std::vector<Instance*> instancesCache[2][2][64];
+	Instance* instancesCache[2][2][64] = {};
 	Player* player = nullptr;
 	Game* game = Game::getInstance();
 
@@ -55,56 +33,73 @@ void World::instancesPreparer(int c) {
 
 		if (!chunk->renderingGroupsMutex.try_lock()) continue;
 
-		Block* blocksCache[MAX_HEIGHT][16][16] = {};
+		bool generatingChunksCached = generatingChunks.load();
 
 		for (auto& block : chunk->blocksToRender) {
-			BLOCK_TYPE type = block->getType();
+			BLOCK_TYPE type = block->type;
 
-			const glm::ivec3& bPos = block->getPos();
+			const glm::ivec3& bPos = block->pos;
 			const glm::vec3 diff = glm::vec3(bPos) - pos;
 			uint8_t hiddenFaces = block->hiddenFaces;
-			bool transparent = isBlockTypeTransparent(type);
+			bool transparent = block->hasTransparency();
 
 			BLOCK_STRUCTURE_TYPE structType = getStructureType(type);
 
-			const float half = .5f;
-
 			if (structType == BLOCK_STRUCTURE_TYPE::PLANT) hiddenFaces = 0;
+
+			uint8_t newHiddenFaces = block->hiddenFaces;
+			if (!transparent && structType == BLOCK_STRUCTURE_TYPE::FULL_BLOCK) {
+				for (int i = 0; i < 6; i++) {
+					if ((hiddenFaces & (1 << i))) continue;
+					glm::ivec3 dir = faceDirections[i];
+
+					if ((diff.y * dir.y > maxDist.y) ||
+						(diff.x * dir.x > maxDist.x) ||
+						(diff.z * dir.z > maxDist.z)
+						) {
+						newHiddenFaces += 1 << i;
+					}
+				}
+
+				if (newHiddenFaces == 63) continue;
+			}
 
 			glm::ivec3 extend = {};
 			glm::ivec4 blockTypes = { type, 0, 0, 0 };
 
-			if (game->getMergeSize() != MergeSize::None && !generatingChunks.load() && (hiddenFaces == 31 || hiddenFaces == 47 || hiddenFaces == 15)) {
+			bool xOdd = bPos.x & 1;
+			bool zOdd = bPos.z & 1;
+			MergeSize mergeSize = game->getMergeSize();
+
+			if (mergeSize == MergeSize::OneByTwo && !generatingChunksCached && (hiddenFaces == 31 || hiddenFaces == 47 || hiddenFaces == 15)) {
 				Block* otherBlock = nullptr;
 
-				bool isWater = type == BLOCK_TYPE::WATER;
-
-				if (bPos.x % 2 && (otherBlock = getBlockCached(blocksCache, this, bPos + glm::ivec3(-1, 0, 0)))) {
-					if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) continue;
-				} else if ((bPos.x % 2) == 0 && (otherBlock = getBlockCached(blocksCache, this, bPos + glm::ivec3(1, 0, 0)))) {
-					if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
-						extend = { 1, 0, 0 };
-						blockTypes[1] = (int)otherBlock->getType();
-						if (game->getMergeSize() == MergeSize::TwoByTwo) {
-							if ((bPos.z % 2) == 0) {
-								if ((otherBlock = getBlockCached(blocksCache, this, bPos + glm::ivec3(0, 0, 1)))) {
-									if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
-										BLOCK_TYPE prevBlockType = otherBlock->getType();
-										if ((otherBlock = getBlockCached(blocksCache, this, bPos + glm::ivec3(1, 0, 1)))) {
-											if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
-												extend = { 1, 0, 1 };
-												blockTypes[2] = (int)prevBlockType;
-												blockTypes[3] = (int)otherBlock->getType();;
+				if (xOdd && (otherBlock = getBlock(bPos + glm::ivec3(-1, 0, 0)))) {
+					if (otherBlock->hiddenFaces == hiddenFaces) continue;
+				} else if (!xOdd && (otherBlock = getBlock(bPos + glm::ivec3(1, 0, 0)))) {
+					if (otherBlock->hiddenFaces == hiddenFaces) {
+						extend.x = 1;
+						blockTypes[1] = (int)otherBlock->type;
+						if (mergeSize == MergeSize::TwoByTwo) {
+							if (zOdd) {
+								if ((otherBlock = getBlock(bPos + glm::ivec3(0, 0, -1)))) {
+									if (otherBlock->hiddenFaces == hiddenFaces) {
+										if ((otherBlock = getBlock(bPos + glm::ivec3(1, 0, -1)))) {
+											if (otherBlock->hiddenFaces == hiddenFaces) {
+												continue;
 											}
 										}
 									}
 								}
 							} else {
-								if ((otherBlock = getBlockCached(blocksCache, this, bPos + glm::ivec3(0, 0, -1)))) {
-									if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
-										if ((otherBlock = getBlockCached(blocksCache, this, bPos + glm::ivec3(1, 0, -1)))) {
-											if ((isWater == (otherBlock->getType() == BLOCK_TYPE::WATER)) && otherBlock->hiddenFaces == hiddenFaces) {
-												continue;
+								if ((otherBlock = getBlock(bPos + glm::ivec3(0, 0, 1)))) {
+									if (otherBlock->hiddenFaces == hiddenFaces) {
+										BLOCK_TYPE prevBlockType = otherBlock->type;
+										if ((otherBlock = getBlock(bPos + glm::ivec3(1, 0, 1)))) {
+											if (otherBlock->hiddenFaces == hiddenFaces) {
+												extend.z = 1;
+												blockTypes[2] = (int)prevBlockType;
+												blockTypes[3] = (int)otherBlock->type;
 											}
 										}
 									}
@@ -115,25 +110,9 @@ void World::instancesPreparer(int c) {
 				}
 			}
 
-			if (!transparent && (bPos.x % 2) == 0 && structType == BLOCK_STRUCTURE_TYPE::FULL_BLOCK) {
-				for (int i = 0; i < 6; i++) {
-					if ((hiddenFaces & (1 << i))) continue;
-					glm::ivec3 faceDir = getBlockFaceDirection(BLOCK_FACE(i));
-					glm::ivec3 d = glm::ivec3(diff) * faceDir;
+			hiddenFaces = newHiddenFaces;
 
-					if (d.x > maxDist.x || d.y > maxDist.y || d.z > maxDist.z) {
-						hiddenFaces += 1 << i;
-					}
-				}
-
-				if (hiddenFaces == 63) continue;
-			}
-
-			Instance* i = nullptr;
-			for (auto& inst : instancesCache[transparent][(int)structType][hiddenFaces]) {
-				i = inst;
-				break;
-			}
+			Instance* i = instancesCache[transparent][(int)structType][hiddenFaces];
 			if (i == nullptr) {
 				i = new Instance();
 				i->hiddenFaces = hiddenFaces;
@@ -148,7 +127,7 @@ void World::instancesPreparer(int c) {
 				instancesToInit.push_back(i);
 				instancesToInitMutex.unlock();
 
-				instancesCache[transparent][(int)structType][hiddenFaces].push_back(i);
+				instancesCache[transparent][(int)structType][hiddenFaces] = i;
 			}
 
 			i->offsets.push_back(BlockOffsetData{ bPos, blockTypes, extend });
@@ -229,7 +208,7 @@ void World::render() {
 		targetBlock = nullptr;
 	}
 	if (targetBlock != nullptr) {
-		shader->setUniform("highlighted", targetBlock->getPos());
+		shader->setUniform("highlighted", targetBlock->pos);
 	} else {
 		shader->setUniform("highlighted", glm::ivec3(0, -1, 0));
 	}

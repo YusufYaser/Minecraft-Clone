@@ -195,7 +195,7 @@ void Player::checkInputs(float delta) {
 		speed = PLAYER_SPEED;
 	}
 	Block* playerBlock = world->getBlock(glm::round(pos));
-	if (playerBlock != nullptr && playerBlock->getType() == BLOCK_TYPE::WATER && !flying) {
+	if (playerBlock != nullptr && playerBlock->type == BLOCK_TYPE::WATER && !flying) {
 		speed = PLAYER_LIQUID_SPEED;
 	} else if (speed == PLAYER_LIQUID_SPEED) {
 		speed = PLAYER_SPEED;
@@ -254,7 +254,7 @@ void Player::checkInputs(float delta) {
 	getTargetBlock(&targetBlock, &face);
 
 	if (keyHandler->mouseClicked(GLFW_MOUSE_BUTTON_MIDDLE) && targetBlock != nullptr) {
-		BLOCK_TYPE type = targetBlock->getType();
+		BLOCK_TYPE type = targetBlock->type;
 		for (int i = 0; i < 9; i++) {
 			if (m_items[i]->block == type) {
 				slot = i;
@@ -275,19 +275,19 @@ void Player::checkInputs(float delta) {
 				round(pos.z)
 			);
 
-			if (targetBlock->getPos() + getBlockFaceDirection(face) != iPos &&
-				targetBlock->getPos() + getBlockFaceDirection(face) != iPos + glm::ivec3(up)) {
+			if (targetBlock->pos + faceDirections[(uint8_t)face] != iPos &&
+				targetBlock->pos + faceDirections[(uint8_t)face] != iPos + glm::ivec3(up)) {
 
-				Block* replacingBlock = world->getBlock(targetBlock->getPos() + getBlockFaceDirection(face));
-				world->setBlock(targetBlock->getPos() + getBlockFaceDirection(face), m_items[slot]->block,
-					replacingBlock != nullptr && replacingBlock->getType() == BLOCK_TYPE::WATER);
+				Block* replacingBlock = world->getBlock(targetBlock->pos + faceDirections[(uint8_t)face]);
+				world->setBlock(targetBlock->pos + faceDirections[(uint8_t)face], m_items[slot]->block,
+					replacingBlock != nullptr && replacingBlock->type == BLOCK_TYPE::WATER);
 
 				lastModified = glfwGetTime();
 			}
 		}
 
 		if (keyHandler->mouseHeld(GLFW_MOUSE_BUTTON_LEFT) && currentTime > lastModified + .2) {
-			world->setBlock(targetBlock->getPos(), BLOCK_TYPE::AIR);
+			world->setBlock(targetBlock->pos, BLOCK_TYPE::AIR);
 			getTargetBlock(&targetBlock, &face);
 			lastModified = glfwGetTime();
 		}
@@ -362,7 +362,7 @@ void Player::getTargetBlock(Block** block, BLOCK_FACE* face) {
 				float distance = 1000.0f;
 
 				for (int i = 0; i < 6; i++) {
-					glm::ivec3 facePos = getBlockFaceDirection((BLOCK_FACE)i) + targetBlock->getPos();
+					glm::ivec3 facePos = faceDirections[i] + targetBlock->pos;
 					float curDistance = glm::distance(glm::vec3(facePos), blockPosNoCeil);
 					if (curDistance < distance) {
 						curFace = (BLOCK_FACE)i;
@@ -417,7 +417,7 @@ glm::mat4 Player::getProjection() const {
 	}
 
 	Block* collBlock = game->getWorld()->getBlock(glm::round(getCameraPos()));
-	if (collBlock != nullptr && collBlock->getType() == BLOCK_TYPE::WATER && !flying) {
+	if (collBlock != nullptr && collBlock->type == BLOCK_TYPE::WATER && !flying) {
 		FOV -= 25.0f;
 	}
 
