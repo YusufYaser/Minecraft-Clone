@@ -180,7 +180,9 @@ void WorldSelector::render() {
 	back->render();
 	if (game->loadingWorld()) {
 		tempWorld->setEnabled(false);
+#ifdef GAME_DEBUG
 		debugWorld->setEnabled(false);
+#endif
 	}
 	tempWorld->render();
 #ifdef GAME_DEBUG
