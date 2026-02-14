@@ -20,6 +20,7 @@ private:
 	Button* settings;
 	Button* screenshot;
 	Button* mainMenu;
+	Button* newTempWorld;
 
 	SettingsMenu* settingsMenu = nullptr;
 	ScreenshotMenu* screenshotMenu = nullptr;

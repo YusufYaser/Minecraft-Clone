@@ -47,8 +47,10 @@ This is my own Minecraft Clone, a personal project where I attempt to create my 
 - Visual Studio 2022
 - Desktop development with C++
 
+Simply clone this GitHub repository and build with Visual Studio 2022
+
 ## Building on Linux
-To build the game on Linux, you need to run the following commands:
+To build the game on Linux, you need to clone this repository and run the following commands:
 ```sh
 apt install build-essential
 make build

@@ -20,7 +20,7 @@ Block* World::getBlock(glm::ivec3 pos) {
 }
 
 void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
-	if (type == BLOCK_TYPE::NONE || (uint8_t)type < 0 || (uint8_t)type >= BLOCK_TYPE_COUNT) return;
+	if (type == BLOCK_TYPE::NONE || (uint8_t)type >= BLOCK_TYPE_COUNT) return;
 
 	start.y = std::min(MAX_HEIGHT, std::max(0, start.y));
 	end.y = std::min(MAX_HEIGHT, std::max(0, end.y));
@@ -93,7 +93,7 @@ void World::fillBlocks(glm::ivec3 start, glm::ivec3 end, BLOCK_TYPE type) {
 }
 
 Block* World::setBlock(glm::ivec3 pos, BLOCK_TYPE type, bool replace) {
-	if (type == BLOCK_TYPE::NONE || (uint8_t)type < 0 || (uint8_t)type >= BLOCK_TYPE_COUNT) return nullptr;
+	if (type == BLOCK_TYPE::NONE || (uint8_t)type >= BLOCK_TYPE_COUNT) return nullptr;
 
 	if (pos.y < 0 || pos.y >= MAX_HEIGHT) return nullptr;
 	if (unloading.load()) return nullptr;

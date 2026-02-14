@@ -23,6 +23,7 @@ private:
 	Button* newWorld;
 	Button* worldsDirectory;
 	Button* back;
+	Button* tempWorld;
 #ifdef GAME_DEBUG
 	Button* debugWorld;
 #endif

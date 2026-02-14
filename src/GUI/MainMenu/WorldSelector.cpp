@@ -33,11 +33,16 @@ WorldSelector::WorldSelector() {
 	back->setText("Back");
 	back->setPosition({ .5f, 0, 1, -75 });
 
+	tempWorld = new Button();
+	tempWorld->setText("Temporary World");
+	tempWorld->setPosition({ 1, -80, 1, -25 });
+	tempWorld->setSize({ 0, 135, 0, 25 });
+
 #ifdef GAME_DEBUG
 	debugWorld = new Button();
 	debugWorld->setText("Debug World");
-	debugWorld->setPosition({ 1, -65, 1, -25 });
-	debugWorld->setSize({ 0, 100, 0, 25 });
+	debugWorld->setPosition({ 1, -80, 1, -60 });
+	debugWorld->setSize({ 0, 135, 0, 25 });
 #endif
 
 	overflow = new Text();
@@ -173,6 +178,11 @@ void WorldSelector::render() {
 	newWorld->render();
 	worldsDirectory->render();
 	back->render();
+	if (game->loadingWorld()) {
+		tempWorld->setEnabled(false);
+		debugWorld->setEnabled(false);
+	}
+	tempWorld->render();
 #ifdef GAME_DEBUG
 	debugWorld->render();
 #endif
@@ -202,8 +212,8 @@ void WorldSelector::render() {
 			continue;
 		}
 
-		e->playButton->render();
 		if (game->loadingWorld()) e->playButton->setEnabled(false);
+		e->playButton->render();
 
 		bool autoGo = false;
 		if (!autoWentToWorld && getAutoGotoWorld() != "") {
@@ -345,7 +355,7 @@ void WorldSelector::render() {
 	}
 #endif
 
-	if (!autoWentToWorld && getAutoGotoWorld() == "TEMP_WORLD") {
+	if (tempWorld->isClicked() || (!autoWentToWorld && getAutoGotoWorld() == "TEMP_WORLD")) {
 		autoWentToWorld = true;
 
 		WorldSettings settings;

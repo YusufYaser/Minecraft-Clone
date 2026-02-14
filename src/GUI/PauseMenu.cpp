@@ -24,6 +24,10 @@ PauseMenu::PauseMenu() {
 	mainMenu = new Button();
 	mainMenu->setText("Main Menu");
 	mainMenu->setPosition({ .5f, 0, .5f, 100 });
+
+	newTempWorld = new Button();
+	newTempWorld->setText("New Temporary World");
+	newTempWorld->setPosition({ .5f, 0, .5f, 150 });
 }
 
 PauseMenu::~PauseMenu() {
@@ -42,6 +46,7 @@ PauseMenu::~PauseMenu() {
 
 void PauseMenu::render() {
 	Game* game = Game::getInstance();
+	World* world = game->getWorld();
 	static int lastFrame = 0;
 	if (settingsMenu != nullptr && (lastFrame + 1 != game->getFrameNum() || settingsMenu->isClosing())) {
 		delete settingsMenu;
@@ -70,6 +75,10 @@ void PauseMenu::render() {
 	screenshot->render();
 	title->render();
 
+	if (world->isInternal() && world->getName() == "[internal:Temporary World]") {
+		newTempWorld->render();
+	}
+
 	if (resume->isClicked()) {
 		Game::getInstance()->setGamePaused(false);
 	}
@@ -84,5 +93,20 @@ void PauseMenu::render() {
 
 	if (mainMenu->isClicked()) {
 		Game::getInstance()->unloadWorld();
+	}
+
+	if (newTempWorld->isClicked()) {
+		Game::getInstance()->unloadWorld();
+
+		WorldSettings settings;
+		settings.name = "Temporary World";
+		settings.internalWorld = true;
+		settings.structuresCount = STRUCTURES_COUNT;
+		settings.allStructures = true;
+		for (int i = 0; i < settings.structuresCount; i++) {
+			settings.structures[i] = (STRUCTURE_TYPE)i;
+		}
+
+		game->loadWorld(settings);
 	}
 }
